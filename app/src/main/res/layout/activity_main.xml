@@ -13,27 +13,39 @@
         android:layout_weight="1" />
 
     <Button
+        android:id="@+id/button_cnn"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:onClick="ChooseAlgorithmOnClick"
+        android:tag="0"
         android:text="CNN" />
 
     <Button
+        android:id="@+id/button_cnnWithTransferLearning"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:onClick="ChooseAlgorithmOnClick"
+        android:tag="1"
         android:text="CNN with transfer learning" />
 
     <Button
+        android:id="@+id/button_rgbThermalMapping"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:onClick="ChooseAlgorithmOnClick"
+        android:tag="2"
         android:text="RGB-Thermal Mapping" />
 
     <Button
+        android:id="@+id/button_maxMinTemplate"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:onClick="ChooseAlgorithmOnClick"
+        android:tag="3"
         android:text="Max-Min Template" />
 
     <Space
