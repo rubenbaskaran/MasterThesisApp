@@ -41,13 +41,15 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Back"/>
+            android:text="Back"
+            android:onClick="BackOnClick"/>
 
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Save"/>
+            android:text="Save"
+            android:onClick="SaveOnClick"/>
 
     </LinearLayout>
 
