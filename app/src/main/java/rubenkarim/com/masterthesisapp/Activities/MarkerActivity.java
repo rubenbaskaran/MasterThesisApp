@@ -37,6 +37,12 @@ public class MarkerActivity extends AppCompatActivity
         imageView_markerImage.setImageResource(resourceId);
     }
 
+    public void BackOnClick(View view)
+    {
+        Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
+        startActivity(intent);
+    }
+
     public void SubmitOnClick(View view)
     {
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);

@@ -1,5 +1,6 @@
 package rubenkarim.com.masterthesisapp.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,5 +28,8 @@ public class MainActivity extends AppCompatActivity
         GlobalVariables.Algorithms chosenAlgorithm = GlobalVariables.Algorithms.values()[idOfChosenAlgorithm];
         GlobalVariables.setCurrentAlgorithm(chosenAlgorithm);
         Log.e("Chosen algorithm", GlobalVariables.getCurrentAlgorithm().toString());
+
+        Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
+        startActivity(intent);
     }
 }
