@@ -1,6 +1,7 @@
-package rubenkarim.com.masterthesisapp;
+package rubenkarim.com.masterthesisapp.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import rubenkarim.com.masterthesisapp.R;
 
 import android.os.Bundle;
 

@@ -1,16 +1,17 @@
-package rubenkarim.com.masterthesisapp;
+package rubenkarim.com.masterthesisapp.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import rubenkarim.com.masterthesisapp.R;
 
 import android.os.Bundle;
 
-public class OverviewActivity extends AppCompatActivity
+public class MarkerActivity extends AppCompatActivity
 {
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_overview);
+        setContentView(R.layout.activity_marker);
     }
 }
