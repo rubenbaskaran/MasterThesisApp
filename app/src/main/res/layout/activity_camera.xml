@@ -5,14 +5,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="4"
-    tools:context=".Activities.CameraActivity">
+    tools:context=".Activities.CameraActivity"
+    android:id="@+id/linearLayout_CameraActivity">
 
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <TextView
+    <TextureView
+        android:id="@+id/textureView_viewFinder"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
