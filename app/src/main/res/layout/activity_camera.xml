@@ -13,14 +13,14 @@
     <androidx.camera.view.CameraView
         android:id="@+id/previewView_viewFinder"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="400dp"
         android:layout_weight="1"
         android:gravity="center"
         />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="40dp"
         android:layout_weight="0.5"
         android:orientation="horizontal"
         android:weightSum="2">
