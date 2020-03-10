@@ -2,6 +2,7 @@ package rubenkarim.com.masterthesisapp.Activities;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,9 +33,7 @@ public class MarkerActivity extends AppCompatActivity
 
     private void SetPicture()
     {
-        Resources resources = getApplicationContext().getResources();
-        int resourceId = resources.getIdentifier(filename, "drawable", getApplicationContext().getPackageName());
-        imageView_markerImage.setImageResource(resourceId);
+        imageView_markerImage.setImageURI(Uri.parse(filename));
     }
 
     public void BackOnClick(View view)

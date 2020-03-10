@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MasterThesisApp</string>
+    <string name="camera_permission_rationale">We need camera permissions to take a picture</string>
+    <string name="ok">ok</string>
 </resources>
