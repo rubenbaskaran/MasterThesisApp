@@ -106,7 +106,7 @@ public class CameraActivity extends AppCompatActivity{
 
                 @Override
                 public void onError(@NonNull ImageCaptureException exception) {
-                    Log.d(TAG, "onError: " + exception);
+                    Log.e(TAG, "onError: " + exception);
                 }
             });
 
