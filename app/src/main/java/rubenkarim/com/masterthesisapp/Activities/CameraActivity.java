@@ -3,49 +3,65 @@ package rubenkarim.com.masterthesisapp.Activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-
 import com.google.android.material.snackbar.Snackbar;
+import com.google.common.util.concurrent.ListenableFuture;
 
+import java.io.File;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.camera2.Camera2Config;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.CameraXConfig;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.Preview;
+import androidx.camera.core.Preview.Builder;
+import androidx.camera.core.impl.ImageCaptureConfig;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.CameraView;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleOwner;
 import rubenkarim.com.masterthesisapp.R;
 
-public class CameraActivity extends AppCompatActivity {
-
+public class CameraActivity extends AppCompatActivity{
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 10;
-    private static final String TAG= "CameraActivity";
+    private static final String TAG = "CameraActivity";
     private View rootView;
-    private View cameraViewFinder;
+    private CameraView cameraViewFinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
-        cameraViewFinder = findViewById(R.id.textureView_viewFinder);
-
         //Check Permissions:
-        if(!checkCameraPermissions()){
+        if (!checkCameraPermissions()) {
             requestCameraPermissions();
         } else {
             findAndOpenAndroidCamera();
         }
 
+
+
     }
 
     private void findAndOpenAndroidCamera() {
-
+        cameraViewFinder = findViewById(R.id.previewView_viewFinder);
+        cameraViewFinder.bindToLifecycle(this);
     }
-
 
 
     private boolean checkCameraPermissions() {
         int permissionState = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-
         // Check if the Camera permission is already available.
         if (permissionState != PackageManager.PERMISSION_GRANTED) {
             // Camera permission has not been granted.
@@ -94,7 +110,24 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void TakePictureOnClick(View view) {
-        Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
-        startActivity(intent);
+
+        cameraViewFinder.takePicture(
+                new File(String.valueOf(getFilesDir()+"/Image.jpg")),
+                (imageSaver)-> {imageSaver.run();},
+                new ImageCapture.OnImageSavedCallback() {
+
+            @Override
+            public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                Log.d(TAG, "IMAGE SAVE to: " + outputFileResults.getSavedUri());
+            }
+
+            @Override
+            public void onError(@NonNull ImageCaptureException exception) {
+                Log.d(TAG, "ERROR: " + exception);
+            }
+        });
+
+        //Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
+        //startActivity(intent);
     }
 }
