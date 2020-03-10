@@ -66,14 +66,11 @@ public class CameraActivity extends AppCompatActivity{
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
             Snackbar.make(rootView, R.string.camera_permission_rationale, Snackbar
                     .LENGTH_INDEFINITE)
-                    .setAction(R.string.ok, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // Request Camera permission
-                            ActivityCompat.requestPermissions(CameraActivity.this,
-                                    new String[]{Manifest.permission.CAMERA},
-                                    REQUEST_PERMISSIONS_REQUEST_CODE);
-                        }
+                    .setAction(R.string.ok, view -> {
+                        // Request Camera permission
+                        ActivityCompat.requestPermissions(CameraActivity.this,
+                                new String[]{Manifest.permission.CAMERA},
+                                REQUEST_PERMISSIONS_REQUEST_CODE);
                     })
                     .show();
         } else {
