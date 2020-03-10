@@ -22,6 +22,7 @@ import androidx.camera.core.CameraSelector;
 import androidx.camera.core.CameraXConfig;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.core.Preview.Builder;
 import androidx.camera.core.impl.ImageCaptureConfig;
@@ -110,22 +111,25 @@ public class CameraActivity extends AppCompatActivity{
     }
 
     public void TakePictureOnClick(View view) {
-
+            String path = String.valueOf(getBaseContext().getFilesDir());
         cameraViewFinder.takePicture(
-                new File(String.valueOf(getFilesDir()+"/Image.jpg")),
-                (imageSaver)-> {imageSaver.run();},
-                new ImageCapture.OnImageSavedCallback() {
 
-            @Override
-            public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                Log.d(TAG, "IMAGE SAVE to: " + outputFileResults.getSavedUri());
-            }
+                (imageSaver)-> {
+                    Log.d(TAG, "TakePictureOnClick: " + path);
+                    imageSaver.run();},
+                new ImageCapture.OnImageCapturedCallback() {
+                    @Override
+                    public void onCaptureSuccess(@NonNull ImageProxy image) {
+                        super.onCaptureSuccess(image);
+                        Log.d(TAG, "onCaptureSuccess: " +image.getImageInfo());
+                    }
 
-            @Override
-            public void onError(@NonNull ImageCaptureException exception) {
-                Log.d(TAG, "ERROR: " + exception);
+                    @Override
+                    public void onError(@NonNull ImageCaptureException exception) {
+                    Log.d(TAG, "ERROR: " + exception);
             }
-        });
+        }
+        );
 
         //Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
         //startActivity(intent);
