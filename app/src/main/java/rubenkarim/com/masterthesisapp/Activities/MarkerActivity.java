@@ -13,7 +13,7 @@ import rubenkarim.com.masterthesisapp.R;
 public class MarkerActivity extends AppCompatActivity
 {
     ImageView imageView_markerImage;
-    String filename = "default_picture";
+    String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "default_picture";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)

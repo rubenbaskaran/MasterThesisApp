@@ -2,6 +2,7 @@ package rubenkarim.com.masterthesisapp.Activities;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,7 +13,7 @@ import rubenkarim.com.masterthesisapp.R;
 public class OverviewActivity extends AppCompatActivity
 {
     ImageView imageView_patientImage;
-    String filename = "default_picture";
+    String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "default_picture";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -32,9 +33,7 @@ public class OverviewActivity extends AppCompatActivity
 
     private void SetPicture()
     {
-        Resources resources = getApplicationContext().getResources();
-        int resourceId = resources.getIdentifier(filename, "drawable", getApplicationContext().getPackageName());
-        imageView_patientImage.setImageResource(resourceId);
+        imageView_patientImage.setImageURI(Uri.parse(filename));
     }
 
     public void BackOnClick(View view)
