@@ -10,10 +10,17 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.flir.thermalsdk.ErrorCode;
+import com.flir.thermalsdk.androidsdk.BuildConfig;
+import com.flir.thermalsdk.androidsdk.ThermalSdkAndroid;
+import com.flir.thermalsdk.image.ThermalImage;
+import com.flir.thermalsdk.live.Camera;
 import com.flir.thermalsdk.live.CommunicationInterface;
 import com.flir.thermalsdk.live.Identity;
+import com.flir.thermalsdk.live.connectivity.ConnectionStatusListener;
 import com.flir.thermalsdk.live.discovery.DiscoveryEventListener;
 import com.flir.thermalsdk.live.discovery.DiscoveryFactory;
+import com.flir.thermalsdk.live.streaming.ThermalImageStreamListener;
+import com.flir.thermalsdk.log.ThermalLog;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -28,11 +35,12 @@ import androidx.camera.view.CameraView;
 import androidx.core.app.ActivityCompat;
 import rubenkarim.com.masterthesisapp.R;
 
-public class CameraActivity extends AppCompatActivity{
+public class CameraActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 10;
     private static final String TAG = "CameraActivity";
     private View rootView;
     private CameraView cameraViewFinder;
+    private Camera flirCamera;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,14 +48,53 @@ public class CameraActivity extends AppCompatActivity{
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
 
+
+        ThermalLog.LogLevel enableLoggingInDebug = BuildConfig.DEBUG ? ThermalLog.LogLevel.DEBUG : ThermalLog.LogLevel.NONE;
+        //Initialize Flir SDK
+        ThermalSdkAndroid.init(getApplicationContext(), enableLoggingInDebug);
+        flirCamera = new Camera();
+
         //Check Permissions:
         if (!checkPermissions()) {
             requestPermissions();
 
         } else {
             findAndOpenAndroidCamera();
+            findAndOpenFlirCamera();
         }
     }
+
+    private final ThermalImageStreamListener thermalImageStreamListener = () -> {
+        //Is called on a non-UI thread!
+
+    };
+
+    /**
+     * Note it is call on a non-UI thread
+     */
+    private final Camera.Consumer<ThermalImage> handleIncommingImage = (thermalImage)->{
+
+    };
+
+    private final ConnectionStatusListener connectionStatusListener = (connectionStatus, errorCode)->{
+        runOnUiThread(()->{
+            log("ConnectionChange: " + connectionStatus + " ERROR? " + errorCode);
+            switch (connectionStatus){
+                case CONNECTING: break;
+                case CONNECTED:
+                    //STREAM FRAMES
+                    flirCamera.subscribeStream(thermalImageStreamListener);
+                    break;
+                case DISCONNECTING: break;
+                case DISCONNECTED: break;
+                default:
+                    log("WHAT WHY IS DEFAULT CALLED!?: " + connectionStatus);
+            }
+
+        });
+    };
+
+
 
     private void findAndOpenFlirCamera(){
 
@@ -55,14 +102,13 @@ public class CameraActivity extends AppCompatActivity{
             @Override
             public void onCameraFound(Identity identity) {
                 // identity describes a device and is used to connect to device
-
-
-
-
+                log("Identity" + identity.toString());
+                flirCamera.connect(identity, connectionStatusListener);
                 }
 
             @Override
             public void onDiscoveryError(CommunicationInterface communicationInterface, ErrorCode errorCode) {
+                log("Error: " +errorCode);
                 Log.e(TAG, "onDiscoveryError: " + errorCode + " interface: " + communicationInterface);
             }
         };
@@ -151,5 +197,4 @@ public class CameraActivity extends AppCompatActivity{
         textView.append(String.format("%s\n", s));
 
     }
-
 }
