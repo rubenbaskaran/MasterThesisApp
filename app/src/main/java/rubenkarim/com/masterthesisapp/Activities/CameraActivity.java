@@ -72,6 +72,8 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
 
+        MyCameraManager.getInstance().Init(getApplicationContext());
+
         //Check Permissions:
         if (!checkPermissions()) {
             requestPermissions();
@@ -84,75 +86,9 @@ public class CameraActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * Note it is call on a non-UI thread
-     */
-    private final Camera.Consumer<ThermalImage> handleIncommingThermalImage = (thermalImage)->{
-        //The image must not be processed on the UI Thread
-        final ImageView flir_ViewFinder = findViewById(R.id.imageView_flirViewFinder);
-        JavaImageBuffer javaImageBuffer= thermalImage.getImage();
-        final Bitmap bitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
-
-        //To get the visual image from flir:
-        //Fusion fusion = thermalImage.getFusion();
-        //assert fusion != null;
-        //fusion.getPhoto();
-        log("New Image");
-        runOnUiThread(()->{
-            flir_ViewFinder.setImageBitmap(bitmap);
-
-        });
-    };
-
-    private ThermalImageStreamListener thermalImageStreamListener = () -> {
-        //Is called on a non-UI thread!
-        //THIS IS WEIRD!?
-        flirCamera.withImage(this.thermalImageStreamListener, handleIncommingThermalImage);
-    };
-
-    private final ConnectionStatusListener connectionStatusListener = (connectionStatus, errorCode)->{
-        runOnUiThread(()->{
-            log("ConnectionChange: " + connectionStatus + " ERROR? " + errorCode);
-            switch (connectionStatus){
-                case CONNECTING:
-                case DISCONNECTING:
-                case DISCONNECTED:
-                    this.connectionStatus = connectionStatus;
-                    break;
-                case CONNECTED:
-                    //STREAM FRAMES
-                    this.connectionStatus = connectionStatus;
-                    flirCamera.subscribeStream(thermalImageStreamListener);
-                    break;
-                default:
-                    log("WHAT WHY IS DEFAULT CALLED!?: " + connectionStatus);
-            }
-
-        });
-    };
-
-    private DiscoveryEventListener aDiscoveryEventListener = new DiscoveryEventListener() {
-        @Override
-        public void onCameraFound(Identity identity) {
-            // identity describes a device and is used to connect to device
-            log("Identity" + identity.toString());
-            flirCamera.connect(identity, connectionStatusListener);
-        }
-
-
-        @Override
-        public void onDiscoveryError(CommunicationInterface communicationInterface, ErrorCode errorCode) {
-            log("Error: " +errorCode);
-            Log.e(TAG, "onDiscoveryError: " + errorCode + " interface: " + communicationInterface);
-        }
-    };
 
     private void findAndOpenFlirCamera(){
-        if (connectionStatus == ConnectionStatus.DISCONNECTED || connectionStatus == null) {
-            DiscoveryFactory.getInstance().scan(aDiscoveryEventListener, CommunicationInterface.USB);
-        } else {
-            log("Cant open camera ConnectionStatus: " + connectionStatus);
-        }
+
     }
 
 
