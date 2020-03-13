@@ -24,11 +24,9 @@ public class MarkerActivity extends AppCompatActivity
     String marker = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "marker";
     ImageView imageView_markerOne;
     ImageView imageView_markerTwo;
-    int imageVerticalOffset = 0;
+    int imageViewVerticalOffset;
     int imageHeight;
     int imageWidth;
-    int fullscreenWidth;
-    int fullscreenHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -90,43 +88,37 @@ public class MarkerActivity extends AppCompatActivity
         imageView_markerTwo.setImageURI(Uri.parse(marker));
     }
 
-    private void GetCoordinates(ImageView imageView)
+    private void GetCoordinates(ImageView marker)
     {
-        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-        int height = bitmap.getHeight();
-        int width = bitmap.getWidth();
+        Bitmap markerBitmap = ((BitmapDrawable) marker.getDrawable()).getBitmap();
+        int markerVerticalOffset = markerBitmap.getHeight();
+        int markerHorizontalOffset = markerBitmap.getWidth();
         int[] coordinates = new int[2];
-        imageView.getLocationOnScreen(coordinates);
+        marker.getLocationOnScreen(coordinates);
 
-        // TODO: Calibration
-        int x = coordinates[0] + width / 2;
-        int y = coordinates[1] + height / 2 - imageVerticalOffset;
-        Log.e(String.valueOf(imageView.getTag()), "x: " + x + ", y: " + y);
+        int x = coordinates[0] + markerHorizontalOffset / 2;
+        int y = coordinates[1] + markerVerticalOffset / 2 - imageViewVerticalOffset;
+        Log.e(String.valueOf(marker.getTag()), "x: " + x + ", y: " + y);
         GetPixelColor(x, y);
     }
-
 
     private void GetPixelColor(int x, int y)
     {
         View container = findViewById(R.id.linearLayout_MarkerActivity);
-        Bitmap fullscreenBitMap = loadBitmapFromView(container);
+        Bitmap rootElementBitmap = loadBitmapFromView(container);
 
-        fullscreenWidth = fullscreenBitMap.getWidth();
-        fullscreenHeight = fullscreenBitMap.getHeight();
-
-        // Should be replaced with UI restriction
         x = x < 0 ? 0 : Math.min(x, imageWidth - 1);
         y = y < 0 ? 0 : Math.min(y, imageHeight - 1);
 
-        int targetPixel = fullscreenBitMap.getPixel(x, y);
-        Log.e("Target pixel", "x:" + x + ", y: " + y);
+        int targetPixel = rootElementBitmap.getPixel(x, y);
+        Log.e("Target pixel", "x: " + x + ", y: " + y);
         Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
     }
 
     public static Bitmap loadBitmapFromView(View view)
     {
         //Define a bitmap with the same size as the view
-        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),Bitmap.Config.ARGB_8888);
+        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
         //Bind a canvas to it
         Canvas canvas = new Canvas(returnedBitmap);
         // draw the view on the canvas
@@ -141,7 +133,7 @@ public class MarkerActivity extends AppCompatActivity
         super.onWindowFocusChanged(hasFocus);
         int[] coordinates = new int[2];
         imageView_markerImage.getLocationOnScreen(coordinates);
-        imageVerticalOffset = coordinates[1];
+        imageViewVerticalOffset = coordinates[1];
         imageHeight = imageView_markerImage.getHeight();
         imageWidth = imageView_markerImage.getWidth();
         Log.e("Image dimensions", "x: " + imageWidth + ", y: " + imageHeight);
