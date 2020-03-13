@@ -1,6 +1,7 @@
 package rubenkarim.com.masterthesisapp.MyCameraManager;
 
 import android.content.Context;
+import android.hardware.usb.UsbDevice;
 import android.util.Log;
 
 import com.flir.thermalsdk.ErrorCode;
@@ -22,9 +23,10 @@ public class MyCameraManager {
     private static final String TAG = "CameraActivity";
     private Camera flirCamera;
     private ConnectionStatus connectionStatus;
-    private Context cameraActivityContext;
     private boolean hasBeenInitialized = false;
     private ThermalImagelistener thermalImagelistener;
+    private FlirConnectionListener flirConnectionListener = null;
+    private UsbDevice usbDevice;
 
     private static MyCameraManager instance;
 
@@ -53,6 +55,7 @@ public class MyCameraManager {
             ThermalLog.LogLevel enableLoggingInDebug = BuildConfig.DEBUG ? ThermalLog.LogLevel.DEBUG : ThermalLog.LogLevel.NONE;
             ThermalSdkAndroid.init(applicationContext, enableLoggingInDebug);
             flirCamera = new Camera();
+            hasBeenInitialized = true;
         }
     }
 
@@ -61,14 +64,15 @@ public class MyCameraManager {
         this.thermalImagelistener = thermalImagelistener;
     }
 
+    public void subscribeToFlirConnectionStatus(FlirConnectionListener flirConnectionListener){
+        this.flirConnectionListener = flirConnectionListener;
+    }
+
     private void updateThermalListener(ThermalImage thermalImage){
         this.thermalImagelistener.subscribe(thermalImage);
     }
 
-    //---------- below is Flir's crappy setup code ----------//
-    /**
-     * Note it is call on a non-UI thread
-     */
+    //region ---------- Flir's crappy setup code ----------
     private final Camera.Consumer<ThermalImage> handleIncomingThermalImage = this::updateThermalListener;
 
     private ThermalImageStreamListener thermalImageStreamListener = () -> {
@@ -81,10 +85,14 @@ public class MyCameraManager {
                 case CONNECTING:
                 case DISCONNECTING:
                 case DISCONNECTED:
-                    this.connectionStatus = connectionStatus;
+                    if(this.flirConnectionListener != null){
+                        this.flirConnectionListener.onDisconnection(connectionStatus);
+                    }
                     break;
                 case CONNECTED:
-                    this.connectionStatus = connectionStatus;
+                    if(this.flirConnectionListener != null){
+                        this.flirConnectionListener.onConncetion(connectionStatus);
+                    }
                     flirCamera.subscribeStream(thermalImageStreamListener);
                     break;
             }
@@ -101,4 +109,11 @@ public class MyCameraManager {
             Log.e(TAG, "onDiscoveryError: " + errorCode + " interface: " + communicationInterface);
         }
     };
+
+    public void setUsbDevice(UsbDevice usbDevice) {
+        this.usbDevice = usbDevice;
+    }
+    //endregion
+
+
 }

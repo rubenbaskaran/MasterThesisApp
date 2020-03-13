@@ -13,6 +13,7 @@ import android.widget.Button;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
+import rubenkarim.com.masterthesisapp.MyCameraManager.MyCameraManager;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity
 
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         if(usbDevice != null){
+                            MyCameraManager.getInstance().setUsbDevice(usbDevice);
                         }
                     }
                     else {

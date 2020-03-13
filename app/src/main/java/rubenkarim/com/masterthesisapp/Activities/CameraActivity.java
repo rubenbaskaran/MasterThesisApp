@@ -57,13 +57,6 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        try {
-        flirCamera.unsubscribeAllStreams();
-
-            flirCamera.close();
-        } catch (Exception e) {
-            log(e.toString());
-        }
     }
 
     @Override
@@ -72,25 +65,18 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
 
+        //Setup camera manager
         MyCameraManager.getInstance().Init(getApplicationContext());
 
         //Check Permissions:
         if (!checkPermissions()) {
             requestPermissions();
-
         } else {
-            //findAndOpenAndroidCamera();
-            // findAndOpenFlirCamera();
-            log("All permission granted");
+
+
         }
 
     }
-
-
-    private void findAndOpenFlirCamera(){
-
-    }
-
 
     private void findAndOpenAndroidCamera() {
         cameraViewFinder = findViewById(R.id.previewView_viewFinder);
@@ -109,7 +95,6 @@ public class CameraActivity extends AppCompatActivity {
             return false;
         } else {
             Log.i(TAG, "CAMERA permission has already been granted.");
-            log("Permission granted");
             return true;
         }
     }
@@ -167,18 +152,21 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * temporary method
-     * @param s text to be printed to screen
-     */
-    private void log(String s){
-        TextView textView = findViewById(R.id.textView_log);
-        textView.setMovementMethod(new ScrollingMovementMethod());
-        textView.append(String.format("%s\n", s));
-
-    }
-
     public void connectFlir(View view) {
-        findAndOpenFlirCamera();
+        MyCameraManager.getInstance().subscribeToFlirCamera((thermalImage)->{
+            //The image must not be processed on the UI Thread
+            final ImageView flir_ViewFinder = findViewById(R.id.imageView_flirViewFinder);
+            JavaImageBuffer javaImageBuffer= thermalImage.getImage();
+            final Bitmap bitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
+
+            //To get the visual image from flir:
+            //Fusion fusion = thermalImage.getFusion();
+            //assert fusion != null;
+            //fusion.getPhoto();
+            runOnUiThread(()->{
+                flir_ViewFinder.setImageBitmap(bitmap);
+
+            });
+        });
     }
 }
