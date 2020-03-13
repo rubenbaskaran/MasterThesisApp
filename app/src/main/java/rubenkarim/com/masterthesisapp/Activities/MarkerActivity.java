@@ -19,7 +19,7 @@ import rubenkarim.com.masterthesisapp.R;
 public class MarkerActivity extends AppCompatActivity
 {
     ImageView imageView_markerImage;
-    String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "default_picture";
+    String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "color_test";
     String marker = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "marker";
     ImageView imageView_markerOne;
     ImageView imageView_markerTwo;
@@ -86,10 +86,13 @@ public class MarkerActivity extends AppCompatActivity
 
     private void GetCoordinates(ImageView imageView)
     {
+        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        int height = bitmap.getHeight();
+        int width = bitmap.getWidth();
         int[] coordinates = new int[2];
         imageView.getLocationOnScreen(coordinates);
-        int x = coordinates[0];
-        int y = coordinates[1];
+        int x = coordinates[0];// + height/2;
+        int y = coordinates[1];// + width/2;
         Log.e(String.valueOf(imageView.getTag()), "x: " + x + ", y: " + y);
         GetPixelColor(x, y);
     }
@@ -97,6 +100,11 @@ public class MarkerActivity extends AppCompatActivity
     private void GetPixelColor(int x, int y)
     {
         final Bitmap bitmap = ((BitmapDrawable) imageView_markerImage.getDrawable()).getBitmap();
+
+        // Should be replaced with UI restriction
+        x = x < 0 ? 0 : Math.min(x, bitmap.getWidth()-1);
+        y = y < 0 ? 0 : Math.min(y, bitmap.getHeight()-1);
+
         int targetPixel = bitmap.getPixel(x, y);
         Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
     }
