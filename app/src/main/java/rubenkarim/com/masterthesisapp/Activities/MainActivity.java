@@ -1,6 +1,10 @@
 package rubenkarim.com.masterthesisapp.Activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,7 +16,7 @@ import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 
 public class MainActivity extends AppCompatActivity
 {
-
+    private UsbDevice usbDevice;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -32,4 +36,29 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
         startActivity(intent);
     }
+
+    private static final String ACTION_USB_PERMISSION =
+            "com.android.example.USB_PERMISSION";
+
+    private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
+
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (ACTION_USB_PERMISSION.equals(action)) {
+                synchronized (this) {
+                    usbDevice = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                        if(usbDevice != null){
+                            //call method to set up device communication
+
+                        }
+                    }
+                    else {
+                        Log.d("CameraActivity", "permission denied for device " + usbDevice);
+                    }
+                }
+            }
+        }
+    };
 }
