@@ -15,6 +15,9 @@ import com.flir.thermalsdk.ErrorCode;
 import com.flir.thermalsdk.androidsdk.BuildConfig;
 import com.flir.thermalsdk.androidsdk.ThermalSdkAndroid;
 import com.flir.thermalsdk.image.ThermalImage;
+import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.fusion.Fusion;
+import com.flir.thermalsdk.image.fusion.VisualOnly;
 import com.flir.thermalsdk.live.Camera;
 import com.flir.thermalsdk.live.CommunicationInterface;
 import com.flir.thermalsdk.live.Identity;
@@ -63,7 +66,7 @@ public class CameraActivity extends AppCompatActivity {
             requestPermissions();
 
         } else {
-            findAndOpenAndroidCamera();
+            //findAndOpenAndroidCamera();
             findAndOpenFlirCamera();
         }
     }
@@ -71,16 +74,20 @@ public class CameraActivity extends AppCompatActivity {
     /**
      * Note it is call on a non-UI thread
      */
-    private final Camera.Consumer<ThermalImage> handleIncommingImage = (thermalImage)->{
+    private final Camera.Consumer<ThermalImage> handleIncommingThermalImage = (thermalImage)->{
         runOnUiThread(()->{
             log("RESULTS!");
+
+            //To get the visual image from flir:
+            Fusion fusion = thermalImage.getFusion();
+            fusion.getPhoto();
         });
     };
 
     private ThermalImageStreamListener thermalImageStreamListener = () -> {
         //Is called on a non-UI thread!
         //THIS IS WEIRD!?
-        flirCamera.withImage(this.thermalImageStreamListener, handleIncommingImage);
+        flirCamera.withImage(this.thermalImageStreamListener, handleIncommingThermalImage);
     };
 
     private final ConnectionStatusListener connectionStatusListener = (connectionStatus, errorCode)->{
