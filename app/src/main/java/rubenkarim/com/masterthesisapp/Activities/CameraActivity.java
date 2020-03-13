@@ -3,17 +3,21 @@ package rubenkarim.com.masterthesisapp.Activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.flir.thermalsdk.ErrorCode;
 import com.flir.thermalsdk.androidsdk.BuildConfig;
 import com.flir.thermalsdk.androidsdk.ThermalSdkAndroid;
+import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
+import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImage;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.Fusion;
@@ -49,6 +53,17 @@ public class CameraActivity extends AppCompatActivity {
     private Camera flirCamera;
     private ConnectionStatus connectionStatus;
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try {
+        flirCamera.unsubscribeAllStreams();
+
+            flirCamera.close();
+        } catch (Exception e) {
+            log(e.toString());
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +82,8 @@ public class CameraActivity extends AppCompatActivity {
 
         } else {
             //findAndOpenAndroidCamera();
-            findAndOpenFlirCamera();
+            // findAndOpenFlirCamera();
+            log("All permission granted");
         }
     }
 
@@ -75,12 +91,19 @@ public class CameraActivity extends AppCompatActivity {
      * Note it is call on a non-UI thread
      */
     private final Camera.Consumer<ThermalImage> handleIncommingThermalImage = (thermalImage)->{
-        runOnUiThread(()->{
-            log("RESULTS!");
+        //The image must not be processed on the UI Thread
+        final ImageView flir_ViewFinder = findViewById(R.id.imageView_flirViewFinder);
+        JavaImageBuffer javaImageBuffer= thermalImage.getImage();
+        final Bitmap bitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
 
-            //To get the visual image from flir:
-            Fusion fusion = thermalImage.getFusion();
-            fusion.getPhoto();
+        //To get the visual image from flir:
+        //Fusion fusion = thermalImage.getFusion();
+        //assert fusion != null;
+        //fusion.getPhoto();
+        log("New Image");
+        runOnUiThread(()->{
+            flir_ViewFinder.setImageBitmap(bitmap);
+
         });
     };
 
@@ -220,5 +243,9 @@ public class CameraActivity extends AppCompatActivity {
         textView.setMovementMethod(new ScrollingMovementMethod());
         textView.append(String.format("%s\n", s));
 
+    }
+
+    public void connectFlir(View view) {
+        findAndOpenFlirCamera();
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,28 +17,45 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center"
-        />
+        >
+
+    </androidx.camera.view.CameraView>
+
+    <ImageView
+        android:id="@+id/imageView_flirViewFinder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_weight="0.25"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="1">
 
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0.33"
             android:onClick="BackOnClick"
             android:text="Back" />
 
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0.33"
             android:onClick="TakePictureOnClick"
             android:text="Take Picture" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.33"
+            android:onClick="connectFlir"
+            android:text="Connect" />
 
     </LinearLayout>
 
@@ -45,7 +63,7 @@
         android:id="@+id/textView_log"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
+        android:layout_weight="1"
         android:gravity="bottom"
         android:isScrollContainer="true"
         android:scrollbars="vertical" />
