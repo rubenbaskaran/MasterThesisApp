@@ -1,9 +1,9 @@
 package rubenkarim.com.masterthesisapp.Activities;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -54,5 +54,23 @@ public class MarkerActivity extends AppCompatActivity
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
         intent.putExtra("filename", filename);
         startActivity(intent);
+    }
+
+    private void GetCoordinates()
+    {
+        int[] coordinatesOne = new int[2];
+        imageView_markerOne.getLocationOnScreen(coordinatesOne);
+        Log.e("MarkerOne location", "x: " + String.valueOf(coordinatesOne[0]) + ", y: " + String.valueOf(coordinatesOne[1]));
+
+        int[] coordinatesTwo = new int[2];
+        imageView_markerTwo.getLocationOnScreen(coordinatesTwo);
+        Log.e("MarkerTwo location", "x: " + String.valueOf(coordinatesTwo[0]) + ", y: " + String.valueOf(coordinatesTwo[1]));
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus)
+    {
+        super.onWindowFocusChanged(hasFocus);
+        GetCoordinates();
     }
 }
