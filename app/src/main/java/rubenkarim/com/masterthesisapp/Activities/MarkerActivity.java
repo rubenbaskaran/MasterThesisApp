@@ -1,9 +1,12 @@
 package rubenkarim.com.masterthesisapp.Activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -26,6 +29,8 @@ public class MarkerActivity extends AppCompatActivity
         imageView_markerImage = findViewById(R.id.imageView_markerImage);
         imageView_markerOne = findViewById(R.id.imageView_markerOne);
         imageView_markerTwo = findViewById(R.id.imageView_markerTwo);
+        SetOnTouchListener(imageView_markerOne);
+        SetOnTouchListener(imageView_markerTwo);
 
         Intent receivedIntent = getIntent();
         if (receivedIntent.hasExtra("filename"))
@@ -36,11 +41,51 @@ public class MarkerActivity extends AppCompatActivity
         SetPicture();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private void SetOnTouchListener(ImageView img)
+    {
+        img.setOnTouchListener(new View.OnTouchListener()
+        {
+            PointF DownPT = new PointF(); // Record Mouse Position When Pressed Down
+            PointF StartPT = new PointF(); // Record Start Position of 'img'
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                switch (event.getAction())
+                {
+                    case MotionEvent.ACTION_MOVE:
+                        img.setX((int) (StartPT.x + event.getX() - DownPT.x));
+                        img.setY((int) (StartPT.y + event.getY() - DownPT.y));
+                        StartPT.set(img.getX(), img.getY());
+                        break;
+                    case MotionEvent.ACTION_DOWN:
+                        DownPT.set(event.getX(), event.getY());
+                        StartPT.set(img.getX(), img.getY());
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        GetCoordinates(img);
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+    }
+
     private void SetPicture()
     {
         imageView_markerImage.setImageURI(Uri.parse(filename));
         imageView_markerOne.setImageURI(Uri.parse(marker));
         imageView_markerTwo.setImageURI(Uri.parse(marker));
+    }
+
+    private void GetCoordinates(ImageView imageView)
+    {
+        int[] coordinates = new int[2];
+        imageView.getLocationOnScreen(coordinates);
+        Log.e(String.valueOf(imageView.getTag()), "x: " + coordinates[0] + ", y: " + coordinates[1]);
     }
 
     public void BackOnClick(View view)
@@ -54,23 +99,5 @@ public class MarkerActivity extends AppCompatActivity
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
         intent.putExtra("filename", filename);
         startActivity(intent);
-    }
-
-    private void GetCoordinates()
-    {
-        int[] coordinatesOne = new int[2];
-        imageView_markerOne.getLocationOnScreen(coordinatesOne);
-        Log.e("MarkerOne location", "x: " + String.valueOf(coordinatesOne[0]) + ", y: " + String.valueOf(coordinatesOne[1]));
-
-        int[] coordinatesTwo = new int[2];
-        imageView_markerTwo.getLocationOnScreen(coordinatesTwo);
-        Log.e("MarkerTwo location", "x: " + String.valueOf(coordinatesTwo[0]) + ", y: " + String.valueOf(coordinatesTwo[1]));
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus)
-    {
-        super.onWindowFocusChanged(hasFocus);
-        GetCoordinates();
     }
 }

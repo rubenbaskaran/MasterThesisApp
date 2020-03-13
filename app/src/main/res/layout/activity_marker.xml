@@ -21,6 +21,7 @@
 
         <ImageView
             android:id="@+id/imageView_markerOne"
+            android:tag="MarkerOne"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentLeft="true"
@@ -28,6 +29,7 @@
 
         <ImageView
             android:id="@+id/imageView_markerTwo"
+            android:tag="MarkerTwo"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_toEndOf="@id/imageView_markerOne" />
