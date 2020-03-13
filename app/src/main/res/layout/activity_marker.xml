@@ -7,13 +7,30 @@
     android:weightSum="5"
     tools:context=".Activities.MarkerActivity">
 
-    <ImageView
-        android:id="@+id/imageView_markerImage"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="4"
-        android:background="@color/colorPrimaryDark"
-        android:gravity="center" />
+        android:background="@color/colorPrimaryDark">
+
+        <ImageView
+            android:id="@+id/imageView_markerImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/imageView_markerOne"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true" />
+
+        <ImageView
+            android:id="@+id/imageView_markerTwo"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true"
+            android:layout_toEndOf="@id/imageView_markerOne" />
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

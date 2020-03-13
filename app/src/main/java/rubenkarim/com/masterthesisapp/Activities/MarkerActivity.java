@@ -14,6 +14,9 @@ public class MarkerActivity extends AppCompatActivity
 {
     ImageView imageView_markerImage;
     String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "default_picture";
+    String marker = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "marker";
+    ImageView imageView_markerOne;
+    ImageView imageView_markerTwo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -21,6 +24,8 @@ public class MarkerActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_marker);
         imageView_markerImage = findViewById(R.id.imageView_markerImage);
+        imageView_markerOne = findViewById(R.id.imageView_markerOne);
+        imageView_markerTwo = findViewById(R.id.imageView_markerTwo);
 
         Intent receivedIntent = getIntent();
         if (receivedIntent.hasExtra("filename"))
@@ -34,6 +39,8 @@ public class MarkerActivity extends AppCompatActivity
     private void SetPicture()
     {
         imageView_markerImage.setImageURI(Uri.parse(filename));
+        imageView_markerOne.setImageURI(Uri.parse(marker));
+        imageView_markerTwo.setImageURI(Uri.parse(marker));
     }
 
     public void BackOnClick(View view)
