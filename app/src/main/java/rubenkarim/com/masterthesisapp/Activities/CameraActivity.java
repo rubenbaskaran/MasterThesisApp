@@ -43,6 +43,7 @@ import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.view.CameraView;
 import androidx.core.app.ActivityCompat;
+import rubenkarim.com.masterthesisapp.MyCameraManager.MyCameraManager;
 import rubenkarim.com.masterthesisapp.R;
 
 public class CameraActivity extends AppCompatActivity {
@@ -71,11 +72,6 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
 
-        ThermalLog.LogLevel enableLoggingInDebug = BuildConfig.DEBUG ? ThermalLog.LogLevel.DEBUG : ThermalLog.LogLevel.NONE;
-        //Initialize Flir SDK
-        ThermalSdkAndroid.init(getApplicationContext(), enableLoggingInDebug);
-        flirCamera = new Camera();
-
         //Check Permissions:
         if (!checkPermissions()) {
             requestPermissions();
@@ -85,6 +81,7 @@ public class CameraActivity extends AppCompatActivity {
             // findAndOpenFlirCamera();
             log("All permission granted");
         }
+
     }
 
     /**
