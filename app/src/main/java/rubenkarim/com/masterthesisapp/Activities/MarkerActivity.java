@@ -2,7 +2,10 @@ package rubenkarim.com.masterthesisapp.Activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -85,7 +88,17 @@ public class MarkerActivity extends AppCompatActivity
     {
         int[] coordinates = new int[2];
         imageView.getLocationOnScreen(coordinates);
-        Log.e(String.valueOf(imageView.getTag()), "x: " + coordinates[0] + ", y: " + coordinates[1]);
+        int x = coordinates[0];
+        int y = coordinates[1];
+        Log.e(String.valueOf(imageView.getTag()), "x: " + x + ", y: " + y);
+        GetPixelColor(x, y);
+    }
+
+    private void GetPixelColor(int x, int y)
+    {
+        final Bitmap bitmap = ((BitmapDrawable) imageView_markerImage.getDrawable()).getBitmap();
+        int targetPixel = bitmap.getPixel(x, y);
+        Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
     }
 
     public void BackOnClick(View view)
