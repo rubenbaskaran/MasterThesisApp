@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
@@ -22,8 +24,6 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //TODO: MAKE ME A SANDWICH
-        //TODO: This is a test
     }
 
     public void ChooseAlgorithmOnClick(View view)
@@ -37,11 +37,11 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    //Starting the activity when Flir camera is connected.
     private static final String ACTION_USB_PERMISSION =
             "com.android.example.USB_PERMISSION";
 
     private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
-
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (ACTION_USB_PERMISSION.equals(action)) {
@@ -50,12 +50,11 @@ public class MainActivity extends AppCompatActivity
 
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         if(usbDevice != null){
-                            //call method to set up device communication
-
                         }
                     }
                     else {
-                        Log.d("CameraActivity", "permission denied for device " + usbDevice);
+                        //TODO: Handle permission denied by user.
+                        Log.d("MainActivity", "permission denied for device " + usbDevice);
                     }
                 }
             }
