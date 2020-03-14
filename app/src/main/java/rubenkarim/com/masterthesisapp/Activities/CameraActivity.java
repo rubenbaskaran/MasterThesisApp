@@ -58,11 +58,31 @@ public class CameraActivity extends AppCompatActivity {
         } else {
             if(!deviceList.isEmpty()){
                 Snackbar.make(rootView, "USB device is detected trying to connect", Snackbar.LENGTH_SHORT).show();
+                showThermalViewfinder();
                 flirCamera();
             } else {
                 Snackbar.make(rootView, "Cant find USB device opening phones camera", Snackbar.LENGTH_SHORT).show();
+                showNativeCamera();
             }
         }
+    }
+
+
+//TODO: Handle Camera Disconnection!!!
+
+    private void showNativeCamera(){
+        ImageView imageView = findViewById(R.id.imageView_thermalViewFinder);
+        imageView.setVisibility(View.GONE);
+        CameraView cameraView = findViewById(R.id.cameraView_RGBviewFinder);
+        cameraView.setVisibility(View.VISIBLE);
+        cameraView.bindToLifecycle(this);
+    }
+
+    private void showThermalViewfinder(){
+        CameraView cameraView = findViewById(R.id.cameraView_RGBviewFinder);
+        cameraView.setVisibility(View.GONE);
+        ImageView imageView = findViewById(R.id.imageView_thermalViewFinder);
+        imageView.setVisibility(View.VISIBLE);
     }
 
     private void flirCamera(){
@@ -73,7 +93,7 @@ public class CameraActivity extends AppCompatActivity {
          */
         MyCameraManager.getInstance().subscribeToFlirCamera((thermalImage)->{
             //The image must not be processed on the UI Thread
-            final ImageView flir_ViewFinder = findViewById(R.id.imageView_flirViewFinder);
+            final ImageView flir_ViewFinder = findViewById(R.id.imageView_thermalViewFinder);
             JavaImageBuffer javaImageBuffer= thermalImage.getImage();
             final Bitmap bitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
 
@@ -86,11 +106,6 @@ public class CameraActivity extends AppCompatActivity {
 
             });
         });
-    }
-
-    private void findAndOpenAndroidCamera() {
-        cameraViewFinder = findViewById(R.id.previewView_viewFinder);
-        cameraViewFinder.bindToLifecycle(this);
     }
 
     private boolean checkPermissions() {
@@ -132,7 +147,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void TakePictureOnClick(View view) {
-
+        //TODO: Fix take picture so i can take both with native an thermal
         File mImageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
         boolean isDirectoryCreated = mImageDir.exists() || mImageDir.mkdirs();
 

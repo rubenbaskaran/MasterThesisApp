@@ -74,16 +74,7 @@ public class MyCameraManager {
         this.thermalImagelistener.subscribe(thermalImage);
     }
 
-    public boolean isUsbDeviceAttached() {
-        if (usbDevice != null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public double getTempFromPoint(ThermalImage thermalImage, Point point){
-
         return thermalImage.getValueAt(point);
     }
 

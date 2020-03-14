@@ -12,20 +12,21 @@
 
 
     <androidx.camera.view.CameraView
-        android:id="@+id/previewView_viewFinder"
+        android:visibility="gone"
+        android:id="@+id/cameraView_RGBviewFinder"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0"
+        android:layout_weight="7"
         android:gravity="center"
         >
 
     </androidx.camera.view.CameraView>
 
     <ImageView
-        android:id="@+id/imageView_flirViewFinder"
+        android:id="@+id/imageView_thermalViewFinder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0" />
+        android:layout_weight="7" />
 
 
 
