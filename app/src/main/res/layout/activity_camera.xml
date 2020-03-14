@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout_CameraActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="5"
-    tools:context=".Activities.CameraActivity"
-    android:id="@+id/linearLayout_CameraActivity">
+    tools:context=".Activities.CameraActivity">
 
-
-
-    <androidx.camera.view.CameraView
-        android:id="@+id/previewView_viewFinder"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="4"
-        android:gravity="center"
-        />
+        android:layout_weight="4">
+
+        <androidx.camera.view.CameraView
+            android:id="@+id/previewView_viewFinder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            android:layout_centerInParent="true"
+            android:background="@color/colorPrimaryDark"/>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,7 +45,5 @@
             android:layout_weight="1"
             android:onClick="TakePictureOnClick"
             android:text="Take Picture" />
-
     </LinearLayout>
-
 </LinearLayout>
