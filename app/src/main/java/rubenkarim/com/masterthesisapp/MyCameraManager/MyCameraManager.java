@@ -7,7 +7,9 @@ import android.util.Log;
 import com.flir.thermalsdk.ErrorCode;
 import com.flir.thermalsdk.androidsdk.BuildConfig;
 import com.flir.thermalsdk.androidsdk.ThermalSdkAndroid;
+import com.flir.thermalsdk.image.Point;
 import com.flir.thermalsdk.image.ThermalImage;
+import com.flir.thermalsdk.image.measurements.MeasurementSpot;
 import com.flir.thermalsdk.live.Camera;
 import com.flir.thermalsdk.live.CommunicationInterface;
 import com.flir.thermalsdk.live.Identity;
@@ -70,6 +72,19 @@ public class MyCameraManager {
 
     private void updateThermalListener(ThermalImage thermalImage){
         this.thermalImagelistener.subscribe(thermalImage);
+    }
+
+    public boolean isUsbDeviceAttached() {
+        if (usbDevice != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public double getTempFromPoint(ThermalImage thermalImage, Point point){
+
+        return thermalImage.getValueAt(point);
     }
 
     //region ---------- Flir's crappy setup code ----------

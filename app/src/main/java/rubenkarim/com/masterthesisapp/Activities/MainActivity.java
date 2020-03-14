@@ -1,25 +1,16 @@
 package rubenkarim.com.masterthesisapp.Activities;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
-import rubenkarim.com.masterthesisapp.MyCameraManager.MyCameraManager;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 
 public class MainActivity extends AppCompatActivity
 {
-    private UsbDevice usbDevice;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -41,25 +32,4 @@ public class MainActivity extends AppCompatActivity
     //Starting the activity when Flir camera is connected.
     private static final String ACTION_USB_PERMISSION =
             "com.android.example.USB_PERMISSION";
-
-    private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (ACTION_USB_PERMISSION.equals(action)) {
-                synchronized (this) {
-                    usbDevice = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                        if(usbDevice != null){
-                            MyCameraManager.getInstance().setUsbDevice(usbDevice);
-                        }
-                    }
-                    else {
-                        //TODO: Handle permission denied by user.
-                        Log.d("MainActivity", "permission denied for device " + usbDevice);
-                    }
-                }
-            }
-        }
-    };
 }

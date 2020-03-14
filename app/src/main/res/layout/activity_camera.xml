@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:weightSum="4"
+    android:weightSum="8"
     tools:context=".Activities.CameraActivity"
     android:id="@+id/linearLayout_CameraActivity">
 
@@ -15,7 +15,7 @@
         android:id="@+id/previewView_viewFinder"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="0"
         android:gravity="center"
         >
 
@@ -25,14 +25,14 @@
         android:id="@+id/imageView_flirViewFinder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:layout_weight="0" />
 
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_weight="0.25"
+        android:layout_weight="1"
         android:orientation="horizontal"
         android:weightSum="1">
 
@@ -58,14 +58,5 @@
             android:text="Connect" />
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/textView_log"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="bottom"
-        android:isScrollContainer="true"
-        android:scrollbars="vertical" />
 
 </LinearLayout>
