@@ -57,7 +57,7 @@ public class MarkerActivity extends AppCompatActivity
             isThermalPicture = receivedIntent.getBooleanExtra("isThermalImage", true);
         }
 
-        SetPicture();
+        setPicture();
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -83,7 +83,7 @@ public class MarkerActivity extends AppCompatActivity
                         StartPT.set(img.getX(), img.getY());
                         break;
                     case MotionEvent.ACTION_UP:
-                        GetCoordinates(img);
+                        getCoordinates(img);
                         break;
                     default:
                         break;
@@ -93,7 +93,7 @@ public class MarkerActivity extends AppCompatActivity
         });
     }
 
-    private void SetPicture()
+    private void setPicture()
     {
         imageView_markerImage.setImageURI(Uri.parse(filename));
         imageView_markerOne.setImageURI(Uri.parse(marker));
@@ -119,7 +119,7 @@ public class MarkerActivity extends AppCompatActivity
         }
     }
 
-    private void GetCoordinates(ImageView marker)
+    private void getCoordinates(ImageView marker)
     {
         Bitmap markerBitmap = ((BitmapDrawable) marker.getDrawable()).getBitmap();
         int markerVerticalOffset = markerBitmap.getHeight();
@@ -130,10 +130,10 @@ public class MarkerActivity extends AppCompatActivity
         int x = coordinates[0] + markerHorizontalOffset / 2;
         int y = coordinates[1] + markerVerticalOffset / 2 - imageViewVerticalOffset;
         Log.e(String.valueOf(marker.getTag()), "x: " + x + ", y: " + y);
-        GetPixelColor(x, y);
+        getPixelColor(x, y);
     }
 
-    private void GetPixelColor(int x, int y)
+    private void getPixelColor(int x, int y)
     {
         View container = findViewById(R.id.linearLayout_MarkerActivity);
         Bitmap rootElementBitmap = loadBitmapFromView(container);

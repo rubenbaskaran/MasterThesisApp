@@ -1,7 +1,6 @@
 package rubenkarim.com.masterthesisapp.Activities;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -28,22 +27,22 @@ public class OverviewActivity extends AppCompatActivity
             filename = receivedIntent.getStringExtra("filename");
         }
 
-        SetPicture();
+        setPicture();
     }
 
-    private void SetPicture()
+    private void setPicture()
     {
         imageView_patientImage.setImageURI(Uri.parse(filename));
     }
 
-    public void BackOnClick(View view)
+    public void backOnClick(View view)
     {
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
         intent.putExtra("filename", filename);
         startActivity(intent);
     }
 
-    public void SaveOnClick(View view)
+    public void saveOnClick(View view)
     {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
