@@ -28,8 +28,4 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
         startActivity(intent);
     }
-
-    //Starting the activity when Flir camera is connected.
-    private static final String ACTION_USB_PERMISSION =
-            "com.android.example.USB_PERMISSION";
 }
