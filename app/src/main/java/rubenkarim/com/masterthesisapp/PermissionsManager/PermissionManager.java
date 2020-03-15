@@ -1,20 +1,15 @@
 package rubenkarim.com.masterthesisapp.PermissionsManager;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
-import android.view.View;
-
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import rubenkarim.com.masterthesisapp.Activities.CameraActivity;
-import rubenkarim.com.masterthesisapp.R;
 
 public class PermissionManager implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -41,7 +36,7 @@ public class PermissionManager implements ActivityCompat.OnRequestPermissionsRes
 
 
     public void requestPermissions(Activity activity, PermissionListener permissionListener, String... permissions){
-        Log.i(TAG, "requestPermissions for " + permissions);
+        Log.i(TAG, "requestPermissions for " + Arrays.toString(permissions));
         this.permissionListener = permissionListener;
             ActivityCompat.requestPermissions(
                     activity,
