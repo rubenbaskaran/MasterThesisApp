@@ -13,6 +13,7 @@ public class OverviewActivity extends AppCompatActivity
 {
     ImageView imageView_patientImage;
     String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "default_picture";
+    Boolean isThermalPicture = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -25,6 +26,9 @@ public class OverviewActivity extends AppCompatActivity
         if (receivedIntent.hasExtra("filename"))
         {
             filename = receivedIntent.getStringExtra("filename");
+        }
+        if (receivedIntent.hasExtra("isThermalImage")){
+            isThermalPicture = receivedIntent.getBooleanExtra("isThermalImage", true);
         }
 
         setPicture();
@@ -39,6 +43,7 @@ public class OverviewActivity extends AppCompatActivity
     {
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
         intent.putExtra("filename", filename);
+        intent.putExtra("isThermalImage", isThermalPicture);
         startActivity(intent);
     }
 
