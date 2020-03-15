@@ -59,10 +59,7 @@ public class PermissionManager implements ActivityCompat.OnRequestPermissionsRes
     /**
      * Is used to tap into the Activity's callback.
      * simply call this method in the activity's {@link Activity#onRequestPermissionsResult(int, String[], int[])} in which this class is instantiated.
-     * The parameters are the same...
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
+     * The parameters are the same and map's to the same...
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
