@@ -50,7 +50,8 @@
                 android:layout_height="60dp"
                 android:layout_below="@id/imageView_leftEye"
                 android:layout_centerHorizontal="true"
-                android:src="@drawable/detailed_face_template" />
+                android:src="@drawable/detailed_face_template"
+                android:layout_marginTop="-10dp"/>
         </RelativeLayout>
 
         <ImageView
