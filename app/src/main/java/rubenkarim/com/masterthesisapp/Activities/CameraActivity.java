@@ -38,7 +38,6 @@ import rubenkarim.com.masterthesisapp.PermissionsManager.PermissionManager;
 import rubenkarim.com.masterthesisapp.R;
 
 public class CameraActivity extends AppCompatActivity {
-    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 10;
     private static final String TAG = CameraActivity.class.getSimpleName();
     private View rootView;
     private CameraView cameraViewFinder;
@@ -132,9 +131,7 @@ public class CameraActivity extends AppCompatActivity {
             JavaImageBuffer javaImageBuffer= thermalImage.getImage();
             final Bitmap bitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
 
-            runOnUiThread(()->{
-                flir_ViewFinder.setImageBitmap(bitmap);
-            });
+            runOnUiThread(()-> flir_ViewFinder.setImageBitmap(bitmap));
         });
         myCameraManager.subscribeToFlirConnectionStatus(new FlirConnectionListener() {
             @Override
