@@ -9,6 +9,8 @@ import android.view.View;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import rubenkarim.com.masterthesisapp.Activities.CameraActivity;
@@ -20,16 +22,20 @@ public class PermissionManager implements ActivityCompat.OnRequestPermissionsRes
     private PermissionListener permissionListener;
     private final int PERMISSIONS_REQUEST_CODE = 10;
 
-    public static boolean checkPermission(Context context, String permissionType){
-        int permissionState = ActivityCompat.checkSelfPermission(context, permissionType);
-
-        if (permissionState != PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "CAMERA permission has NOT been granted.");
-            return false;
-        } else {
-            Log.i(TAG, "CAMERA permission has already been granted.");
-            return true;
+    public static boolean checkPermissions(Context context, String... permissionTypes){
+        ArrayList<Integer> permissionsStats = new ArrayList<>();
+        for (String permissionType: permissionTypes) {
+            permissionsStats.add(ActivityCompat.checkSelfPermission(context, permissionType));
         }
+        for (Integer i: permissionsStats
+             ) {
+            if (i != PackageManager.PERMISSION_GRANTED) {
+                Log.i(TAG, "A permission has NOT been granted.");
+                return false;
+            }
+        }
+        Log.i(TAG, "All permission has already been granted.");
+        return true;
     }
 
 

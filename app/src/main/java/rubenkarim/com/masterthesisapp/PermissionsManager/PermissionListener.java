@@ -1,6 +1,6 @@
 package rubenkarim.com.masterthesisapp.PermissionsManager;
 
-interface PermissionListener {
+public interface PermissionListener {
     void permissionGranted(String[] permissions);
     void permissionDenied(String[] permissions);
 }

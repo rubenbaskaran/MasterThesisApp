@@ -3,7 +3,6 @@ package rubenkarim.com.masterthesisapp.Activities;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
@@ -32,9 +31,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.view.CameraView;
-import androidx.core.app.ActivityCompat;
 import rubenkarim.com.masterthesisapp.MyCameraManager.FlirConnectionListener;
 import rubenkarim.com.masterthesisapp.MyCameraManager.MyCameraManager;
+import rubenkarim.com.masterthesisapp.PermissionsManager.PermissionListener;
+import rubenkarim.com.masterthesisapp.PermissionsManager.PermissionManager;
 import rubenkarim.com.masterthesisapp.R;
 
 public class CameraActivity extends AppCompatActivity {
@@ -58,18 +58,37 @@ public class CameraActivity extends AppCompatActivity {
         HashMap<String, UsbDevice> deviceList = manager.getDeviceList();
 
         //Check Permissions:
-        if (!checkPermissions()) {
-            requestPermissions();
+        if (PermissionManager.checkPermissions(this, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            //Continue
+            startView(deviceList);
+
         } else {
-            if(!deviceList.isEmpty()){
-                Snackbar.make(rootView, "USB device is detected trying to connect", Snackbar.LENGTH_SHORT).show();
-                showThermalViewfinder();
-                flirCamera();
-            } else {
-                Snackbar.make(rootView, "Cant find USB device opening phones camera", Snackbar.LENGTH_SHORT).show();
-                myCameraManager.close();
-                showNativeCamera();
-            }
+            new PermissionManager().requestPermissions(this, new PermissionListener() {
+                @Override
+                public void permissionGranted(String[] permissions) {
+                    startView(deviceList);
+                }
+
+                @Override
+                public void permissionDenied(String[] permissions) {
+                    Snackbar.make(rootView, "crucial permissions have been denied come back to allow permissions", Snackbar.LENGTH_INDEFINITE).show();
+                }
+            },
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+    }
+
+    private void startView(HashMap<String, UsbDevice> deviceList) {
+        if(!deviceList.isEmpty()){
+            Snackbar.make(rootView, "USB device is detected trying to connect", Snackbar.LENGTH_SHORT).show();
+            showThermalViewfinder();
+            flirCamera();
+        } else {
+            Snackbar.make(rootView, "Cant find USB device opening phones camera", Snackbar.LENGTH_SHORT).show();
+            myCameraManager.close();
+            showNativeCamera();
         }
     }
 
@@ -155,39 +174,6 @@ public class CameraActivity extends AppCompatActivity {
                 Snackbar.make(rootView, "USB Permission is Denied", Snackbar.LENGTH_INDEFINITE).show();
             }
         });
-    }
-
-    private boolean checkPermissions() {
-        int permissionStateCamera = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        int permissionStateWriteStorage = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int permissionStateReadStorage = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-        //int permissionStateReadStorage = ActivityCompat.checkSelfPermission(this, Manifest.permission.);
-
-        if (permissionStateCamera != PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "CAMERA permission has NOT been granted.");
-            return false;
-        } else {
-            Log.i(TAG, "CAMERA permission has already been granted.");
-            return true;
-        }
-    }
-
-    private void requestPermissions() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-            Snackbar.make(rootView, R.string.permission_rationale, Snackbar
-                    .LENGTH_INDEFINITE)
-                    .setAction(R.string.ok, view -> {
-                        // Request Camera permission
-                        ActivityCompat.requestPermissions(CameraActivity.this,
-                                new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                REQUEST_PERMISSIONS_REQUEST_CODE);
-                    })
-                    .show();
-        } else {
-            ActivityCompat.requestPermissions(CameraActivity.this,
-                    new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    REQUEST_PERMISSIONS_REQUEST_CODE);
-        }
     }
 
     public void backOnClick(View view) {
