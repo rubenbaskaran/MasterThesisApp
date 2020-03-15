@@ -23,9 +23,9 @@ import java.io.IOException;
 
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.R;
+import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 
-public class MarkerActivity extends AppCompatActivity
-{
+public class MarkerActivity extends AppCompatActivity {
     ImageView imageView_markerImage;
     String filename = "default_picture";
     Boolean isThermalPicture = false;
@@ -38,8 +38,7 @@ public class MarkerActivity extends AppCompatActivity
     int imageWidth;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_marker);
         imageView_markerImage = findViewById(R.id.imageView_markerImage);
@@ -49,11 +48,10 @@ public class MarkerActivity extends AppCompatActivity
         SetOnTouchListener(imageView_markerTwo);
 
         Intent receivedIntent = getIntent();
-        if (receivedIntent.hasExtra("filename"))
-        {
+        if (receivedIntent.hasExtra("filename")) {
             filename = receivedIntent.getStringExtra("filename");
         }
-        if (receivedIntent.hasExtra("isThermalImage")){
+        if (receivedIntent.hasExtra("isThermalImage")) {
             isThermalPicture = receivedIntent.getBooleanExtra("isThermalImage", true);
         }
 
@@ -61,18 +59,14 @@ public class MarkerActivity extends AppCompatActivity
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void SetOnTouchListener(ImageView img)
-    {
-        img.setOnTouchListener(new View.OnTouchListener()
-        {
+    private void SetOnTouchListener(ImageView img) {
+        img.setOnTouchListener(new View.OnTouchListener() {
             PointF DownPT = new PointF(); // Record Mouse Position When Pressed Down
             PointF StartPT = new PointF(); // Record Start Position of 'img'
 
             @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {
-                switch (event.getAction())
-                {
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_MOVE:
                         img.setX((int) (StartPT.x + event.getX() - DownPT.x));
                         img.setY((int) (StartPT.y + event.getY() - DownPT.y));
@@ -93,34 +87,36 @@ public class MarkerActivity extends AppCompatActivity
         });
     }
 
-    private void setPicture()
-    {
+    private void setPicture() {
+        ImageProcessing.FixImageOrientation(filename);
         imageView_markerImage.setImageURI(Uri.parse(filename));
         imageView_markerOne.setImageURI(Uri.parse(marker));
         imageView_markerTwo.setImageURI(Uri.parse(marker));
 
-        if(isThermalPicture){
+        if (isThermalPicture) {
             try {
-                if(ThermalImageFile.isThermalImage(filename)){
+                if (ThermalImageFile.isThermalImage(filename)) {
                     ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filename);
 
                     JavaImageBuffer javaBuffer = thermalImageFile.getImage();
                     android.graphics.Bitmap bmp = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
                     imageView_markerImage.setImageBitmap(bmp);
 
-                } else {
+                }
+                else {
                     Log.e(TAG, "SetPicture: IS NOT A THERMAL PICTURE");
                 }
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 //TODO: Handle IO exception
             }
-        } else {
+        }
+        else {
             imageView_markerImage.setImageURI(Uri.parse(filename));
         }
     }
 
-    private void getCoordinates(ImageView marker)
-    {
+    private void getCoordinates(ImageView marker) {
         Bitmap markerBitmap = ((BitmapDrawable) marker.getDrawable()).getBitmap();
         int markerVerticalOffset = markerBitmap.getHeight();
         int markerHorizontalOffset = markerBitmap.getWidth();
@@ -133,8 +129,7 @@ public class MarkerActivity extends AppCompatActivity
         getPixelColor(x, y);
     }
 
-    private void getPixelColor(int x, int y)
-    {
+    private void getPixelColor(int x, int y) {
         View container = findViewById(R.id.linearLayout_MarkerActivity);
         Bitmap rootElementBitmap = loadBitmapFromView(container);
 
@@ -146,8 +141,7 @@ public class MarkerActivity extends AppCompatActivity
         Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
     }
 
-    public static Bitmap loadBitmapFromView(View view)
-    {
+    public static Bitmap loadBitmapFromView(View view) {
         //Define a bitmap with the same size as the view
         Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
         //Bind a canvas to it
@@ -159,8 +153,7 @@ public class MarkerActivity extends AppCompatActivity
     }
 
     @Override
-    public void onWindowFocusChanged(boolean hasFocus)
-    {
+    public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         int[] coordinates = new int[2];
         imageView_markerImage.getLocationOnScreen(coordinates);
@@ -171,14 +164,12 @@ public class MarkerActivity extends AppCompatActivity
     }
 
     //region Navigation buttons
-    public void backOnClick(View view)
-    {
+    public void backOnClick(View view) {
         Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
         startActivity(intent);
     }
 
-    public void submitOnClick(View view)
-    {
+    public void submitOnClick(View view) {
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
         intent.putExtra("filename", filename);
         intent.putExtra("isThermalImage", isThermalPicture);
