@@ -28,7 +28,7 @@ public class MarkerActivity extends AppCompatActivity
 {
     ImageView imageView_markerImage;
     String filename = "default_picture";
-    Boolean isThermalPicture;
+    Boolean isThermalPicture = false;
     private static final String TAG = CameraActivity.class.getSimpleName();
     String marker = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "marker";
     ImageView imageView_markerOne;
