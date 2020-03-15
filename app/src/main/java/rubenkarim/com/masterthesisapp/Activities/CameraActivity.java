@@ -13,8 +13,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.flir.thermalsdk.ErrorCode;
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
+import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
 import com.flir.thermalsdk.image.JavaImageBuffer;
+import com.flir.thermalsdk.live.Identity;
+import com.flir.thermalsdk.live.connectivity.ConnectionStatus;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -29,6 +33,7 @@ import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.view.CameraView;
 import androidx.core.app.ActivityCompat;
+import rubenkarim.com.masterthesisapp.MyCameraManager.FlirConnectionListener;
 import rubenkarim.com.masterthesisapp.MyCameraManager.MyCameraManager;
 import rubenkarim.com.masterthesisapp.R;
 
@@ -105,6 +110,51 @@ public class CameraActivity extends AppCompatActivity {
                 flir_ViewFinder.setImageBitmap(bitmap);
             });
         });
+        myCameraManager.subscribeToFlirConnectionStatus(new FlirConnectionListener() {
+            @Override
+            public void onConnection(ConnectionStatus connectionStatus) {
+                Snackbar.make(rootView, "Camera connected", Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onDisconnection(ConnectionStatus connectionStatus, ErrorCode errorCode) {
+                if (!errorCode.getMessage().isEmpty()){
+                    Snackbar.make(rootView, "Disconnection Error: " + errorCode.getMessage(), Snackbar.LENGTH_INDEFINITE).show();
+                    myCameraManager.close();
+                    showNativeCamera();
+                }
+
+            }
+
+            @Override
+            public void onDisconnecting(ConnectionStatus connectionStatus) {
+
+            }
+
+            @Override
+            public void onConnecting(ConnectionStatus connectionStatus) {
+                //Snackbar.make(rootView, "Camera connecting", Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void identityFound(Identity identity) {
+                if(myCameraManager.isFlirOne(identity)){
+                    Snackbar.make(rootView, "Flir One found", Snackbar.LENGTH_SHORT).show();
+                } else {
+                    Snackbar.make(rootView, "Hardware is not supported", Snackbar.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void permissionError(UsbPermissionHandler.UsbPermissionListener.ErrorType errorType, Identity identity) {
+                Snackbar.make(rootView, "Permission error: " + errorType.name(), Snackbar.LENGTH_INDEFINITE).show();
+            }
+
+            @Override
+            public void permissionDenied(Identity identity) {
+                Snackbar.make(rootView, "USB Permission is Denied", Snackbar.LENGTH_INDEFINITE).show();
+            }
+        });
     }
 
     private boolean checkPermissions() {
@@ -179,6 +229,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void takeAndSaveRGBImage(){
+        Snackbar.make(rootView, "Taking picture hold still", Snackbar.LENGTH_LONG).show();
         File mImageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
         boolean isDirectoryCreated = mImageDir.exists() || mImageDir.mkdirs();
 

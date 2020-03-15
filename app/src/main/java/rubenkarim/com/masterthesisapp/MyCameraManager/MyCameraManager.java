@@ -1,13 +1,12 @@
 package rubenkarim.com.masterthesisapp.MyCameraManager;
 
 import android.content.Context;
-import android.hardware.usb.UsbDevice;
 import android.util.Log;
 
 import com.flir.thermalsdk.ErrorCode;
 import com.flir.thermalsdk.androidsdk.BuildConfig;
 import com.flir.thermalsdk.androidsdk.ThermalSdkAndroid;
-import com.flir.thermalsdk.image.Point;
+import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
 import com.flir.thermalsdk.image.ThermalImage;
 import com.flir.thermalsdk.live.Camera;
 import com.flir.thermalsdk.live.CommunicationInterface;
@@ -19,11 +18,9 @@ import com.flir.thermalsdk.live.discovery.DiscoveryFactory;
 import com.flir.thermalsdk.live.streaming.ThermalImageStreamListener;
 import com.flir.thermalsdk.log.ThermalLog;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.ArrayList;
 
-import androidx.camera.core.ImageProxy;
+import androidx.annotation.NonNull;
 
 public class MyCameraManager {
 
@@ -32,8 +29,10 @@ public class MyCameraManager {
     private ConnectionStatus connectionStatus;
     private ArrayList<ThermalImagelistener> thermalImageListeners;
     private FlirConnectionListener flirConnectionListener = null;
+    private Context context;
 
     public MyCameraManager(Context applicationContext) {
+        context = applicationContext;
         ThermalLog.LogLevel enableLoggingInDebug = BuildConfig.DEBUG ? ThermalLog.LogLevel.DEBUG : ThermalLog.LogLevel.NONE;
         ThermalSdkAndroid.init(applicationContext, enableLoggingInDebug);
         flirCamera = new Camera();
@@ -73,7 +72,14 @@ public class MyCameraManager {
         }
     }
 
-
+    public boolean isFlirOne(Identity identity) {
+        switch (identity.cameraType){
+            case FLIR_ONE:
+                return true;
+            default:
+                return false;
+        }
+    }
 
     //region ---------- Flir's crappy setup code ----------
     private final Camera.Consumer<ThermalImage> handleIncomingThermalImage = this::updateThermalListener;
@@ -86,15 +92,21 @@ public class MyCameraManager {
     private final ConnectionStatusListener connectionStatusListener = (connectionStatus, errorCode)->{
             switch (connectionStatus){
                 case CONNECTING:
+                    if(this.flirConnectionListener != null){
+                        this.flirConnectionListener.onConnecting(connectionStatus);
+                    }
                 case DISCONNECTING:
+                    if(this.flirConnectionListener != null){
+                        this.flirConnectionListener.onDisconnecting(connectionStatus);
+                    }
                 case DISCONNECTED:
                     if(this.flirConnectionListener != null){
-                        this.flirConnectionListener.onDisconnection(connectionStatus);
+                        this.flirConnectionListener.onDisconnection(connectionStatus, errorCode);
                     }
                     break;
                 case CONNECTED:
                     if(this.flirConnectionListener != null){
-                        this.flirConnectionListener.onConncetion(connectionStatus);
+                        this.flirConnectionListener.onConnection(connectionStatus);
                     }
                     flirCamera.subscribeStream(thermalImageStreamListener);
                     break;
@@ -104,8 +116,38 @@ public class MyCameraManager {
     private DiscoveryEventListener aDiscoveryEventListener = new DiscoveryEventListener() {
         @Override
         public void onCameraFound(Identity identity) {
-            flirCamera.connect(identity, connectionStatusListener);
-            DiscoveryFactory.getInstance().stop(CommunicationInterface.USB);
+            if(UsbPermissionHandler.isFlirOne(identity)){
+                if (UsbPermissionHandler.hasFlirOnePermission(identity, context)){
+                    connectToFlir(identity);
+                } else {
+                    new UsbPermissionHandler().requestFlirOnePermisson(identity, context, new UsbPermissionHandler.UsbPermissionListener() {
+                        @Override
+                        public void permissionGranted(@NonNull Identity identity) {
+                            connectToFlir(identity);
+                        }
+
+                        @Override
+                        public void permissionDenied(@NonNull Identity identity) {
+                            if(flirConnectionListener != null){
+                                flirConnectionListener.permissionDenied(identity);
+                            }
+                        }
+
+                        @Override
+                        public void error(ErrorType errorType, Identity identity) {
+                            if(flirConnectionListener != null){
+                                flirConnectionListener.permissionError(errorType, identity);
+                            }
+                        }
+                    });
+                }
+            }
+
+
+
+
+
+
         }
 
         @Override
@@ -113,6 +155,14 @@ public class MyCameraManager {
             Log.e(TAG, "onDiscoveryError: " + errorCode + " interface: " + communicationInterface);
         }
     };
+
+    private void connectToFlir(Identity identity) {
+        flirCamera.connect(identity, connectionStatusListener);
+        DiscoveryFactory.getInstance().stop(CommunicationInterface.USB);
+        if(flirConnectionListener != null){
+            flirConnectionListener.identityFound(identity);
+        }
+    }
     //endregion
 
 
