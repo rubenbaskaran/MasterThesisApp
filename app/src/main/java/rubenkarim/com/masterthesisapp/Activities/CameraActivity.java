@@ -92,24 +92,14 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void flirCamera(){
-        /*
-        ImageView imageView = findViewById(R.id.imageView_flirViewFinder);
-        ViewGroup.LayoutParams params = imageView.getLayoutParams();
-        imageView.setLayoutParams(params);
-         */
         MyCameraManager.getInstance().InitCameraSearchAndSub((thermalImage)->{
             //The image must not be processed on the UI Thread
             final ImageView flir_ViewFinder = findViewById(R.id.imageView_thermalViewFinder);
             JavaImageBuffer javaImageBuffer= thermalImage.getImage();
             final Bitmap bitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
 
-            //To get the visual image from flir:
-            //Fusion fusion = thermalImage.getFusion();
-            //assert fusion != null;
-            //fusion.getPhoto();
             runOnUiThread(()->{
                 flir_ViewFinder.setImageBitmap(bitmap);
-
             });
         });
     }
