@@ -41,6 +41,8 @@ public class PermissionManager implements ActivityCompat.OnRequestPermissionsRes
 
 
     public void requestPermissions(Activity activity, PermissionListener permissionListener, String... permissions){
+        Log.i(TAG, "requestPermissions for " + permissions);
+        this.permissionListener = permissionListener;
             ActivityCompat.requestPermissions(
                     activity,
                     permissions,
@@ -51,13 +53,16 @@ public class PermissionManager implements ActivityCompat.OnRequestPermissionsRes
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.i(TAG, "onRequestPermissionsResult: HELLO " + requestCode);
         if(requestCode == PERMISSIONS_REQUEST_CODE){
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 if(this.permissionListener != null){
+                    Log.i(TAG, "onRequestPermissionsResult: user allowed all permissions");
                     this.permissionListener.permissionGranted(permissions);
                 }
             } else {
                 if(this.permissionListener != null){
+                    Log.i(TAG, "onRequestPermissionsResult: user denied som permissions");
                     this.permissionListener.permissionDenied(permissions);
                 }
             }

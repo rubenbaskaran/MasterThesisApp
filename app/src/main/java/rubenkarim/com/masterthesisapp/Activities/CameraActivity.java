@@ -44,6 +44,7 @@ public class CameraActivity extends AppCompatActivity {
     private CameraView cameraViewFinder;
     private boolean isThermalCameraOn = true;
     private MyCameraManager myCameraManager;
+    private PermissionManager permissionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,7 @@ public class CameraActivity extends AppCompatActivity {
         rootView = findViewById(R.id.linearLayout_CameraActivity);
         cameraViewFinder = findViewById(R.id.cameraView_RgbViewFinder);
         myCameraManager = new MyCameraManager(getApplicationContext());
+        permissionManager = new PermissionManager();
 
         //CheckforUsbDevice
         UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
@@ -59,13 +61,12 @@ public class CameraActivity extends AppCompatActivity {
 
         //Check Permissions:
         if (PermissionManager.checkPermissions(this, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            //Continue
             startView(deviceList);
-
         } else {
-            new PermissionManager().requestPermissions(this, new PermissionListener() {
+          permissionManager.requestPermissions(this, new PermissionListener() {
                 @Override
                 public void permissionGranted(String[] permissions) {
+                    Snackbar.make(rootView, "permissions allowed", Snackbar.LENGTH_SHORT).show();
                     startView(deviceList);
                 }
 
@@ -96,6 +97,12 @@ public class CameraActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         myCameraManager.close();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        permissionManager.onRequestPermissionsResult(requestCode, permissions,grantResults);
     }
 
     private void showNativeCamera(){
