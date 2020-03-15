@@ -38,6 +38,7 @@ public class CameraActivity extends AppCompatActivity {
     private View rootView;
     private CameraView cameraViewFinder;
     private boolean isThermalCameraOn = true;
+    private MyCameraManager myCameraManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +46,7 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
         cameraViewFinder = findViewById(R.id.cameraView_RgbViewFinder);
-
-        //Setup camera manager
-        MyCameraManager.getInstance().Init(getApplicationContext());
+        myCameraManager = new MyCameraManager(getApplicationContext());
 
         //CheckforUsbDevice
         UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
@@ -63,13 +62,17 @@ public class CameraActivity extends AppCompatActivity {
                 flirCamera();
             } else {
                 Snackbar.make(rootView, "Cant find USB device opening phones camera", Snackbar.LENGTH_SHORT).show();
+                myCameraManager.close();
                 showNativeCamera();
             }
         }
     }
 
-
-//TODO: Handle Camera Disconnection and disconnect camera on change of activity!!!
+    @Override
+    protected void onPause() {
+        super.onPause();
+        myCameraManager.close();
+    }
 
     private void showNativeCamera(){
         ImageView imageView = findViewById(R.id.imageView_thermalViewFinder);
@@ -92,7 +95,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void flirCamera(){
-        MyCameraManager.getInstance().InitCameraSearchAndSub((thermalImage)->{
+        myCameraManager.InitCameraSearchAndSub((thermalImage)->{
             //The image must not be processed on the UI Thread
             final ImageView flir_ViewFinder = findViewById(R.id.imageView_thermalViewFinder);
             JavaImageBuffer javaImageBuffer= thermalImage.getImage();
@@ -152,7 +155,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private void takeAndSaveThermalImage(){
 
-        MyCameraManager.getInstance().addThermalImageListener((thermalImage)->{
+        myCameraManager.addThermalImageListener((thermalImage)->{
             File ImageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
             boolean isDirectoryCreated = ImageDir.exists() || ImageDir.mkdirs();
             try{
