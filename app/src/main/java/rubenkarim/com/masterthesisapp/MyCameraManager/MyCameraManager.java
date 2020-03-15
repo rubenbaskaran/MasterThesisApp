@@ -24,7 +24,7 @@ import androidx.annotation.NonNull;
 
 public class MyCameraManager {
 
-    private static final String TAG = "CameraActivity";
+    private static final String TAG = MyCameraManager.class.getSimpleName();
     private Camera flirCamera;
     private ConnectionStatus connectionStatus;
     private ArrayList<ThermalImagelistener> thermalImageListeners;
