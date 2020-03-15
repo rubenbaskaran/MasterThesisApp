@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.R;
@@ -12,14 +11,11 @@ import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 
 public class MainActivity extends AppCompatActivity
 {
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //TODO: MAKE ME A SANDWICH
-        //TODO: This is a test
     }
 
     public void ChooseAlgorithmOnClick(View view)
@@ -32,4 +28,8 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
         startActivity(intent);
     }
+
+    //Starting the activity when Flir camera is connected.
+    private static final String ACTION_USB_PERMISSION =
+            "com.android.example.USB_PERMISSION";
 }
