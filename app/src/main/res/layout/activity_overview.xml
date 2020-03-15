@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="5"
-        android:background="@color/colorPrimaryDark" />
+        android:background="@color/colorPrimaryDark"
+        android:scaleType="fitXY" />
 
     <TextView
         android:layout_width="match_parent"
@@ -34,22 +35,22 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:weightSum="2"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="2">
 
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Back"
-            android:onClick="backOnClick"/>
+            android:onClick="backOnClick"
+            android:text="Back" />
 
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Save"
-            android:onClick="saveOnClick"/>
+            android:onClick="saveOnClick"
+            android:text="Save" />
 
     </LinearLayout>
 
