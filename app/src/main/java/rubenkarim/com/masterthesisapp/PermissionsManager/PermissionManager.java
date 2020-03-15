@@ -18,6 +18,13 @@ public class PermissionManager implements ActivityCompat.OnRequestPermissionsRes
     private final int PERMISSIONS_REQUEST_CODE = 10;
 
     /**
+     * Remeber to tap into the Activity's {@link Activity#onRequestPermissionsResult(int, String[], int[])} with
+     * this class {@link PermissionManager#onRequestPermissionsResult(int, String[], int[])} see more on the method.
+     */
+    public PermissionManager(){}
+
+
+    /**
      * Is used to check whether a permission has been granted
      * @param context The activity context
      * @param permissionTypes the permission that will be checked
@@ -59,6 +66,15 @@ public class PermissionManager implements ActivityCompat.OnRequestPermissionsRes
     /**
      * Is used to tap into the Activity's callback.
      * simply call this method in the activity's {@link Activity#onRequestPermissionsResult(int, String[], int[])} in which this class is instantiated.
+     *
+     *     private PermissionManager permissionManager;
+     *     ...
+     *     @Override
+     *     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+     *         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+     *         permissionManager.onRequestPermissionsResult(requestCode, permissions,grantResults);
+     *     }
+     *
      * The parameters are the same and map's to the same...
      */
     @Override
