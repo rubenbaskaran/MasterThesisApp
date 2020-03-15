@@ -14,13 +14,22 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
+import com.flir.thermalsdk.image.ImageFactory;
+import com.flir.thermalsdk.image.JavaImageBuffer;
+import com.flir.thermalsdk.image.ThermalImageFile;
+
+import java.io.IOException;
+
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.R;
 
 public class MarkerActivity extends AppCompatActivity
 {
     ImageView imageView_markerImage;
-    String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "color_test";
+    String filename = "default_picture";
+    Boolean isThermalPicture;
+    private static final String TAG = CameraActivity.class.getSimpleName();
     String marker = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "marker";
     ImageView imageView_markerOne;
     ImageView imageView_markerTwo;
@@ -43,6 +52,9 @@ public class MarkerActivity extends AppCompatActivity
         if (receivedIntent.hasExtra("filename"))
         {
             filename = receivedIntent.getStringExtra("filename");
+        }
+        if (receivedIntent.hasExtra("isThermalImage")){
+            isThermalPicture = receivedIntent.getBooleanExtra("isThermalImage", true);
         }
 
         SetPicture();
@@ -86,6 +98,25 @@ public class MarkerActivity extends AppCompatActivity
         imageView_markerImage.setImageURI(Uri.parse(filename));
         imageView_markerOne.setImageURI(Uri.parse(marker));
         imageView_markerTwo.setImageURI(Uri.parse(marker));
+
+        if(isThermalPicture){
+            try {
+                if(ThermalImageFile.isThermalImage(filename)){
+                    ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filename);
+
+                    JavaImageBuffer javaBuffer = thermalImageFile.getImage();
+                    android.graphics.Bitmap bmp = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
+                    imageView_markerImage.setImageBitmap(bmp);
+
+                } else {
+                    Log.e(TAG, "SetPicture: IS NOT A THERMAL PICTURE");
+                }
+            } catch (IOException e) {
+                //TODO: Handle IO exception
+            }
+        } else {
+            imageView_markerImage.setImageURI(Uri.parse(filename));
+        }
     }
 
     private void GetCoordinates(ImageView marker)

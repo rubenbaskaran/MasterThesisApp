@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout_CameraActivity"
     android:layout_width="match_parent"
@@ -14,9 +15,16 @@
         android:layout_weight="4">
 
         <androidx.camera.view.CameraView
-            android:id="@+id/previewView_viewFinder"
+            android:id="@+id/cameraView_RgbViewFinder"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/imageView_thermalViewFinder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"/>
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -58,23 +66,24 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="40dp"
         android:layout_weight="1"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="1">
 
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="BackOnClick"
+            android:layout_weight="0.5"
+            android:onClick="backOnClick"
             android:text="Back" />
 
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="TakePictureOnClick"
+            android:layout_weight="0.5"
+            android:onClick="takePictureOnClick"
             android:text="Take Picture" />
     </LinearLayout>
+
 </LinearLayout>
