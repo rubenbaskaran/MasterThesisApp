@@ -41,14 +41,14 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.33"
-            android:onClick="BackOnClick"
+            android:onClick="backOnClick"
             android:text="Back" />
 
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.33"
-            android:onClick="TakePictureOnClick"
+            android:onClick="takePictureOnClick"
             android:text="Take Picture" />
 
         <Button

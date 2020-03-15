@@ -9,7 +9,6 @@ import com.flir.thermalsdk.androidsdk.BuildConfig;
 import com.flir.thermalsdk.androidsdk.ThermalSdkAndroid;
 import com.flir.thermalsdk.image.Point;
 import com.flir.thermalsdk.image.ThermalImage;
-import com.flir.thermalsdk.image.measurements.MeasurementSpot;
 import com.flir.thermalsdk.live.Camera;
 import com.flir.thermalsdk.live.CommunicationInterface;
 import com.flir.thermalsdk.live.Identity;
@@ -20,17 +19,23 @@ import com.flir.thermalsdk.live.discovery.DiscoveryFactory;
 import com.flir.thermalsdk.live.streaming.ThermalImageStreamListener;
 import com.flir.thermalsdk.log.ThermalLog;
 
+import java.util.ArrayList;
+
+import androidx.camera.core.ImageProxy;
+
 public class MyCameraManager {
 
     private static final String TAG = "CameraActivity";
     private Camera flirCamera;
     private ConnectionStatus connectionStatus;
     private boolean hasBeenInitialized = false;
-    private ThermalImagelistener thermalImagelistener;
+    private ArrayList<ThermalImagelistener> thermalImageListeners;
     private FlirConnectionListener flirConnectionListener = null;
     private UsbDevice usbDevice;
+    private ThermalImage tempSavedThermalImage;
 
     private static MyCameraManager instance;
+    private ImageProxy tempSavedImageProxy;
 
     private MyCameraManager() {}
 
@@ -58,24 +63,47 @@ public class MyCameraManager {
             ThermalSdkAndroid.init(applicationContext, enableLoggingInDebug);
             flirCamera = new Camera();
             hasBeenInitialized = true;
+            thermalImageListeners = new ArrayList<>();
         }
     }
 
-    public void subscribeToFlirCamera(ThermalImagelistener thermalImagelistener){
+    public void addThermalImageListener(ThermalImagelistener thermalImagelistener){
+        this.thermalImageListeners.add(thermalImagelistener);
+    }
+
+    public void InitCameraSearchAndSub(ThermalImagelistener thermalImagelistener){
         DiscoveryFactory.getInstance().scan(aDiscoveryEventListener, CommunicationInterface.USB);
-        this.thermalImagelistener = thermalImagelistener;
+        this.thermalImageListeners.add(thermalImagelistener);
     }
 
     public void subscribeToFlirConnectionStatus(FlirConnectionListener flirConnectionListener){
         this.flirConnectionListener = flirConnectionListener;
     }
 
-    private void updateThermalListener(ThermalImage thermalImage){
-        this.thermalImagelistener.subscribe(thermalImage);
+    public void saveThermalImage(ThermalImage thermalImage){
+        this.tempSavedThermalImage = thermalImage;
     }
 
-    public double getTempFromPoint(ThermalImage thermalImage, Point point){
-        return thermalImage.getValueAt(point);
+    public void saveNativeCameraImage(ImageProxy imageProxy){
+        this.tempSavedImageProxy = imageProxy;
+    }
+
+    public ImageProxy getTempSavedImageProxy() {
+        return tempSavedImageProxy;
+    }
+
+    public ThermalImage getTempSavedThermalImage() {
+        return tempSavedThermalImage;
+    }
+
+    public double getTempFromPoint(ThermalImage thermalImage, int x, int y){
+        return thermalImage.getValueAt(new Point(x, y));
+    }
+
+    private void updateThermalListener(ThermalImage thermalImage){
+        for (ThermalImagelistener t: this.thermalImageListeners) {
+            t.subscribe(thermalImage);
+        }
     }
 
     //region ---------- Flir's crappy setup code ----------

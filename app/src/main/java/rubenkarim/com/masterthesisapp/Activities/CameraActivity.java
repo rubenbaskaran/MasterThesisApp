@@ -15,19 +15,21 @@ import android.widget.ImageView;
 
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.JavaImageBuffer;
-import com.flir.thermalsdk.live.Camera;
-import com.flir.thermalsdk.live.connectivity.ConnectionStatus;
+import com.flir.thermalsdk.image.ThermalImage;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.ImageProxy;
 import androidx.camera.view.CameraView;
 import androidx.core.app.ActivityCompat;
 import rubenkarim.com.masterthesisapp.MyCameraManager.MyCameraManager;
@@ -35,15 +37,17 @@ import rubenkarim.com.masterthesisapp.R;
 
 public class CameraActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 10;
-    private static final String TAG = "CameraActivity";
+    private static final String TAG = CameraActivity.class.getSimpleName();
     private View rootView;
     private CameraView cameraViewFinder;
+    private boolean isThermalCameraOn = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
+        cameraViewFinder = findViewById(R.id.cameraView_RGBviewFinder);
 
         //Setup camera manager
         MyCameraManager.getInstance().Init(getApplicationContext());
@@ -68,21 +72,25 @@ public class CameraActivity extends AppCompatActivity {
     }
 
 
-//TODO: Handle Camera Disconnection!!!
+//TODO: Handle Camera Disconnection and disconnect camera on change of activity!!!
 
     private void showNativeCamera(){
         ImageView imageView = findViewById(R.id.imageView_thermalViewFinder);
-        imageView.setVisibility(View.GONE);
-        CameraView cameraView = findViewById(R.id.cameraView_RGBviewFinder);
-        cameraView.setVisibility(View.VISIBLE);
-        cameraView.bindToLifecycle(this);
+        if(imageView.getVisibility() == View.VISIBLE){
+            imageView.setVisibility(View.GONE);
+        }
+        isThermalCameraOn = false;
+        cameraViewFinder.setVisibility(View.VISIBLE);
+        cameraViewFinder.bindToLifecycle(this);
     }
 
     private void showThermalViewfinder(){
-        CameraView cameraView = findViewById(R.id.cameraView_RGBviewFinder);
-        cameraView.setVisibility(View.GONE);
+        if(cameraViewFinder.getVisibility() == View.VISIBLE){
+            cameraViewFinder.setVisibility(View.GONE);
+        }
         ImageView imageView = findViewById(R.id.imageView_thermalViewFinder);
         imageView.setVisibility(View.VISIBLE);
+        isThermalCameraOn = true;
     }
 
     private void flirCamera(){
@@ -91,7 +99,7 @@ public class CameraActivity extends AppCompatActivity {
         ViewGroup.LayoutParams params = imageView.getLayoutParams();
         imageView.setLayoutParams(params);
          */
-        MyCameraManager.getInstance().subscribeToFlirCamera((thermalImage)->{
+        MyCameraManager.getInstance().InitCameraSearchAndSub((thermalImage)->{
             //The image must not be processed on the UI Thread
             final ImageView flir_ViewFinder = findViewById(R.id.imageView_thermalViewFinder);
             JavaImageBuffer javaImageBuffer= thermalImage.getImage();
@@ -141,13 +149,45 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    public void BackOnClick(View view) {
+    public void backOnClick(View view) {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
     }
 
-    public void TakePictureOnClick(View view) {
-        //TODO: Fix take picture so i can take both with native an thermal
+    public void takePictureOnClick(View view) {
+        if(isThermalCameraOn){
+            takeAndSaveThermalImage();
+        } else {
+            takeAndSaveRGBImage();
+        }
+    }
+
+    private void takeAndSaveThermalImage(){
+
+        MyCameraManager.getInstance().addThermalImageListener((thermalImage)->{
+            File ImageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
+            boolean isDirectoryCreated = ImageDir.exists() || ImageDir.mkdirs();
+            try{
+            if (isDirectoryCreated) {
+                String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
+                String filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
+                thermalImage.saveAs(filepath);
+                goToMarkerActivity(filepath);
+            } else {
+
+                    throw new IOException("Image Directory not created");
+
+            }
+            } catch (IOException e) {
+                Log.d(TAG, "takeAndSaveThermalImage: ERROR: " + e);
+            }
+
+        });
+
+
+    }
+
+    private void takeAndSaveRGBImage(){
         File mImageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
         boolean isDirectoryCreated = mImageDir.exists() || mImageDir.mkdirs();
 
@@ -156,13 +196,22 @@ public class CameraActivity extends AppCompatActivity {
             String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis()));
             File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/Masterthesisimages", fileName+".jpg");
 
+            cameraViewFinder.takePicture(Runnable::run, new ImageCapture.OnImageCapturedCallback() {
+                @Override
+                public void onCaptureSuccess(@NonNull ImageProxy image) {
+                    super.onCaptureSuccess(image);
+                    //MyCameraManager.getInstance().saveNativeCameraImage(image);
+                    Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
+                    startActivity(intent);
+                }
+            });
+
+            /*
             cameraViewFinder.takePicture(file, Runnable::run, new ImageCapture.OnImageSavedCallback() {
                 @Override
                 public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                     Log.i(TAG, "onImageSaved: Picture saved! path: " + file.getPath());
-                    Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
-                    intent.putExtra("filename", file.getPath());
-                    startActivity(intent);
+                    goToMarkerActivity(file.getPath());
                 }
 
                 @Override
@@ -171,9 +220,17 @@ public class CameraActivity extends AppCompatActivity {
                 }
             });
 
+             */
+
         } else {
             Log.e(TAG, "TakePictureOnClick: There is an error with creating dir!");
         }
     }
 
+    private void goToMarkerActivity(String imageFilePath) {
+        Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
+        intent.putExtra("isThermalImage", isThermalCameraOn);
+        intent.putExtra("filename", imageFilePath);
+        startActivity(intent);
+    }
 }
