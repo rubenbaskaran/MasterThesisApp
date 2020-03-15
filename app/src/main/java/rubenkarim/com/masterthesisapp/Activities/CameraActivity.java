@@ -15,7 +15,6 @@ import android.widget.ImageView;
 
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.JavaImageBuffer;
-import com.flir.thermalsdk.image.ThermalImage;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -23,13 +22,11 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
-import androidx.camera.core.ImageProxy;
 import androidx.camera.view.CameraView;
 import androidx.core.app.ActivityCompat;
 import rubenkarim.com.masterthesisapp.MyCameraManager.MyCameraManager;
@@ -47,7 +44,7 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
-        cameraViewFinder = findViewById(R.id.cameraView_RGBviewFinder);
+        cameraViewFinder = findViewById(R.id.cameraView_RgbViewFinder);
 
         //Setup camera manager
         MyCameraManager.getInstance().Init(getApplicationContext());
@@ -82,6 +79,7 @@ public class CameraActivity extends AppCompatActivity {
         isThermalCameraOn = false;
         cameraViewFinder.setVisibility(View.VISIBLE);
         cameraViewFinder.bindToLifecycle(this);
+        Log.i(TAG, "showNativeCamera: Showing Native Camera");
     }
 
     private void showThermalViewfinder(){
