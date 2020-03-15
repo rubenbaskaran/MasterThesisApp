@@ -1,33 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout_CameraActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:weightSum="8"
-    tools:context=".Activities.CameraActivity"
-    android:id="@+id/linearLayout_CameraActivity">
+    android:weightSum="5"
+    tools:context=".Activities.CameraActivity">
 
-
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4">
 
     <androidx.camera.view.CameraView
         android:visibility="gone"
         android:id="@+id/cameraView_RGBviewFinder"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="7"
-        android:gravity="center"
-        >
+        android:gravity="center" />
 
-    </androidx.camera.view.CameraView>
+        <ImageView
+            android:layout_width="250dp"
+            android:layout_height="350dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/face_template" />
+    </RelativeLayout>
+
 
     <ImageView
         android:id="@+id/imageView_thermalViewFinder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="7" />
-
+        android:layout_weight="4" />
 
 
     <LinearLayout
@@ -40,24 +46,16 @@
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.33"
+            android:layout_weight="0.5"
             android:onClick="backOnClick"
             android:text="Back" />
 
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.33"
+            android:layout_weight="0.5"
             android:onClick="takePictureOnClick"
             android:text="Take Picture" />
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.33"
-            android:onClick="connectFlir"
-            android:text="Connect" />
-
     </LinearLayout>
 
 </LinearLayout>
