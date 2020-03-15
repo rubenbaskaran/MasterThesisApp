@@ -177,7 +177,7 @@ public class MarkerActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    public void SubmitOnClick(View view)
+    public void submitOnClick(View view)
     {
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
         intent.putExtra("filename", filename);
