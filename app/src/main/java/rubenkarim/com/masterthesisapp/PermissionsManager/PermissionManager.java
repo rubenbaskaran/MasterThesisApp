@@ -81,14 +81,19 @@ public class PermissionManager implements ActivityCompat.OnRequestPermissionsRes
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.i(TAG, "onRequestPermissionsResult: HELLO " + requestCode);
         if(requestCode == PERMISSIONS_REQUEST_CODE){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                if(this.permissionListener != null){
-                    Log.i(TAG, "onRequestPermissionsResult: user allowed all permissions");
-                    this.permissionListener.permissionGranted(permissions);
+
+            boolean isAllPermissionGranted=true;
+            for (int i: grantResults
+                 ) {
+                if (i == PackageManager.PERMISSION_DENIED) {
+                    isAllPermissionGranted = false;
+                    break;
                 }
-            } else {
-                if(this.permissionListener != null){
-                    Log.i(TAG, "onRequestPermissionsResult: user denied som permissions");
+            }
+            if(this.permissionListener != null){
+                if(isAllPermissionGranted){
+                    this.permissionListener.permissionGranted(permissions);
+                } else {
                     this.permissionListener.permissionDenied(permissions);
                 }
             }
