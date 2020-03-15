@@ -171,7 +171,7 @@ public class MarkerActivity extends AppCompatActivity
     }
 
     //region Navigation buttons
-    public void BackOnClick(View view)
+    public void backOnClick(View view)
     {
         Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
         startActivity(intent);
