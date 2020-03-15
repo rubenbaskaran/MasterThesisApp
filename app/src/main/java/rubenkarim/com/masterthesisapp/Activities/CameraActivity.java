@@ -172,7 +172,7 @@ public class CameraActivity extends AppCompatActivity {
                 String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
                 String filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                 thermalImage.saveAs(filepath);
-                goToMarkerActivity(filepath);
+                goToMarkerActivity(filepath, isThermalCameraOn);
             } else {
 
                     throw new IOException("Image Directory not created");
@@ -196,22 +196,12 @@ public class CameraActivity extends AppCompatActivity {
             String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis()));
             File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/Masterthesisimages", fileName+".jpg");
 
-            cameraViewFinder.takePicture(Runnable::run, new ImageCapture.OnImageCapturedCallback() {
-                @Override
-                public void onCaptureSuccess(@NonNull ImageProxy image) {
-                    super.onCaptureSuccess(image);
-                    //MyCameraManager.getInstance().saveNativeCameraImage(image);
-                    Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
-                    startActivity(intent);
-                }
-            });
 
-            /*
             cameraViewFinder.takePicture(file, Runnable::run, new ImageCapture.OnImageSavedCallback() {
                 @Override
                 public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                     Log.i(TAG, "onImageSaved: Picture saved! path: " + file.getPath());
-                    goToMarkerActivity(file.getPath());
+                    goToMarkerActivity(file.getPath(), isThermalCameraOn);
                 }
 
                 @Override
@@ -220,16 +210,14 @@ public class CameraActivity extends AppCompatActivity {
                 }
             });
 
-             */
-
         } else {
             Log.e(TAG, "TakePictureOnClick: There is an error with creating dir!");
         }
     }
 
-    private void goToMarkerActivity(String imageFilePath) {
+    private void goToMarkerActivity(String imageFilePath, boolean isThermalImage) {
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
-        intent.putExtra("isThermalImage", isThermalCameraOn);
+        intent.putExtra("isThermalImage", isThermalImage);
         intent.putExtra("filename", imageFilePath);
         startActivity(intent);
     }

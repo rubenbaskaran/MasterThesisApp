@@ -32,10 +32,7 @@ public class MyCameraManager {
     private ArrayList<ThermalImagelistener> thermalImageListeners;
     private FlirConnectionListener flirConnectionListener = null;
     private UsbDevice usbDevice;
-    private ThermalImage tempSavedThermalImage;
-
     private static MyCameraManager instance;
-    private ImageProxy tempSavedImageProxy;
 
     private MyCameraManager() {}
 
@@ -78,22 +75,6 @@ public class MyCameraManager {
 
     public void subscribeToFlirConnectionStatus(FlirConnectionListener flirConnectionListener){
         this.flirConnectionListener = flirConnectionListener;
-    }
-
-    public void saveThermalImage(ThermalImage thermalImage){
-        this.tempSavedThermalImage = thermalImage;
-    }
-
-    public void saveNativeCameraImage(ImageProxy imageProxy){
-        this.tempSavedImageProxy = imageProxy;
-    }
-
-    public ImageProxy getTempSavedImageProxy() {
-        return tempSavedImageProxy;
-    }
-
-    public ThermalImage getTempSavedThermalImage() {
-        return tempSavedThermalImage;
     }
 
     public double getTempFromPoint(ThermalImage thermalImage, int x, int y){
