@@ -181,6 +181,7 @@ public class MarkerActivity extends AppCompatActivity
     {
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
         intent.putExtra("filename", filename);
+        intent.putExtra("isThermalImage", isThermalPicture);
         startActivity(intent);
     }
     //endregion
