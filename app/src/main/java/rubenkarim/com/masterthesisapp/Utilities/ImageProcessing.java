@@ -7,31 +7,26 @@ import android.media.ExifInterface;
 
 import java.io.FileOutputStream;
 
-public class ImageProcessing
-{
-    public static void FixImageOrientation(String filename)
-    {
+/**
+ * Source: https://stackoverflow.com/questions/14066038/why-does-an-image-captured-using-camera-intent-gets-rotated-on-some-devices-on-a
+ */
+
+public class ImageProcessing {
+    public static void FixImageOrientation(String filename) {
         int degree = checkImageOrientation(filename);
-        if (degree != 0)
-        {
+        if (degree != 0) {
             rotateImage(degree, filename);
         }
     }
 
-    static int checkImageOrientation(String photoPath)
-    {
+    private static int checkImageOrientation(String photoPath) {
         int degree = 0;
 
-        try
-        {
+        try {
             ExifInterface ei = new ExifInterface(photoPath);
             int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
 
-            switch (orientation)
-            {
-                case ExifInterface.ORIENTATION_NORMAL:
-                    degree = 0;
-                    break;
+            switch (orientation) {
                 case ExifInterface.ORIENTATION_ROTATE_90:
                     degree = 90;
                     break;
@@ -41,34 +36,25 @@ public class ImageProcessing
                 case ExifInterface.ORIENTATION_ROTATE_270:
                     degree = 270;
                     break;
+                case ExifInterface.ORIENTATION_NORMAL:
                 case ExifInterface.ORIENTATION_UNDEFINED:
-                    degree = 0;
-                    break;
                 default:
                     degree = 0;
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             e.printStackTrace();
         }
 
         return degree;
     }
 
-    static String rotateImage(int degree, String imagePath)
-    {
-        if (degree <= 0)
-        {
-            return imagePath;
-        }
-        try
-        {
+    private static void rotateImage(int degree, String imagePath) {
+        try {
             Bitmap b = BitmapFactory.decodeFile(imagePath);
 
             Matrix matrix = new Matrix();
-            if (b.getWidth() > b.getHeight())
-            {
+            if (b.getWidth() > b.getHeight()) {
                 matrix.setRotate(degree);
                 b = Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), matrix, true);
             }
@@ -78,12 +64,10 @@ public class ImageProcessing
             String imageType = imageName.substring(imageName.lastIndexOf(".") + 1);
 
             FileOutputStream out = new FileOutputStream(imagePath);
-            if (imageType.equalsIgnoreCase("png"))
-            {
+            if (imageType.equalsIgnoreCase("png")) {
                 b.compress(Bitmap.CompressFormat.PNG, 100, out);
             }
-            else if (imageType.equalsIgnoreCase("jpeg") || imageType.equalsIgnoreCase("jpg"))
-            {
+            else if (imageType.equalsIgnoreCase("jpeg") || imageType.equalsIgnoreCase("jpg")) {
                 b.compress(Bitmap.CompressFormat.JPEG, 100, out);
             }
             fOut.flush();
@@ -91,10 +75,8 @@ public class ImageProcessing
 
             b.recycle();
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             e.printStackTrace();
         }
-        return imagePath;
     }
 }
