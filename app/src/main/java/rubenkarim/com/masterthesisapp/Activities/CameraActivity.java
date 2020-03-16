@@ -94,8 +94,9 @@ public class CameraActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        super.onPause();
         myCameraManager.close();
+        myCameraManager = null;
+        super.onPause();
     }
 
     @Override
@@ -131,21 +132,29 @@ public class CameraActivity extends AppCompatActivity {
             JavaImageBuffer javaImageBuffer= thermalImage.getImage();
             final Bitmap bitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
 
-            runOnUiThread(()-> flir_ViewFinder.setImageBitmap(bitmap));
+            runOnUiThread(()-> {
+                flir_ViewFinder.setImageBitmap(bitmap);
+            });
         });
+
         myCameraManager.subscribeToFlirConnectionStatus(new FlirConnectionListener() {
             @Override
-            public void onConnection(ConnectionStatus connectionStatus) {
+            public void onConnected(ConnectionStatus connectionStatus) {
+                runOnUiThread(()->{
+
+                });
                 Snackbar.make(rootView, "Camera connected", Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onDisconnection(ConnectionStatus connectionStatus, ErrorCode errorCode) {
-                if (!errorCode.getMessage().isEmpty()){
-                    Snackbar.make(rootView, "Disconnection Error: " + errorCode.getMessage(), Snackbar.LENGTH_INDEFINITE).show();
-                    myCameraManager.close();
-                    showNativeCamera();
-                }
+            public void onDisconnected(ConnectionStatus connectionStatus, ErrorCode errorCode) {
+                runOnUiThread(()->{
+                    if (!errorCode.getMessage().isEmpty()){
+                        Snackbar.make(rootView, "Disconnection Error: " + errorCode.getMessage(), Snackbar.LENGTH_INDEFINITE).show();
+                        Log.i(TAG, "onDisconnection: ERROR: " + errorCode.toString());
+                    }
+                });
+
 
             }
 
@@ -156,28 +165,33 @@ public class CameraActivity extends AppCompatActivity {
 
             @Override
             public void onConnecting(ConnectionStatus connectionStatus) {
-                //Snackbar.make(rootView, "Camera connecting", Snackbar.LENGTH_LONG).show();
+                runOnUiThread(()->{
+                    Snackbar.make(rootView, "Camera connecting", Snackbar.LENGTH_LONG).show();
+                });
+
             }
 
             @Override
             public void identityFound(Identity identity) {
-                if(myCameraManager.isFlirOne(identity)){
-                    Snackbar.make(rootView, "Flir One found", Snackbar.LENGTH_SHORT).show();
-                } else {
-                    Snackbar.make(rootView, "Hardware is not supported", Snackbar.LENGTH_SHORT).show();
-                }
             }
 
             @Override
             public void permissionError(UsbPermissionHandler.UsbPermissionListener.ErrorType errorType, Identity identity) {
-                Snackbar.make(rootView, "Permission error: " + errorType.name(), Snackbar.LENGTH_INDEFINITE).show();
+                runOnUiThread(()->{
+                    Snackbar.make(rootView, "Permission error: " + errorType.name(), Snackbar.LENGTH_INDEFINITE).show();
+                });
+
             }
 
             @Override
             public void permissionDenied(Identity identity) {
-                Snackbar.make(rootView, "USB Permission is Denied", Snackbar.LENGTH_INDEFINITE).show();
+                runOnUiThread(()->{
+                    Snackbar.make(rootView, "USB Permission is Denied", Snackbar.LENGTH_INDEFINITE).show();
+                });
             }
         });
+
+
     }
 
     public void backOnClick(View view) {
@@ -205,9 +219,8 @@ public class CameraActivity extends AppCompatActivity {
                 thermalImage.saveAs(filepath);
                 goToMarkerActivity(filepath, isThermalCameraOn);
             } else {
-
-                    throw new IOException("Image Directory not created");
-
+                Log.i(TAG, "takeAndSaveThermalImage: ERROR! IMAGE DIR NOT CREATED");
+                throw new IOException("Image Directory not created");
             }
             } catch (IOException e) {
                 Log.d(TAG, "takeAndSaveThermalImage: ERROR: " + e);

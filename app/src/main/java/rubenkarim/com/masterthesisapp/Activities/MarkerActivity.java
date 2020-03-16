@@ -108,6 +108,7 @@ public class MarkerActivity extends AppCompatActivity {
                 }
             }
             catch (IOException e) {
+                Log.e(TAG, "setPicture: IO ERROR: " + e.toString());
                 //TODO: Handle IO exception
             }
         }

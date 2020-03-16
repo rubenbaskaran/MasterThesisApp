@@ -6,8 +6,8 @@ import com.flir.thermalsdk.live.Identity;
 import com.flir.thermalsdk.live.connectivity.ConnectionStatus;
 
 public interface FlirConnectionListener {
-    void onConnection(ConnectionStatus connectionStatus);
-    void onDisconnection(ConnectionStatus connectionStatus, ErrorCode errorCode);
+    void onConnected(ConnectionStatus connectionStatus);
+    void onDisconnected(ConnectionStatus connectionStatus, ErrorCode errorCode);
 
     void onDisconnecting(ConnectionStatus connectionStatus);
 
