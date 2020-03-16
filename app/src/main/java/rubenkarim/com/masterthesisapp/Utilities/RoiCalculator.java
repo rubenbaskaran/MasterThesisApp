@@ -6,32 +6,39 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
-import java.util.Dictionary;
-import java.util.List;
-
-import rubenkarim.com.masterthesisapp.R;
-
 public class RoiCalculator {
-    public static List<Dictionary> getListOfRoiPixels(ImageView imageView) {
-        int width = imageView.getWidth();
-        int height = imageView.getHeight();
-        int radius = imageView.getWidth() / 2;
+    static int[] center;
+    static int radius;
+
+    public static void getListOfRoiPixels(ImageView roiCircle, View capturedImage) {
+        int width = roiCircle.getWidth();
+        int height = roiCircle.getHeight();
+        radius = roiCircle.getWidth() / 2;
         int[] leftUpperCornerLocation = new int[2];
-        imageView.getLocationOnScreen(leftUpperCornerLocation);
-        int[] center = {leftUpperCornerLocation[0] + radius, leftUpperCornerLocation[1] + radius};
-        Bitmap imageViewBitmap = ImageProcessing.loadBitmapFromView((View)imageView);
+        roiCircle.getLocationOnScreen(leftUpperCornerLocation);
+        center = new int[]{leftUpperCornerLocation[0] + radius, leftUpperCornerLocation[1] + radius};
+        Bitmap capturedImageBitmap = ImageProcessing.loadBitmapFromView(capturedImage);
+        int totalCounter = 0;
         int counter = 0;
 
-        for(int x = leftUpperCornerLocation[0]; x <= leftUpperCornerLocation[0] + width; x++){
-            for(int y = leftUpperCornerLocation[1]; y <= leftUpperCornerLocation[1] + height; y++){
-
-                // TODO: If pixel is within radius then get pixel value
-                Log.e("ROI Pixels", "x: " + x + ", y: " + y);
-                //imageViewBitmap.getPixel(x,y);
-                //Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
+        for (int x = leftUpperCornerLocation[0]; x <= leftUpperCornerLocation[0] + width; x++) {
+            for (int y = leftUpperCornerLocation[1]; y <= leftUpperCornerLocation[1] + height; y++) {
+                totalCounter += 1;
+                if (isPixelInsideRoi(x, y)) {
+                    counter += 1;
+                    int targetPixel = capturedImageBitmap.getPixel(x, y);
+                    Log.e("Target pixel", "x: " + x + ", y: " + y);
+                    Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
+                }
             }
         }
 
-        return null;
+        Log.e("totalCounter", String.valueOf(totalCounter));
+        Log.e("Counter", String.valueOf(counter));
+    }
+
+    private static boolean isPixelInsideRoi(int pixelX, int pixelY) {
+        double distanceFromCenterToPixel = Math.sqrt(Math.pow(center[0] - pixelX, 2) + Math.pow(center[1] - pixelY, 2));
+        return distanceFromCenterToPixel <= radius;
     }
 }

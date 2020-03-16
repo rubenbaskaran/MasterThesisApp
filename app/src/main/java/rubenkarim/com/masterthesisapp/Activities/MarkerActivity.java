@@ -24,6 +24,7 @@ import java.io.IOException;
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
+import rubenkarim.com.masterthesisapp.Utilities.RoiCalculator;
 
 public class MarkerActivity extends AppCompatActivity {
     ImageView imageView_markerImage;
@@ -36,6 +37,8 @@ public class MarkerActivity extends AppCompatActivity {
     int imageViewVerticalOffset;
     int imageHeight;
     int imageWidth;
+    ImageView imageView_leftEye;
+    View container;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,8 @@ public class MarkerActivity extends AppCompatActivity {
         imageView_markerTwo = findViewById(R.id.imageView_markerTwo);
         SetOnTouchListener(imageView_markerOne);
         SetOnTouchListener(imageView_markerTwo);
+        container = findViewById(R.id.linearLayout_MarkerActivity);
+        imageView_leftEye = findViewById(R.id.imageView_leftEye);
 
         Intent receivedIntent = getIntent();
         if (receivedIntent.hasExtra("filename")) {
@@ -131,7 +136,6 @@ public class MarkerActivity extends AppCompatActivity {
     }
 
     private void getPixelColor(int x, int y) {
-        View container = findViewById(R.id.linearLayout_MarkerActivity);
         Bitmap rootElementBitmap = ImageProcessing.loadBitmapFromView(container);
 
         x = x < 0 ? 0 : Math.min(x, imageWidth - 1);
@@ -151,6 +155,8 @@ public class MarkerActivity extends AppCompatActivity {
         imageHeight = imageView_markerImage.getHeight();
         imageWidth = imageView_markerImage.getWidth();
         Log.e("Image dimensions", "x: " + imageWidth + ", y: " + imageHeight);
+        // TODO: Should only be called if MinMaxAlgorithm is chosen
+        RoiCalculator.getListOfRoiPixels(imageView_leftEye, container);
     }
 
     //region Navigation buttons

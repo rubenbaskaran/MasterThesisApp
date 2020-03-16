@@ -45,7 +45,6 @@ public class CameraActivity extends AppCompatActivity {
     private boolean isThermalCameraOn = true;
     private MyCameraManager myCameraManager;
     private PermissionManager permissionManager;
-    private ImageView imageView_leftEye;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +54,6 @@ public class CameraActivity extends AppCompatActivity {
         cameraViewFinder = findViewById(R.id.cameraView_RgbViewFinder);
         myCameraManager = new MyCameraManager(getApplicationContext());
         permissionManager = new PermissionManager();
-        imageView_leftEye = findViewById(R.id.imageView_leftEye);
 
         //CheckforUsbDevice
         UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
@@ -208,9 +206,6 @@ public class CameraActivity extends AppCompatActivity {
         } else {
             takeAndSaveRGBImage();
         }
-
-        // TODO: Should only be called if MinMaxAlgorithm is chosen
-        RoiCalculator.getListOfRoiPixels(imageView_leftEye);
     }
 
     private void takeAndSaveThermalImage(){
