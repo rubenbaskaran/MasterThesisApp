@@ -2,8 +2,10 @@ package rubenkarim.com.masterthesisapp.Utilities;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.view.View;
 
 import java.io.FileOutputStream;
 
@@ -78,5 +80,16 @@ public class ImageProcessing {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static Bitmap loadBitmapFromView(View view) {
+        //Define a bitmap with the same size as the view
+        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        //Bind a canvas to it
+        Canvas canvas = new Canvas(returnedBitmap);
+        // draw the view on the canvas
+        view.draw(canvas);
+        //return the bitmap
+        return returnedBitmap;
     }
 }
