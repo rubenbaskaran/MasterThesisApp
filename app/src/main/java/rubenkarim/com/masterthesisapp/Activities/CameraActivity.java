@@ -97,7 +97,7 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    // TODO: Fix this
+    // TODO: Test
     private void ExecuteAlgorithm() {
         if (GlobalVariables.getCurrentAlgorithm().equals(GlobalVariables.Algorithms.MaxMinTemplate)) {
             ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
@@ -114,7 +114,7 @@ public class CameraActivity extends AppCompatActivity {
 
             MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
                     filepath,
-                    new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_rightEye.getWidth()),
+                    new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_leftEye.getWidth()),
                     new RoiModel(rightEyeLocation, imageView_rightEye.getHeight(), imageView_rightEye.getWidth()),
                     new RoiModel(noseLocation,imageView_nose.getHeight(), imageView_nose.getWidth())
             );
@@ -264,7 +264,6 @@ public class CameraActivity extends AppCompatActivity {
                     String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
                     filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                     thermalImage.saveAs(filepath);
-                    // TODO: Go to markeractivity after algorithm has been executed
                     ExecuteAlgorithm();
                 }
                 else {
@@ -296,7 +295,6 @@ public class CameraActivity extends AppCompatActivity {
                 @Override
                 public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                     Log.i(TAG, "onImageSaved: Picture saved! path: " + filepath);
-                    // TODO: Go to markeractivity after algorithm has been executed
                     ExecuteAlgorithm();
                 }
 
