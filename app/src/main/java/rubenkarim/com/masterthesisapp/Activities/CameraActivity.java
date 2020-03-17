@@ -97,7 +97,6 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    // TODO: Test
     private void ExecuteAlgorithm() {
         if (GlobalVariables.getCurrentAlgorithm().equals(GlobalVariables.Algorithms.MaxMinTemplate)) {
             ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);

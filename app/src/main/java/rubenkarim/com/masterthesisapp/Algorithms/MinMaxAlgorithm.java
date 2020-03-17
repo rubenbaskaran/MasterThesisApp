@@ -4,14 +4,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 import rubenkarim.com.masterthesisapp.Managers.AlgorithmManager;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
+import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 
 public class MinMaxAlgorithm extends AlgorithmManager {
 
@@ -29,8 +28,10 @@ public class MinMaxAlgorithm extends AlgorithmManager {
         this.leftEye = leftEye;
         this.rightEye = rightEye;
         this.nose = nose;
+        // TODO: Rotate image
+        ImageProcessing.FixImageOrientation(imagePath);
         capturedImageBitmap = BitmapFactory.decodeFile(imagePath);
-        modifiedBitmap = capturedImageBitmap.copy( Bitmap.Config.ARGB_8888 , true);
+        modifiedBitmap = capturedImageBitmap.copy(Bitmap.Config.ARGB_8888, true);
     }
 
     @Override
@@ -38,12 +39,14 @@ public class MinMaxAlgorithm extends AlgorithmManager {
         // TODO: What was the dimensions of the image when the template was applied
         // TODO: What is the dimension of the image when it is retrieved from memory and being processed
 
-        getListOfRoiPixels(leftEye);
-
+        double leftEyeMax = getListOfRoiPixels(leftEye, "hottest");
+        double rightEyeMax = getListOfRoiPixels(rightEye, "hottest");
+        double noseMin = getListOfRoiPixels(nose, "coldest");
+        saveImage();
         return 0;
     }
 
-    private void getListOfRoiPixels(RoiModel roiCircle) {
+    private double getListOfRoiPixels(RoiModel roiCircle, String category) {
         int width = roiCircle.getWidth();
         int height = roiCircle.getHeight();
         radius = roiCircle.getWidth() / 2;
@@ -51,6 +54,8 @@ public class MinMaxAlgorithm extends AlgorithmManager {
         center = new int[]{leftUpperCornerLocation[0] + radius, leftUpperCornerLocation[1] + radius};
         int totalCounter = 0;
         int counter = 0;
+        double maxValue = 0;
+        double minValue = 765;
 
         for (int x = leftUpperCornerLocation[0]; x <= leftUpperCornerLocation[0] + width; x++) {
             for (int y = leftUpperCornerLocation[1]; y <= leftUpperCornerLocation[1] + height; y++) {
@@ -60,6 +65,18 @@ public class MinMaxAlgorithm extends AlgorithmManager {
                     int targetPixel = capturedImageBitmap.getPixel(x, y);
                     Log.e("Target pixel", "x: " + x + ", y: " + y);
                     Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
+                    double colorSum = Color.red(targetPixel) + Color.green(targetPixel) + Color.blue(targetPixel);
+                    if(colorSum == 0){
+                        Log.e("test", "test");
+                    }
+
+                    if (category.equals("hottest")) {
+                        maxValue = Math.max(colorSum, maxValue);
+                    }
+                    else {
+                        minValue = Math.min(colorSum, minValue);
+                    }
+
                     modifiedBitmap.setPixel(x, y, Color.YELLOW);
                 }
             }
@@ -67,7 +84,7 @@ public class MinMaxAlgorithm extends AlgorithmManager {
 
         Log.e("totalCounter", String.valueOf(totalCounter));
         Log.e("Counter", String.valueOf(counter));
-        saveImage();
+        return category.equals("hottest") ? maxValue : minValue;
     }
 
     private boolean isPixelInsideRoi(int pixelX, int pixelY) {
@@ -76,7 +93,9 @@ public class MinMaxAlgorithm extends AlgorithmManager {
     }
 
     private void saveImage() {
-        try (FileOutputStream out = new FileOutputStream("/storage/emulated/0/Pictures/Masterthesisimages/14:14:25_bitmap.jpg")) {
+        String[] splittedImagePath = imagePath.split("\\.");
+        String duplicateImagePath = splittedImagePath[0] + "_bitmap." + splittedImagePath[1];
+        try (FileOutputStream out = new FileOutputStream(duplicateImagePath)) {
             modifiedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
             // PNG is a lossless format, the compression factor (100) is ignored
             Log.e("MinMaxAlgorithm", "Saved image with yellow dot");
