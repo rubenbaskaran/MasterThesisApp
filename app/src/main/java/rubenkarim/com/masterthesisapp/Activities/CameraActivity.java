@@ -48,6 +48,7 @@ public class CameraActivity extends AppCompatActivity {
     private boolean isThermalCameraOn = true;
     private MyCameraManager myCameraManager;
     private PermissionManager permissionManager;
+    private String filepath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,15 +100,29 @@ public class CameraActivity extends AppCompatActivity {
     // TODO: Fix this
     private void ExecuteAlgorithm() {
         if (GlobalVariables.getCurrentAlgorithm().equals(GlobalVariables.Algorithms.MaxMinTemplate)) {
+            ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
+            ImageView imageView_rightEye = findViewById(R.id.imageView_RightEye);
+            ImageView imageView_nose = findViewById(R.id.imageView_Nose);
+
+            int[] leftEyeLocation = new int[2];
+            int[] rightEyeLocation = new int[2];
+            int[] noseLocation = new int[2];
+
+            imageView_leftEye.getLocationOnScreen(leftEyeLocation);
+            imageView_rightEye.getLocationOnScreen(rightEyeLocation);
+            imageView_nose.getLocationOnScreen(noseLocation);
+
             MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
-                    "/storage/emulated/0/Pictures/Masterthesisimages/14:14:25.jpg",
-                    new RoiModel(new int[]{0, 280}, 210, 210),
-                    new RoiModel(new int[]{0, 280}, 210, 210),
-                    new RoiModel(new int[]{0, 280}, 210, 210)
+                    filepath,
+                    new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_rightEye.getWidth()),
+                    new RoiModel(rightEyeLocation, imageView_rightEye.getHeight(), imageView_rightEye.getWidth()),
+                    new RoiModel(noseLocation,imageView_nose.getHeight(), imageView_nose.getWidth())
             );
 
             minMaxAlgorithm.calculateGradient();
         }
+
+        goToMarkerActivity(filepath, isThermalCameraOn);
     }
 
     private void startView(HashMap<String, UsbDevice> deviceList) {
@@ -247,10 +262,10 @@ public class CameraActivity extends AppCompatActivity {
             try {
                 if (isDirectoryCreated) {
                     String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
-                    String filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
+                    filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                     thermalImage.saveAs(filepath);
                     // TODO: Go to markeractivity after algorithm has been executed
-                    goToMarkerActivity(filepath, isThermalCameraOn);
+                    ExecuteAlgorithm();
                 }
                 else {
                     Log.i(TAG, "takeAndSaveThermalImage: ERROR! IMAGE DIR NOT CREATED");
@@ -275,14 +290,14 @@ public class CameraActivity extends AppCompatActivity {
 
             String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis()));
             File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/Masterthesisimages", fileName + ".jpg");
-
+            filepath = file.getPath();
 
             cameraViewFinder.takePicture(file, Runnable::run, new ImageCapture.OnImageSavedCallback() {
                 @Override
                 public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                    Log.i(TAG, "onImageSaved: Picture saved! path: " + file.getPath());
+                    Log.i(TAG, "onImageSaved: Picture saved! path: " + filepath);
                     // TODO: Go to markeractivity after algorithm has been executed
-                    goToMarkerActivity(file.getPath(), isThermalCameraOn);
+                    ExecuteAlgorithm();
                 }
 
                 @Override
