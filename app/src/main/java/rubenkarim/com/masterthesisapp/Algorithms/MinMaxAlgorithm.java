@@ -7,9 +7,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import rubenkarim.com.masterthesisapp.Managers.AlgorithmManager;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
-import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 
 public class MinMaxAlgorithm extends AlgorithmManager {
 
@@ -19,34 +21,34 @@ public class MinMaxAlgorithm extends AlgorithmManager {
     private RoiModel nose;
     private int[] center;
     private int radius;
+    private Bitmap capturedImageBitmap;
+    private Bitmap modifiedBitmap;
 
     public MinMaxAlgorithm(String imagePath, RoiModel leftEye, RoiModel rightEye, RoiModel nose) {
         this.imagePath = imagePath;
         this.leftEye = leftEye;
         this.rightEye = rightEye;
         this.nose = nose;
-        Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+        capturedImageBitmap = BitmapFactory.decodeFile(imagePath);
+        modifiedBitmap = capturedImageBitmap.copy( Bitmap.Config.ARGB_8888 , true);
     }
 
     @Override
     public double calculateGradient() {
-        // TODO: Do we even need to convert to bitmap in order to get pixel value? What about png.GetPixel?
-        // TODO: Convert captured image to bitmap // debug and get path
         // TODO: What was the dimensions of the image when the template was applied
         // TODO: What is the dimension of the image when it is retrieved from memory and being processed
-        //getListOfRoiPixels(imageView_leftEye, container);
+
+        getListOfRoiPixels(leftEye);
 
         return 0;
     }
 
-    public void getListOfRoiPixels(ImageView roiCircle, View capturedImage) {
+    private void getListOfRoiPixels(RoiModel roiCircle) {
         int width = roiCircle.getWidth();
         int height = roiCircle.getHeight();
         radius = roiCircle.getWidth() / 2;
-        int[] leftUpperCornerLocation = new int[2];
-        roiCircle.getLocationOnScreen(leftUpperCornerLocation);
+        int[] leftUpperCornerLocation = roiCircle.getUpperLeftCornerLocation();
         center = new int[]{leftUpperCornerLocation[0] + radius, leftUpperCornerLocation[1] + radius};
-        Bitmap capturedImageBitmap = ImageProcessing.loadBitmapFromView(capturedImage);
         int totalCounter = 0;
         int counter = 0;
 
@@ -58,16 +60,29 @@ public class MinMaxAlgorithm extends AlgorithmManager {
                     int targetPixel = capturedImageBitmap.getPixel(x, y);
                     Log.e("Target pixel", "x: " + x + ", y: " + y);
                     Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
+                    modifiedBitmap.setPixel(x, y, Color.YELLOW);
                 }
             }
         }
 
         Log.e("totalCounter", String.valueOf(totalCounter));
         Log.e("Counter", String.valueOf(counter));
+        saveImage();
     }
 
     private boolean isPixelInsideRoi(int pixelX, int pixelY) {
         double distanceFromCenterToPixel = Math.sqrt(Math.pow(center[0] - pixelX, 2) + Math.pow(center[1] - pixelY, 2));
         return distanceFromCenterToPixel <= radius;
+    }
+
+    private void saveImage() {
+        try (FileOutputStream out = new FileOutputStream("/storage/emulated/0/Pictures/Masterthesisimages/14:14:25_bitmap.jpg")) {
+            modifiedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
+            // PNG is a lossless format, the compression factor (100) is ignored
+            Log.e("MinMaxAlgorithm", "Saved image with yellow dot");
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
