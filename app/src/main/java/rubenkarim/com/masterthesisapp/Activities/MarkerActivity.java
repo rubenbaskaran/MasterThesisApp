@@ -3,7 +3,6 @@ package rubenkarim.com.masterthesisapp.Activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
@@ -24,7 +23,6 @@ import java.io.IOException;
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
-import rubenkarim.com.masterthesisapp.Utilities.RoiCalculator;
 
 public class MarkerActivity extends AppCompatActivity {
     ImageView imageView_markerImage;
@@ -155,8 +153,6 @@ public class MarkerActivity extends AppCompatActivity {
         imageHeight = imageView_markerImage.getHeight();
         imageWidth = imageView_markerImage.getWidth();
         Log.e("Image dimensions", "x: " + imageWidth + ", y: " + imageHeight);
-        // TODO: Should only be called if MinMaxAlgorithm is chosen
-        RoiCalculator.getListOfRoiPixels(imageView_leftEye, container);
     }
 
     //region Navigation buttons

@@ -36,7 +36,6 @@ import rubenkarim.com.masterthesisapp.MyCameraManager.MyCameraManager;
 import rubenkarim.com.masterthesisapp.PermissionsManager.PermissionListener;
 import rubenkarim.com.masterthesisapp.PermissionsManager.PermissionManager;
 import rubenkarim.com.masterthesisapp.R;
-import rubenkarim.com.masterthesisapp.Utilities.RoiCalculator;
 
 public class CameraActivity extends AppCompatActivity {
     private static final String TAG = CameraActivity.class.getSimpleName();
