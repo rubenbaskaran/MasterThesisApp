@@ -32,9 +32,39 @@
             android:layout_height="350dp"
             android:layout_centerInParent="true"
             android:src="@drawable/face_template"
-            android:visibility="invisible">
+            android:visibility="visible">
 
         </ImageView>
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout_minMaxTemplate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="invisible">
+
+            <ImageView
+                android:id="@+id/imageView_leftEye"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/detailed_face_template" />
+
+            <ImageView
+                android:id="@+id/imageView_RightEye"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_toEndOf="@id/imageView_leftEye"
+                android:src="@drawable/detailed_face_template" />
+
+            <ImageView
+                android:id="@+id/imageView_Nose"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_below="@id/imageView_leftEye"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/detailed_face_template"
+                android:layout_marginTop="-10dp"/>
+        </RelativeLayout>
     </RelativeLayout>
 
     <LinearLayout

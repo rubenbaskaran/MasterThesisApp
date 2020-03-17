@@ -6,8 +6,6 @@ import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
-import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
-import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 
@@ -16,14 +14,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
-                "/storage/emulated/0/Pictures/Masterthesisimages/14:14:25.jpg",
-                new RoiModel(new int[]{0, 280}, 210, 210),
-                new RoiModel(new int[]{0, 280}, 210, 210),
-                new RoiModel(new int[]{0, 280}, 210, 210)
-        );
-
-        minMaxAlgorithm.calculateGradient();
     }
 
     public void ChooseAlgorithmOnClick(View view) {
