@@ -1,6 +1,7 @@
 package rubenkarim.com.masterthesisapp.Algorithms;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
@@ -24,12 +25,15 @@ public class MinMaxAlgorithm extends AlgorithmManager {
         this.leftEye = leftEye;
         this.rightEye = rightEye;
         this.nose = nose;
+        Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
     }
 
     @Override
     public double calculateGradient() {
-
-        // TODO: Convert default_picture in drawble to bitmap
+        // TODO: Do we even need to convert to bitmap in order to get pixel value? What about png.GetPixel?
+        // TODO: Convert captured image to bitmap // debug and get path
+        // TODO: What was the dimensions of the image when the template was applied
+        // TODO: What is the dimension of the image when it is retrieved from memory and being processed
         //getListOfRoiPixels(imageView_leftEye, container);
 
         return 0;
