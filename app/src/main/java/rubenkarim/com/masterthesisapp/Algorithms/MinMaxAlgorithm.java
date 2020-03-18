@@ -9,6 +9,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import rubenkarim.com.masterthesisapp.Managers.AlgorithmManager;
+import rubenkarim.com.masterthesisapp.Models.GradientModel;
+import rubenkarim.com.masterthesisapp.Models.InterestPointModel;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 
@@ -28,25 +30,32 @@ public class MinMaxAlgorithm extends AlgorithmManager {
         this.leftEye = leftEye;
         this.rightEye = rightEye;
         this.nose = nose;
-        // TODO: Rotate image
+
         ImageProcessing.FixImageOrientation(imagePath);
         capturedImageBitmap = BitmapFactory.decodeFile(imagePath);
         modifiedBitmap = capturedImageBitmap.copy(Bitmap.Config.ARGB_8888, true);
     }
 
     @Override
-    public double calculateGradient() {
+    public GradientModel getGradientAndPositions() {
         // TODO: What was the dimensions of the image when the template was applied
         // TODO: What is the dimension of the image when it is retrieved from memory and being processed
 
-        double leftEyeMax = getListOfRoiPixels(leftEye, "hottest");
-        double rightEyeMax = getListOfRoiPixels(rightEye, "hottest");
-        double noseMin = getListOfRoiPixels(nose, "coldest");
-        saveImage();
-        return 0;
+        InterestPointModel leftEyeMax = GetMaxMinSpotInRoi(leftEye, "max");
+        InterestPointModel rightEyeMax = GetMaxMinSpotInRoi(rightEye, "max");
+        InterestPointModel noseMin = GetMaxMinSpotInRoi(nose, "min");
+
+        SaveDuplicateImageForTestingPurpose();
+
+        if (leftEyeMax.getValue() > rightEyeMax.getValue()) {
+            return new GradientModel(leftEyeMax.getValue() - noseMin.getValue(), leftEyeMax.getPosition(), noseMin.getPosition());
+        }
+        else {
+            return new GradientModel(rightEyeMax.getValue() - noseMin.getValue(), rightEyeMax.getPosition(), noseMin.getPosition());
+        }
     }
 
-    private double getListOfRoiPixels(RoiModel roiCircle, String category) {
+    private InterestPointModel GetMaxMinSpotInRoi(RoiModel roiCircle, String category) {
         int width = roiCircle.getWidth();
         int height = roiCircle.getHeight();
         radius = roiCircle.getWidth() / 2;
@@ -54,6 +63,7 @@ public class MinMaxAlgorithm extends AlgorithmManager {
         center = new int[]{leftUpperCornerLocation[0] + radius, leftUpperCornerLocation[1] + radius};
         int totalCounter = 0;
         int counter = 0;
+        int[] position = new int[2];
         double maxValue = 0;
         double minValue = 765;
 
@@ -66,15 +76,14 @@ public class MinMaxAlgorithm extends AlgorithmManager {
                     Log.e("Target pixel", "x: " + x + ", y: " + y);
                     Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
                     double colorSum = Color.red(targetPixel) + Color.green(targetPixel) + Color.blue(targetPixel);
-                    if(colorSum == 0){
-                        Log.e("test", "test");
-                    }
 
-                    if (category.equals("hottest")) {
+                    if (category.equals("max")) {
                         maxValue = Math.max(colorSum, maxValue);
+                        position = new int[]{x, y};
                     }
                     else {
                         minValue = Math.min(colorSum, minValue);
+                        position = new int[]{x, y};
                     }
 
                     modifiedBitmap.setPixel(x, y, Color.YELLOW);
@@ -84,7 +93,8 @@ public class MinMaxAlgorithm extends AlgorithmManager {
 
         Log.e("totalCounter", String.valueOf(totalCounter));
         Log.e("Counter", String.valueOf(counter));
-        return category.equals("hottest") ? maxValue : minValue;
+
+        return new InterestPointModel(category.equals("max") ? maxValue : minValue, position);
     }
 
     private boolean isPixelInsideRoi(int pixelX, int pixelY) {
@@ -92,7 +102,7 @@ public class MinMaxAlgorithm extends AlgorithmManager {
         return distanceFromCenterToPixel <= radius;
     }
 
-    private void saveImage() {
+    private void SaveDuplicateImageForTestingPurpose() {
         String[] splittedImagePath = imagePath.split("\\.");
         String duplicateImagePath = splittedImagePath[0] + "_bitmap." + splittedImagePath[1];
         try (FileOutputStream out = new FileOutputStream(duplicateImagePath)) {

@@ -33,6 +33,7 @@ import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.view.CameraView;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
+import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.MyCameraManager.FlirConnectionListener;
 import rubenkarim.com.masterthesisapp.MyCameraManager.MyCameraManager;
@@ -98,6 +99,8 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void ExecuteAlgorithm() {
+        GradientModel gradientAndPositions = null;
+
         if (GlobalVariables.getCurrentAlgorithm().equals(GlobalVariables.Algorithms.MaxMinTemplate)) {
             ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
             ImageView imageView_rightEye = findViewById(R.id.imageView_RightEye);
@@ -118,9 +121,11 @@ public class CameraActivity extends AppCompatActivity {
                     new RoiModel(noseLocation,imageView_nose.getHeight(), imageView_nose.getWidth())
             );
 
-            minMaxAlgorithm.calculateGradient();
+            gradientAndPositions = minMaxAlgorithm.getGradientAndPositions();
         }
 
+        Log.e("GradientAndPositions", String.valueOf(gradientAndPositions.getGradient()));
+        // TODO: pass gradientAndPositions
         goToMarkerActivity(filepath, isThermalCameraOn);
     }
 
