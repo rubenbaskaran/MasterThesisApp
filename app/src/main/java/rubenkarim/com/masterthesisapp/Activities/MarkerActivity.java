@@ -21,6 +21,7 @@ import com.flir.thermalsdk.image.ThermalImageFile;
 import java.io.IOException;
 
 import androidx.appcompat.app.AppCompatActivity;
+import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 
@@ -49,6 +50,7 @@ public class MarkerActivity extends AppCompatActivity {
         SetOnTouchListener(imageView_markerTwo);
         container = findViewById(R.id.linearLayout_MarkerActivity);
         imageView_leftEye = findViewById(R.id.imageView_leftEye);
+        GradientModel gradientAndPosition = null;
 
         Intent receivedIntent = getIntent();
         if (receivedIntent.hasExtra("filename")) {
@@ -56,6 +58,12 @@ public class MarkerActivity extends AppCompatActivity {
         }
         if (receivedIntent.hasExtra("isThermalImage")) {
             isThermalPicture = receivedIntent.getBooleanExtra("isThermalImage", true);
+        }
+
+        Bundle bundle = receivedIntent.getExtras();
+
+        if (bundle != null) {
+            gradientAndPosition = (GradientModel) bundle.getSerializable("gradientAndPositions");
         }
 
         setPicture();

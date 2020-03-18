@@ -1,6 +1,8 @@
 package rubenkarim.com.masterthesisapp.Models;
 
-public class GradientModel {
+import java.io.Serializable;
+
+public class GradientModel implements Serializable {
     public double getGradient() {
         return Gradient;
     }

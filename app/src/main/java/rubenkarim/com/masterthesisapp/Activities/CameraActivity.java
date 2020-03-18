@@ -143,7 +143,7 @@ public class CameraActivity extends AppCompatActivity {
         }
 
         // TODO: pass gradientAndPositions
-        goToMarkerActivity(filepath, isThermalCameraOn);
+        goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
     }
 
     private void startView(HashMap<String, UsbDevice> deviceList) {
@@ -331,10 +331,13 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    private void goToMarkerActivity(String imageFilePath, boolean isThermalImage) {
+    private void goToMarkerActivity(String imageFilePath, boolean isThermalImage, GradientModel gradientAndPositions) {
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
         intent.putExtra("isThermalImage", isThermalImage);
         intent.putExtra("filename", imageFilePath);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("gradientAndPositions", gradientAndPositions);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 }
