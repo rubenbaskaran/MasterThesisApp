@@ -90,41 +90,58 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void SetupAlgorithm() {
-        if (GlobalVariables.getCurrentAlgorithm().equals(GlobalVariables.Algorithms.MaxMinTemplate)) {
-            RelativeLayout relativeLayout_minMaxTemplate = findViewById(R.id.relativeLayout_minMaxTemplate);
-            ImageView imageView_head = findViewById(R.id.imageView_head);
-            relativeLayout_minMaxTemplate.setVisibility(View.VISIBLE);
-            imageView_head.setVisibility(View.INVISIBLE);
+        switch (GlobalVariables.getCurrentAlgorithm()) {
+            case CNN:
+                // TODO: Add setup for CNN
+                break;
+            case CNNWithTransferLearning:
+                // TODO: Add setup CNN with transfer learning
+                break;
+            case RgbThermalMapping:
+                // TODO: Add setup for RgbThermalMapping
+                break;
+            case MaxMinTemplate:
+                RelativeLayout relativeLayout_minMaxTemplate = findViewById(R.id.relativeLayout_minMaxTemplate);
+                ImageView imageView_head = findViewById(R.id.imageView_head);
+                relativeLayout_minMaxTemplate.setVisibility(View.VISIBLE);
+                imageView_head.setVisibility(View.INVISIBLE);
+                break;
         }
     }
 
     private void ExecuteAlgorithm() {
         GradientModel gradientAndPositions = null;
 
-        if (GlobalVariables.getCurrentAlgorithm().equals(GlobalVariables.Algorithms.MaxMinTemplate)) {
-            ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
-            ImageView imageView_rightEye = findViewById(R.id.imageView_RightEye);
-            ImageView imageView_nose = findViewById(R.id.imageView_Nose);
-
-            int[] leftEyeLocation = new int[2];
-            int[] rightEyeLocation = new int[2];
-            int[] noseLocation = new int[2];
-
-            imageView_leftEye.getLocationOnScreen(leftEyeLocation);
-            imageView_rightEye.getLocationOnScreen(rightEyeLocation);
-            imageView_nose.getLocationOnScreen(noseLocation);
-
-            MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
-                    filepath,
-                    new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_leftEye.getWidth()),
-                    new RoiModel(rightEyeLocation, imageView_rightEye.getHeight(), imageView_rightEye.getWidth()),
-                    new RoiModel(noseLocation,imageView_nose.getHeight(), imageView_nose.getWidth())
-            );
-
-            gradientAndPositions = minMaxAlgorithm.getGradientAndPositions();
+        switch (GlobalVariables.getCurrentAlgorithm()) {
+            case CNN:
+                // TODO: Add setup for CNN
+                break;
+            case CNNWithTransferLearning:
+                // TODO: Add setup CNN with transfer learning
+                break;
+            case RgbThermalMapping:
+                // TODO: Add setup for RgbThermalMapping
+                break;
+            case MaxMinTemplate:
+                ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
+                ImageView imageView_rightEye = findViewById(R.id.imageView_RightEye);
+                ImageView imageView_nose = findViewById(R.id.imageView_Nose);
+                int[] leftEyeLocation = new int[2];
+                int[] rightEyeLocation = new int[2];
+                int[] noseLocation = new int[2];
+                imageView_leftEye.getLocationOnScreen(leftEyeLocation);
+                imageView_rightEye.getLocationOnScreen(rightEyeLocation);
+                imageView_nose.getLocationOnScreen(noseLocation);
+                MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
+                        filepath,
+                        new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_leftEye.getWidth()),
+                        new RoiModel(rightEyeLocation, imageView_rightEye.getHeight(), imageView_rightEye.getWidth()),
+                        new RoiModel(noseLocation, imageView_nose.getHeight(), imageView_nose.getWidth())
+                );
+                gradientAndPositions = minMaxAlgorithm.getGradientAndPositions();
+                break;
         }
 
-        Log.e("GradientAndPositions", String.valueOf(gradientAndPositions.getGradient()));
         // TODO: pass gradientAndPositions
         goToMarkerActivity(filepath, isThermalCameraOn);
     }
