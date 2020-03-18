@@ -92,13 +92,13 @@ public class CameraActivity extends AppCompatActivity {
     private void SetupAlgorithm() {
         switch (GlobalVariables.getCurrentAlgorithm()) {
             case CNN:
-                // TODO: Add setup for CNN
+                // Add setup for CNN
                 break;
             case CNNWithTransferLearning:
-                // TODO: Add setup CNN with transfer learning
+                // Add setup for CNN with transfer learning
                 break;
             case RgbThermalMapping:
-                // TODO: Add setup for RgbThermalMapping
+                // Add setup for RgbThermalMapping
                 break;
             case MaxMinTemplate:
                 RelativeLayout relativeLayout_minMaxTemplate = findViewById(R.id.relativeLayout_minMaxTemplate);
@@ -114,13 +114,13 @@ public class CameraActivity extends AppCompatActivity {
 
         switch (GlobalVariables.getCurrentAlgorithm()) {
             case CNN:
-                // TODO: Add setup for CNN
+                // Add execution for CNN
                 break;
             case CNNWithTransferLearning:
-                // TODO: Add setup CNN with transfer learning
+                // Add execution for CNN with transfer learning
                 break;
             case RgbThermalMapping:
-                // TODO: Add setup for RgbThermalMapping
+                // Add execution for RgbThermalMapping
                 break;
             case MaxMinTemplate:
                 ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
