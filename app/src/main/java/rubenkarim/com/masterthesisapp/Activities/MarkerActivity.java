@@ -3,7 +3,6 @@ package rubenkarim.com.masterthesisapp.Activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
@@ -36,6 +35,8 @@ public class MarkerActivity extends AppCompatActivity {
     int imageViewVerticalOffset;
     int imageHeight;
     int imageWidth;
+    ImageView imageView_leftEye;
+    View container;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,8 @@ public class MarkerActivity extends AppCompatActivity {
         imageView_markerTwo = findViewById(R.id.imageView_markerTwo);
         SetOnTouchListener(imageView_markerOne);
         SetOnTouchListener(imageView_markerTwo);
+        container = findViewById(R.id.linearLayout_MarkerActivity);
+        imageView_leftEye = findViewById(R.id.imageView_leftEye);
 
         Intent receivedIntent = getIntent();
         if (receivedIntent.hasExtra("filename")) {
@@ -131,8 +134,7 @@ public class MarkerActivity extends AppCompatActivity {
     }
 
     private void getPixelColor(int x, int y) {
-        View container = findViewById(R.id.linearLayout_MarkerActivity);
-        Bitmap rootElementBitmap = loadBitmapFromView(container);
+        Bitmap rootElementBitmap = ImageProcessing.loadBitmapFromView(container);
 
         x = x < 0 ? 0 : Math.min(x, imageWidth - 1);
         y = y < 0 ? 0 : Math.min(y, imageHeight - 1);
@@ -140,17 +142,6 @@ public class MarkerActivity extends AppCompatActivity {
         int targetPixel = rootElementBitmap.getPixel(x, y);
         Log.e("Target pixel", "x: " + x + ", y: " + y);
         Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
-    }
-
-    public static Bitmap loadBitmapFromView(View view) {
-        //Define a bitmap with the same size as the view
-        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
-        //Bind a canvas to it
-        Canvas canvas = new Canvas(returnedBitmap);
-        // draw the view on the canvas
-        view.draw(canvas);
-        //return the bitmap
-        return returnedBitmap;
     }
 
     @Override

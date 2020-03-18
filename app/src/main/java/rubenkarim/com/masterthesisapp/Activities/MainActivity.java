@@ -9,17 +9,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 
-public class MainActivity extends AppCompatActivity
-{
+public class MainActivity extends AppCompatActivity {
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
 
-    public void ChooseAlgorithmOnClick(View view)
-    {
+    public void ChooseAlgorithmOnClick(View view) {
         int idOfChosenAlgorithm = Integer.parseInt(String.valueOf(view.getTag()));
         GlobalVariables.Algorithms chosenAlgorithm = GlobalVariables.Algorithms.values()[idOfChosenAlgorithm];
         GlobalVariables.setCurrentAlgorithm(chosenAlgorithm);
