@@ -1,7 +1,7 @@
-package rubenkarim.com.masterthesisapp.Managers;
+package rubenkarim.com.masterthesisapp.Algorithms;
 
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 
-public abstract class AlgorithmManager {
+public abstract class AbstractAlgorithm {
     public abstract GradientModel getGradientAndPositions();
 }

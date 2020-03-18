@@ -8,13 +8,12 @@ import android.util.Log;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import rubenkarim.com.masterthesisapp.Managers.AlgorithmManager;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.Models.InterestPointModel;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 
-public class MinMaxAlgorithm extends AlgorithmManager {
+public class MinMaxAlgorithm extends AbstractAlgorithm {
 
     private String imagePath;
     private RoiModel leftEye;
