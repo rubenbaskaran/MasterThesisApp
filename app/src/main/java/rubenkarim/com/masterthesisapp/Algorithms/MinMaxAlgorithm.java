@@ -19,26 +19,28 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     private RoiModel leftEye;
     private RoiModel rightEye;
     private RoiModel nose;
+    private int[] uiViewDimensions;
+    private int[] imageOriginalDimensions;
     private int[] center;
     private int radius;
     private Bitmap capturedImageBitmap;
     private Bitmap modifiedBitmap;
 
-    public MinMaxAlgorithm(String imagePath, RoiModel leftEye, RoiModel rightEye, RoiModel nose) {
+    public MinMaxAlgorithm(String imagePath, RoiModel leftEye, RoiModel rightEye, RoiModel nose, int[] uiViewDimensions) {
         this.imagePath = imagePath;
         this.leftEye = leftEye;
         this.rightEye = rightEye;
         this.nose = nose;
+        this.uiViewDimensions = uiViewDimensions;
 
         ImageProcessing.FixImageOrientation(imagePath);
         capturedImageBitmap = BitmapFactory.decodeFile(imagePath);
+        imageOriginalDimensions = new int[]{capturedImageBitmap.getWidth(), capturedImageBitmap.getHeight()};
         modifiedBitmap = capturedImageBitmap.copy(Bitmap.Config.ARGB_8888, true);
     }
 
     @Override
     public GradientModel getGradientAndPositions() {
-        // TODO: Get ImageView dimension
-        // TODO: Get saved image dimension
         // TODO: Find relationship between dimensions
         // TODO: Multiply/divide x,y values accordingly
         // TODO: Move scaling method to utility class, so that it can also be used by MarkerActivity

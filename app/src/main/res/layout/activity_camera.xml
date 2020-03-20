@@ -15,7 +15,7 @@
         android:layout_weight="4">
 
         <androidx.camera.view.CameraView
-            android:id="@+id/cameraView_RgbViewFinder"
+            android:id="@+id/cameraView_rgbViewFinder"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone" />

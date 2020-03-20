@@ -45,18 +45,19 @@ import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 public class CameraActivity extends AppCompatActivity {
     private static final String TAG = CameraActivity.class.getSimpleName();
     private View rootView;
-    private CameraView cameraViewFinder;
+    private CameraView cameraView_rgbViewFinder;
     private boolean isThermalCameraOn = true;
     private MyCameraManager myCameraManager;
     private PermissionManager permissionManager;
     private String filepath;
+    ImageView imageView_thermalViewFinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
-        cameraViewFinder = findViewById(R.id.cameraView_RgbViewFinder);
+        cameraView_rgbViewFinder = findViewById(R.id.cameraView_rgbViewFinder);
         myCameraManager = new MyCameraManager(getApplicationContext());
         permissionManager = new PermissionManager();
 
@@ -136,7 +137,10 @@ public class CameraActivity extends AppCompatActivity {
                         filepath,
                         new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_leftEye.getWidth()),
                         new RoiModel(rightEyeLocation, imageView_rightEye.getHeight(), imageView_rightEye.getWidth()),
-                        new RoiModel(noseLocation, imageView_nose.getHeight(), imageView_nose.getWidth())
+                        new RoiModel(noseLocation, imageView_nose.getHeight(), imageView_nose.getWidth()),
+                        isThermalCameraOn ?
+                                new int[]{imageView_thermalViewFinder.getWidth(), imageView_thermalViewFinder.getHeight()}
+                                : new int[]{cameraView_rgbViewFinder.getWidth(), cameraView_rgbViewFinder.getHeight()}
                 );
                 gradientAndPositions = minMaxAlgorithm.getGradientAndPositions();
                 break;
@@ -172,22 +176,22 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void showNativeCamera() {
-        ImageView imageView = findViewById(R.id.imageView_thermalViewFinder);
-        if (imageView.getVisibility() == View.VISIBLE) {
-            imageView.setVisibility(View.GONE);
+        imageView_thermalViewFinder = findViewById(R.id.imageView_thermalViewFinder);
+        if (imageView_thermalViewFinder.getVisibility() == View.VISIBLE) {
+            imageView_thermalViewFinder.setVisibility(View.GONE);
         }
         isThermalCameraOn = false;
-        cameraViewFinder.setVisibility(View.VISIBLE);
-        cameraViewFinder.bindToLifecycle(this);
+        cameraView_rgbViewFinder.setVisibility(View.VISIBLE);
+        cameraView_rgbViewFinder.bindToLifecycle(this);
         Log.i(TAG, "showNativeCamera: Showing Native Camera");
     }
 
     private void showThermalViewfinder() {
-        if (cameraViewFinder.getVisibility() == View.VISIBLE) {
-            cameraViewFinder.setVisibility(View.GONE);
+        if (cameraView_rgbViewFinder.getVisibility() == View.VISIBLE) {
+            cameraView_rgbViewFinder.setVisibility(View.GONE);
         }
-        ImageView imageView = findViewById(R.id.imageView_thermalViewFinder);
-        imageView.setVisibility(View.VISIBLE);
+        imageView_thermalViewFinder = findViewById(R.id.imageView_thermalViewFinder);
+        imageView_thermalViewFinder.setVisibility(View.VISIBLE);
         isThermalCameraOn = true;
     }
 
@@ -311,7 +315,7 @@ public class CameraActivity extends AppCompatActivity {
             File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/Masterthesisimages", fileName + ".jpg");
             filepath = file.getPath();
 
-            cameraViewFinder.takePicture(file, Runnable::run, new ImageCapture.OnImageSavedCallback() {
+            cameraView_rgbViewFinder.takePicture(file, Runnable::run, new ImageCapture.OnImageSavedCallback() {
                 @Override
                 public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                     Log.i(TAG, "onImageSaved: Picture saved! path: " + filepath);
