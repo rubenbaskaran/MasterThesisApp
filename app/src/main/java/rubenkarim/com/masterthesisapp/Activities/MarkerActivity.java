@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.ImageFactory;
@@ -32,26 +33,18 @@ public class MarkerActivity extends AppCompatActivity {
     private static final String TAG = CameraActivity.class.getSimpleName();
     String eyeMarkerPath = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "eye_marker";
     String noseMarkerPath = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "nose_marker";
-    ImageView imageView_noseMarker;
-    ImageView imageView_eyeMarker;
     int imageViewVerticalOffset;
     int imageHeight;
     int imageWidth;
-    ImageView imageView_leftEye;
     View container;
-    GradientModel gradientAndPosition;
+    GradientModel gradientAndPositions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_marker);
         imageView_markerImage = findViewById(R.id.imageView_markerImage);
-        imageView_noseMarker = findViewById(R.id.imageView_noseMarker);
-        imageView_eyeMarker = findViewById(R.id.imageView_eyeMarker);
-        SetOnTouchListener(imageView_noseMarker);
-        SetOnTouchListener(imageView_eyeMarker);
         container = findViewById(R.id.linearLayout_MarkerActivity);
-        imageView_leftEye = findViewById(R.id.imageView_leftEye);
 
         Intent receivedIntent = getIntent();
         if (receivedIntent.hasExtra("filename")) {
@@ -62,9 +55,8 @@ public class MarkerActivity extends AppCompatActivity {
         }
 
         Bundle bundle = receivedIntent.getExtras();
-
         if (bundle != null) {
-            gradientAndPosition = (GradientModel) bundle.getSerializable("gradientAndPositions");
+            gradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
         }
 
         setPicture();
@@ -102,14 +94,6 @@ public class MarkerActivity extends AppCompatActivity {
     private void setPicture() {
         ImageProcessing.FixImageOrientation(filename);
         imageView_markerImage.setImageURI(Uri.parse(filename));
-        imageView_eyeMarker.setImageURI(Uri.parse(eyeMarkerPath));
-        imageView_noseMarker.setImageURI(Uri.parse(noseMarkerPath));
-
-        // TODO: Set coordinates
-        imageView_eyeMarker.setX(0); //gradientAndPosition.getEyePosition()[0]);
-        imageView_eyeMarker.setY(25); //gradientAndPosition.getEyePosition()[1]);
-        imageView_noseMarker.setX(25); //gradientAndPosition.getEyePosition()[0]);
-        imageView_noseMarker.setY(0); //gradientAndPosition.getEyePosition()[1]);
 
         if (isThermalPicture) {
             try {
@@ -133,6 +117,31 @@ public class MarkerActivity extends AppCompatActivity {
         else {
             imageView_markerImage.setImageURI(Uri.parse(filename));
         }
+
+        addMarkers();
+    }
+
+    private void addMarkers() {
+
+        RelativeLayout relativeLayout_markers = findViewById(R.id.relativeLayout_markers);
+        ImageView imageView_eyeMarker = new ImageView(this);
+        ImageView imageView_noseMarker = new ImageView(this);
+
+        imageView_eyeMarker.setImageURI(Uri.parse(eyeMarkerPath));
+        imageView_noseMarker.setImageURI(Uri.parse(noseMarkerPath));
+
+        SetOnTouchListener(imageView_noseMarker);
+        SetOnTouchListener(imageView_eyeMarker);
+
+        RelativeLayout.LayoutParams eyeParams = new RelativeLayout.LayoutParams(100, 100);
+        eyeParams.leftMargin = gradientAndPositions.getEyePosition()[0];
+        eyeParams.topMargin = gradientAndPositions.getEyePosition()[1];
+        relativeLayout_markers.addView(imageView_eyeMarker, eyeParams);
+
+        RelativeLayout.LayoutParams noseParams = new RelativeLayout.LayoutParams(100, 100);
+        noseParams.leftMargin = gradientAndPositions.getNosePosition()[0];
+        noseParams.topMargin = gradientAndPositions.getNosePosition()[1];
+        relativeLayout_markers.addView(imageView_noseMarker, noseParams);
     }
 
     private void getCoordinates(ImageView marker) {
@@ -180,7 +189,9 @@ public class MarkerActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
         intent.putExtra("filename", filename);
         intent.putExtra("isThermalImage", isThermalPicture);
-        intent.putExtra("gradient", gradientAndPosition.getGradient());
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("gradientAndPositions", gradientAndPositions);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
     //endregion
