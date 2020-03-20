@@ -37,8 +37,11 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
 
     @Override
     public GradientModel getGradientAndPositions() {
-        // TODO: What was the dimensions of the image when the template was applied
-        // TODO: What is the dimension of the image when it is retrieved from memory and being processed
+        // TODO: Get ImageView dimension
+        // TODO: Get saved image dimension
+        // TODO: Find relationship between dimensions
+        // TODO: Multiply/divide x,y values accordingly
+        // TODO: Move scaling method to utility class, so that it can also be used by MarkerActivity
 
         InterestPointModel leftEyeMax = GetMaxMinSpotInRoi(leftEye, "max");
         InterestPointModel rightEyeMax = GetMaxMinSpotInRoi(rightEye, "max");
