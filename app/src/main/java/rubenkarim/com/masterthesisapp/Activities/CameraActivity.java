@@ -142,7 +142,6 @@ public class CameraActivity extends AppCompatActivity {
                 break;
         }
 
-        // TODO: pass gradientAndPositions
         goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
     }
 

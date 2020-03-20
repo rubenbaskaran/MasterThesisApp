@@ -14,6 +14,7 @@ public class OverviewActivity extends AppCompatActivity
     ImageView imageView_patientImage;
     String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "default_picture";
     Boolean isThermalPicture = false;
+    double gradient = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -29,6 +30,9 @@ public class OverviewActivity extends AppCompatActivity
         }
         if (receivedIntent.hasExtra("isThermalImage")){
             isThermalPicture = receivedIntent.getBooleanExtra("isThermalImage", true);
+        }
+        if (receivedIntent.hasExtra("gradient")){
+            gradient = receivedIntent.getDoubleExtra("gradient", 0);
         }
 
         setPicture();

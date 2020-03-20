@@ -21,19 +21,19 @@
             android:scaleType="fitXY" />
 
         <ImageView
-            android:id="@+id/imageView_markerOne"
+            android:id="@+id/imageView_eyeMarker"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_toStartOf="@id/imageView_noseMarker"
+            android:tag="MarkerTwo"/>
+
+        <ImageView
+            android:id="@+id/imageView_noseMarker"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
             android:tag="MarkerOne"/>
-
-        <ImageView
-            android:id="@+id/imageView_markerTwo"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_toStartOf="@id/imageView_markerOne"
-            android:tag="MarkerTwo"/>
     </RelativeLayout>
 
     <LinearLayout

@@ -30,27 +30,28 @@ public class MarkerActivity extends AppCompatActivity {
     String filename = "default_picture";
     Boolean isThermalPicture = false;
     private static final String TAG = CameraActivity.class.getSimpleName();
-    String marker = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "marker";
-    ImageView imageView_markerOne;
-    ImageView imageView_markerTwo;
+    String eyeMarkerPath = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "eye_marker";
+    String noseMarkerPath = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "nose_marker";
+    ImageView imageView_noseMarker;
+    ImageView imageView_eyeMarker;
     int imageViewVerticalOffset;
     int imageHeight;
     int imageWidth;
     ImageView imageView_leftEye;
     View container;
+    GradientModel gradientAndPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_marker);
         imageView_markerImage = findViewById(R.id.imageView_markerImage);
-        imageView_markerOne = findViewById(R.id.imageView_markerOne);
-        imageView_markerTwo = findViewById(R.id.imageView_markerTwo);
-        SetOnTouchListener(imageView_markerOne);
-        SetOnTouchListener(imageView_markerTwo);
+        imageView_noseMarker = findViewById(R.id.imageView_noseMarker);
+        imageView_eyeMarker = findViewById(R.id.imageView_eyeMarker);
+        SetOnTouchListener(imageView_noseMarker);
+        SetOnTouchListener(imageView_eyeMarker);
         container = findViewById(R.id.linearLayout_MarkerActivity);
         imageView_leftEye = findViewById(R.id.imageView_leftEye);
-        GradientModel gradientAndPosition = null;
 
         Intent receivedIntent = getIntent();
         if (receivedIntent.hasExtra("filename")) {
@@ -101,8 +102,8 @@ public class MarkerActivity extends AppCompatActivity {
     private void setPicture() {
         ImageProcessing.FixImageOrientation(filename);
         imageView_markerImage.setImageURI(Uri.parse(filename));
-        imageView_markerOne.setImageURI(Uri.parse(marker));
-        imageView_markerTwo.setImageURI(Uri.parse(marker));
+        imageView_eyeMarker.setImageURI(Uri.parse(eyeMarkerPath));
+        imageView_noseMarker.setImageURI(Uri.parse(noseMarkerPath));
 
         if (isThermalPicture) {
             try {
@@ -173,6 +174,7 @@ public class MarkerActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
         intent.putExtra("filename", filename);
         intent.putExtra("isThermalImage", isThermalPicture);
+        intent.putExtra("gradient", gradientAndPosition.getGradient());
         startActivity(intent);
     }
     //endregion
