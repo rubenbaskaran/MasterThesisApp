@@ -105,6 +105,12 @@ public class MarkerActivity extends AppCompatActivity {
         imageView_eyeMarker.setImageURI(Uri.parse(eyeMarkerPath));
         imageView_noseMarker.setImageURI(Uri.parse(noseMarkerPath));
 
+        // TODO: Set coordinates
+        imageView_eyeMarker.setX(0); //gradientAndPosition.getEyePosition()[0]);
+        imageView_eyeMarker.setY(25); //gradientAndPosition.getEyePosition()[1]);
+        imageView_noseMarker.setX(25); //gradientAndPosition.getEyePosition()[0]);
+        imageView_noseMarker.setY(0); //gradientAndPosition.getEyePosition()[1]);
+
         if (isThermalPicture) {
             try {
                 if (ThermalImageFile.isThermalImage(filename)) {
