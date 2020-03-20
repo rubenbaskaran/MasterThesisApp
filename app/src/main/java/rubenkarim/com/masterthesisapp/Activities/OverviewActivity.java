@@ -5,54 +5,57 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.R;
 
-public class OverviewActivity extends AppCompatActivity
-{
+public class OverviewActivity extends AppCompatActivity {
     ImageView imageView_patientImage;
     String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "default_picture";
     Boolean isThermalPicture = false;
-    double gradient = 0;
+    GradientModel gradientAndPositions;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_overview);
         imageView_patientImage = findViewById(R.id.imageView_patientImage);
+        TextView textView_gradient = findViewById(R.id.textView_gradient);
 
         Intent receivedIntent = getIntent();
-        if (receivedIntent.hasExtra("filename"))
-        {
+        if (receivedIntent.hasExtra("filename")) {
             filename = receivedIntent.getStringExtra("filename");
         }
-        if (receivedIntent.hasExtra("isThermalImage")){
+        if (receivedIntent.hasExtra("isThermalImage")) {
             isThermalPicture = receivedIntent.getBooleanExtra("isThermalImage", true);
         }
-        if (receivedIntent.hasExtra("gradient")){
-            gradient = receivedIntent.getDoubleExtra("gradient", 0);
+
+        Bundle bundle = receivedIntent.getExtras();
+        if (bundle != null) {
+            gradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
+            textView_gradient.setText(String.valueOf(gradientAndPositions.getGradient()));
         }
 
         setPicture();
     }
 
-    private void setPicture()
-    {
+    private void setPicture() {
         imageView_patientImage.setImageURI(Uri.parse(filename));
     }
 
-    public void backOnClick(View view)
-    {
+    public void backOnClick(View view) {
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
         intent.putExtra("filename", filename);
         intent.putExtra("isThermalImage", isThermalPicture);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("gradientAndPositions", gradientAndPositions);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 
-    public void saveOnClick(View view)
-    {
+    public void saveOnClick(View view) {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
     }
