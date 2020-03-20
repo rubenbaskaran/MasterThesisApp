@@ -123,8 +123,6 @@ public class MarkerActivity extends AppCompatActivity {
 
     private void addMarkers() {
 
-        // TODO: Call utility method for scaling x,y values for eye and nose coordinates
-
         RelativeLayout relativeLayout_markers = findViewById(R.id.relativeLayout_markers);
         ImageView imageView_eyeMarker = new ImageView(this);
         ImageView imageView_noseMarker = new ImageView(this);
@@ -136,11 +134,13 @@ public class MarkerActivity extends AppCompatActivity {
         SetOnTouchListener(imageView_eyeMarker);
 
         RelativeLayout.LayoutParams eyeParams = new RelativeLayout.LayoutParams(100, 100);
+        // TODO: Get scaled eye position
         eyeParams.leftMargin = gradientAndPositions.getEyePosition()[0];
         eyeParams.topMargin = gradientAndPositions.getEyePosition()[1];
         relativeLayout_markers.addView(imageView_eyeMarker, eyeParams);
 
         RelativeLayout.LayoutParams noseParams = new RelativeLayout.LayoutParams(100, 100);
+        // TODO: Get scaled nose position
         noseParams.leftMargin = gradientAndPositions.getNosePosition()[0];
         noseParams.topMargin = gradientAndPositions.getNosePosition()[1];
         relativeLayout_markers.addView(imageView_noseMarker, noseParams);
