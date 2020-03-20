@@ -12,6 +12,7 @@ import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.Models.InterestPointModel;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
+import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
 public class MinMaxAlgorithm extends AbstractAlgorithm {
 
@@ -19,32 +20,31 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     private RoiModel leftEye;
     private RoiModel rightEye;
     private RoiModel nose;
-    private int[] uiViewDimensions;
-    private int[] imageOriginalDimensions;
     private int[] center;
     private int radius;
     private Bitmap capturedImageBitmap;
     private Bitmap modifiedBitmap;
 
-    public MinMaxAlgorithm(String imagePath, RoiModel leftEye, RoiModel rightEye, RoiModel nose, int[] uiViewDimensions) {
+    public MinMaxAlgorithm(String imagePath, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) {
         this.imagePath = imagePath;
-        this.leftEye = leftEye;
-        this.rightEye = rightEye;
-        this.nose = nose;
-        this.uiViewDimensions = uiViewDimensions;
-
         ImageProcessing.FixImageOrientation(imagePath);
         capturedImageBitmap = BitmapFactory.decodeFile(imagePath);
-        imageOriginalDimensions = new int[]{capturedImageBitmap.getWidth(), capturedImageBitmap.getHeight()};
         modifiedBitmap = capturedImageBitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+        int[] imageOriginalDimensions = new int[]{capturedImageBitmap.getWidth(), capturedImageBitmap.getHeight()};
+        int[] cameraPreviewDimensions = new int[]{cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight()};
+
+        double scalingFactorX = (double) imageOriginalDimensions[0] / (double) cameraPreviewDimensions[0];
+        double scalingFactorY = (double) imageOriginalDimensions[1] / (double) cameraPreviewDimensions[1];
+        int horizontalOffset = cameraPreviewElement.getUpperLeftCornerLocation()[1];
+
+        this.leftEye = Scaling.GetScaledRoiObject(leftEye, scalingFactorX, scalingFactorY, horizontalOffset);
+        this.rightEye = Scaling.GetScaledRoiObject(rightEye, scalingFactorX, scalingFactorY, horizontalOffset);
+        this.nose = Scaling.GetScaledRoiObject(nose, scalingFactorX, scalingFactorY, horizontalOffset);
     }
 
     @Override
     public GradientModel getGradientAndPositions() {
-        // TODO: Find relationship between dimensions
-        // TODO: Multiply/divide x,y values accordingly
-        // TODO: Move scaling method to utility class, so that it can also be used by MarkerActivity
-
         InterestPointModel leftEyeMax = GetMaxMinSpotInRoi(leftEye, "max");
         InterestPointModel rightEyeMax = GetMaxMinSpotInRoi(rightEye, "max");
         InterestPointModel noseMin = GetMaxMinSpotInRoi(nose, "min");

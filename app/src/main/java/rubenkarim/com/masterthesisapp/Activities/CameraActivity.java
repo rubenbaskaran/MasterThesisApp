@@ -127,20 +127,22 @@ public class CameraActivity extends AppCompatActivity {
                 ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
                 ImageView imageView_rightEye = findViewById(R.id.imageView_RightEye);
                 ImageView imageView_nose = findViewById(R.id.imageView_Nose);
+                View cameraPreviewElement = isThermalCameraOn ? imageView_thermalViewFinder : cameraView_rgbViewFinder;
                 int[] leftEyeLocation = new int[2];
                 int[] rightEyeLocation = new int[2];
                 int[] noseLocation = new int[2];
+                int[] cameraPreviewLocation = new int[2];
                 imageView_leftEye.getLocationOnScreen(leftEyeLocation);
                 imageView_rightEye.getLocationOnScreen(rightEyeLocation);
                 imageView_nose.getLocationOnScreen(noseLocation);
+                cameraPreviewElement.getLocationOnScreen(cameraPreviewLocation);
+
                 MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
                         filepath,
                         new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_leftEye.getWidth()),
                         new RoiModel(rightEyeLocation, imageView_rightEye.getHeight(), imageView_rightEye.getWidth()),
                         new RoiModel(noseLocation, imageView_nose.getHeight(), imageView_nose.getWidth()),
-                        isThermalCameraOn ?
-                                new int[]{imageView_thermalViewFinder.getWidth(), imageView_thermalViewFinder.getHeight()}
-                                : new int[]{cameraView_rgbViewFinder.getWidth(), cameraView_rgbViewFinder.getHeight()}
+                        new RoiModel(cameraPreviewLocation, cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight())
                 );
                 gradientAndPositions = minMaxAlgorithm.getGradientAndPositions();
                 break;
@@ -224,33 +226,26 @@ public class CameraActivity extends AppCompatActivity {
                         Log.i(TAG, "onDisconnection: ERROR: " + errorCode.toString());
                     }
                 });
-
-
             }
 
             @Override
-            public void onDisconnecting(ConnectionStatus connectionStatus) {
-
-            }
+            public void onDisconnecting(ConnectionStatus connectionStatus) {}
 
             @Override
             public void onConnecting(ConnectionStatus connectionStatus) {
                 runOnUiThread(() -> {
                     Snackbar.make(rootView, "Camera connecting", Snackbar.LENGTH_LONG).show();
                 });
-
             }
 
             @Override
-            public void identityFound(Identity identity) {
-            }
+            public void identityFound(Identity identity) {}
 
             @Override
             public void permissionError(UsbPermissionHandler.UsbPermissionListener.ErrorType errorType, Identity identity) {
                 runOnUiThread(() -> {
                     Snackbar.make(rootView, "Permission error: " + errorType.name(), Snackbar.LENGTH_INDEFINITE).show();
                 });
-
             }
 
             @Override
@@ -260,8 +255,6 @@ public class CameraActivity extends AppCompatActivity {
                 });
             }
         });
-
-
     }
 
     public void backOnClick(View view) {
@@ -298,10 +291,7 @@ public class CameraActivity extends AppCompatActivity {
             catch (IOException e) {
                 Log.d(TAG, "takeAndSaveThermalImage: ERROR: " + e);
             }
-
         });
-
-
     }
 
     private void takeAndSaveRGBImage() {
@@ -327,7 +317,6 @@ public class CameraActivity extends AppCompatActivity {
                     Log.e(TAG, "onError: " + exception);
                 }
             });
-
         }
         else {
             Log.e(TAG, "TakePictureOnClick: There is an error with creating dir!");
