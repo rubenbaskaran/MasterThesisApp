@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
+import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
 public class MarkerActivity extends AppCompatActivity {
     ImageView imageView_markerImage;
@@ -93,7 +94,7 @@ public class MarkerActivity extends AppCompatActivity {
 
     private void setPicture() {
         ImageProcessing.FixImageOrientation(filename);
-        imageView_markerImage.setImageURI(Uri.parse(filename));
+        int[] imageOriginalDimensions = null;
 
         if (isThermalPicture) {
             try {
@@ -101,9 +102,9 @@ public class MarkerActivity extends AppCompatActivity {
                     ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filename);
 
                     JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-                    android.graphics.Bitmap bmp = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
-                    imageView_markerImage.setImageBitmap(bmp);
-
+                    android.graphics.Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
+                    imageView_markerImage.setImageBitmap(originalThermalImageBitmap);
+                    imageOriginalDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
                 }
                 else {
                     Log.e(TAG, "SetPicture: IS NOT A THERMAL PICTURE");
@@ -116,12 +117,16 @@ public class MarkerActivity extends AppCompatActivity {
         }
         else {
             imageView_markerImage.setImageURI(Uri.parse(filename));
+            Bitmap originalRgbImageBitmap = ImageProcessing.convertToBitmap(filename);
+            imageOriginalDimensions = new int[]{originalRgbImageBitmap.getWidth(), originalRgbImageBitmap.getHeight()};
         }
 
-        addMarkers();
+        int[] imageViewUpperLeftCornerLocation = new int[2];
+        imageView_markerImage.getLocationOnScreen(imageViewUpperLeftCornerLocation);
+        addMarkers(imageOriginalDimensions, new int[]{imageView_markerImage.getWidth(), imageView_markerImage.getHeight()}, imageViewUpperLeftCornerLocation[1]);
     }
 
-    private void addMarkers() {
+    private void addMarkers(int[] imageOriginalDimensions, int[] imageViewDimensions, int horizontalOffset) {
 
         RelativeLayout relativeLayout_markers = findViewById(R.id.relativeLayout_markers);
         ImageView imageView_eyeMarker = new ImageView(this);
@@ -135,14 +140,16 @@ public class MarkerActivity extends AppCompatActivity {
 
         RelativeLayout.LayoutParams eyeParams = new RelativeLayout.LayoutParams(100, 100);
         // TODO: Get scaled eye position
-        eyeParams.leftMargin = gradientAndPositions.getEyePosition()[0];
-        eyeParams.topMargin = gradientAndPositions.getEyePosition()[1];
+        int[] scaledEyeMarkerPosition = Scaling.getScaledMarkerPosition(gradientAndPositions.getEyePosition(), imageOriginalDimensions, imageViewDimensions, horizontalOffset);
+        eyeParams.leftMargin = scaledEyeMarkerPosition[0];
+        eyeParams.topMargin = scaledEyeMarkerPosition[1];
         relativeLayout_markers.addView(imageView_eyeMarker, eyeParams);
 
         RelativeLayout.LayoutParams noseParams = new RelativeLayout.LayoutParams(100, 100);
         // TODO: Get scaled nose position
-        noseParams.leftMargin = gradientAndPositions.getNosePosition()[0];
-        noseParams.topMargin = gradientAndPositions.getNosePosition()[1];
+        int[] scaledNoseMarkerPosition = Scaling.getScaledMarkerPosition(gradientAndPositions.getEyePosition(), imageOriginalDimensions, imageViewDimensions, horizontalOffset);
+        noseParams.leftMargin = scaledNoseMarkerPosition[0];
+        noseParams.topMargin = scaledNoseMarkerPosition[1];
         relativeLayout_markers.addView(imageView_noseMarker, noseParams);
     }
 

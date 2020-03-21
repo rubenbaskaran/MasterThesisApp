@@ -53,7 +53,7 @@ public class ImageProcessing {
 
     private static void rotateImage(int degree, String imagePath) {
         try {
-            Bitmap b = BitmapFactory.decodeFile(imagePath);
+            Bitmap b = ImageProcessing.convertToBitmap(imagePath);
 
             Matrix matrix = new Matrix();
             if (b.getWidth() > b.getHeight()) {
@@ -91,5 +91,9 @@ public class ImageProcessing {
         view.draw(canvas);
         //return the bitmap
         return returnedBitmap;
+    }
+
+    public static Bitmap convertToBitmap(String imagePath) {
+        return BitmapFactory.decodeFile(imagePath);
     }
 }

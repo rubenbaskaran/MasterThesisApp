@@ -3,7 +3,7 @@ package rubenkarim.com.masterthesisapp.Utilities;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 
 public class Scaling {
-    public static RoiModel GetScaledRoiObject(RoiModel roi, double scalingFactorX, double scalingFactorY, int horizontalOffset) {
+    public static RoiModel getScaledRoiObject(RoiModel roi, double scalingFactorX, double scalingFactorY, int horizontalOffset) {
         double positionX = roi.getUpperLeftCornerLocation()[0] * scalingFactorX;
         double positionY = roi.getUpperLeftCornerLocation()[1] * scalingFactorY - (double) horizontalOffset * scalingFactorY;
         double width = roi.getWidth() * scalingFactorX;
@@ -12,8 +12,13 @@ public class Scaling {
         return new RoiModel(new int[]{(int) positionX, (int) positionY}, (int) width, (int) height);
     }
 
-    public static int[] GetScaledMarkerPosition(int[] markerPosition, double scalingFactorX, double scalingFactorY, int horizontalOffset) {
+    public static int[] getScaledMarkerPosition(int[] markerPosition, int[] imageOriginalDimensions, int[] imageViewDimensions, int horizontalOffset) {
         // TODO: Implement method for scaling marker positions
-        return null;
+        double scalingFactorX = (double)imageOriginalDimensions[0] / (double)imageViewDimensions[0];
+        double scalingFactorY = (double)imageOriginalDimensions[1] / (double)imageViewDimensions[1];
+        double positionX = (double)markerPosition[0] / scalingFactorX;
+        double positionY = (double)markerPosition[1] / scalingFactorY + horizontalOffset;
+
+        return new int[]{(int)positionX, (int)positionY};
     }
 }

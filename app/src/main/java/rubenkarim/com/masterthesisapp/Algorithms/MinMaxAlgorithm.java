@@ -1,7 +1,6 @@
 package rubenkarim.com.masterthesisapp.Algorithms;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Log;
 
@@ -28,7 +27,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     public MinMaxAlgorithm(String imagePath, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) {
         this.imagePath = imagePath;
         ImageProcessing.FixImageOrientation(imagePath);
-        capturedImageBitmap = BitmapFactory.decodeFile(imagePath);
+        capturedImageBitmap = ImageProcessing.convertToBitmap(imagePath);
         modifiedBitmap = capturedImageBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
         int[] imageOriginalDimensions = new int[]{capturedImageBitmap.getWidth(), capturedImageBitmap.getHeight()};
@@ -38,9 +37,9 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
         double scalingFactorY = (double) imageOriginalDimensions[1] / (double) cameraPreviewDimensions[1];
         int horizontalOffset = cameraPreviewElement.getUpperLeftCornerLocation()[1];
 
-        this.leftEye = Scaling.GetScaledRoiObject(leftEye, scalingFactorX, scalingFactorY, horizontalOffset);
-        this.rightEye = Scaling.GetScaledRoiObject(rightEye, scalingFactorX, scalingFactorY, horizontalOffset);
-        this.nose = Scaling.GetScaledRoiObject(nose, scalingFactorX, scalingFactorY, horizontalOffset);
+        this.leftEye = Scaling.getScaledRoiObject(leftEye, scalingFactorX, scalingFactorY, horizontalOffset);
+        this.rightEye = Scaling.getScaledRoiObject(rightEye, scalingFactorX, scalingFactorY, horizontalOffset);
+        this.nose = Scaling.getScaledRoiObject(nose, scalingFactorX, scalingFactorY, horizontalOffset);
     }
 
     @Override
