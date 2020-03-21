@@ -13,6 +13,7 @@ import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
+// TODO: Refactor and add error handling
 public class MinMaxAlgorithm extends AbstractAlgorithm {
 
     private String imagePath;
