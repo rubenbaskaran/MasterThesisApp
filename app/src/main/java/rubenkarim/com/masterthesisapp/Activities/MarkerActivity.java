@@ -59,8 +59,6 @@ public class MarkerActivity extends AppCompatActivity {
         if (bundle != null) {
             gradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
         }
-
-        setPicture();
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -121,9 +119,7 @@ public class MarkerActivity extends AppCompatActivity {
             imageOriginalDimensions = new int[]{originalRgbImageBitmap.getWidth(), originalRgbImageBitmap.getHeight()};
         }
 
-        int[] imageViewUpperLeftCornerLocation = new int[2];
-        imageView_markerImage.getLocationOnScreen(imageViewUpperLeftCornerLocation);
-        addMarkers(imageOriginalDimensions, new int[]{imageView_markerImage.getWidth(), imageView_markerImage.getHeight()}, imageViewUpperLeftCornerLocation[1]);
+        addMarkers(imageOriginalDimensions, new int[]{imageWidth, imageHeight}, imageViewVerticalOffset);
     }
 
     private void addMarkers(int[] imageOriginalDimensions, int[] imageViewDimensions, int horizontalOffset) {
@@ -139,15 +135,15 @@ public class MarkerActivity extends AppCompatActivity {
         SetOnTouchListener(imageView_eyeMarker);
 
         RelativeLayout.LayoutParams eyeParams = new RelativeLayout.LayoutParams(100, 100);
-        // TODO: Get scaled eye position
+        // TODO: Debug
         int[] scaledEyeMarkerPosition = Scaling.getScaledMarkerPosition(gradientAndPositions.getEyePosition(), imageOriginalDimensions, imageViewDimensions, horizontalOffset);
         eyeParams.leftMargin = scaledEyeMarkerPosition[0];
         eyeParams.topMargin = scaledEyeMarkerPosition[1];
         relativeLayout_markers.addView(imageView_eyeMarker, eyeParams);
 
         RelativeLayout.LayoutParams noseParams = new RelativeLayout.LayoutParams(100, 100);
-        // TODO: Get scaled nose position
-        int[] scaledNoseMarkerPosition = Scaling.getScaledMarkerPosition(gradientAndPositions.getEyePosition(), imageOriginalDimensions, imageViewDimensions, horizontalOffset);
+        // TODO: Debug
+        int[] scaledNoseMarkerPosition = Scaling.getScaledMarkerPosition(gradientAndPositions.getNosePosition(), imageOriginalDimensions, imageViewDimensions, horizontalOffset);
         noseParams.leftMargin = scaledNoseMarkerPosition[0];
         noseParams.topMargin = scaledNoseMarkerPosition[1];
         relativeLayout_markers.addView(imageView_noseMarker, noseParams);
@@ -186,6 +182,7 @@ public class MarkerActivity extends AppCompatActivity {
         imageHeight = imageView_markerImage.getHeight();
         imageWidth = imageView_markerImage.getWidth();
         Log.e("Image dimensions", "x: " + imageWidth + ", y: " + imageHeight);
+        setPicture();
     }
 
     //region Navigation buttons

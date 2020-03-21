@@ -13,7 +13,6 @@ public class Scaling {
     }
 
     public static int[] getScaledMarkerPosition(int[] markerPosition, int[] imageOriginalDimensions, int[] imageViewDimensions, int horizontalOffset) {
-        // TODO: Implement method for scaling marker positions
         double scalingFactorX = (double)imageOriginalDimensions[0] / (double)imageViewDimensions[0];
         double scalingFactorY = (double)imageOriginalDimensions[1] / (double)imageViewDimensions[1];
         double positionX = (double)markerPosition[0] / scalingFactorX;

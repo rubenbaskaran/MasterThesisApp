@@ -30,6 +30,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
         capturedImageBitmap = ImageProcessing.convertToBitmap(imagePath);
         modifiedBitmap = capturedImageBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
+        // TODO: Move following 5 lines to Scaling class
         int[] imageOriginalDimensions = new int[]{capturedImageBitmap.getWidth(), capturedImageBitmap.getHeight()};
         int[] cameraPreviewDimensions = new int[]{cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight()};
 
