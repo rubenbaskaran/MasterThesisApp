@@ -5,10 +5,10 @@ public class RoiModel {
     private int height;
     private int width;
 
-    public RoiModel(int[] upperLeftCornerLocation, int height, int width) {
+    public RoiModel(int[] upperLeftCornerLocation, int width, int height) {
         this.upperLeftCornerLocation = upperLeftCornerLocation;
-        this.height = height;
         this.width = width;
+        this.height = height;
     }
 
     public int[] getUpperLeftCornerLocation() {

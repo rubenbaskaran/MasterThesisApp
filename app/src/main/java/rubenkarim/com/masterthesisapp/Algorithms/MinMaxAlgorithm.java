@@ -1,7 +1,6 @@
 package rubenkarim.com.masterthesisapp.Algorithms;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Log;
 
@@ -12,6 +11,7 @@ import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.Models.InterestPointModel;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
+import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
 public class MinMaxAlgorithm extends AbstractAlgorithm {
 
@@ -24,22 +24,26 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     private Bitmap capturedImageBitmap;
     private Bitmap modifiedBitmap;
 
-    public MinMaxAlgorithm(String imagePath, RoiModel leftEye, RoiModel rightEye, RoiModel nose) {
+    public MinMaxAlgorithm(String imagePath, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) {
         this.imagePath = imagePath;
-        this.leftEye = leftEye;
-        this.rightEye = rightEye;
-        this.nose = nose;
-
         ImageProcessing.FixImageOrientation(imagePath);
-        capturedImageBitmap = BitmapFactory.decodeFile(imagePath);
+        capturedImageBitmap = ImageProcessing.convertToBitmap(imagePath);
         modifiedBitmap = capturedImageBitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+        int[] imageOriginalDimensions = new int[]{capturedImageBitmap.getWidth(), capturedImageBitmap.getHeight()};
+        int[] cameraPreviewDimensions = new int[]{cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight()};
+
+        double scalingFactorX = (double) imageOriginalDimensions[0] / (double) cameraPreviewDimensions[0];
+        double scalingFactorY = (double) imageOriginalDimensions[1] / (double) cameraPreviewDimensions[1];
+        int horizontalOffset = cameraPreviewElement.getUpperLeftCornerLocation()[1];
+
+        this.leftEye = Scaling.getScaledRoiObject(leftEye, scalingFactorX, scalingFactorY, horizontalOffset);
+        this.rightEye = Scaling.getScaledRoiObject(rightEye, scalingFactorX, scalingFactorY, horizontalOffset);
+        this.nose = Scaling.getScaledRoiObject(nose, scalingFactorX, scalingFactorY, horizontalOffset);
     }
 
     @Override
     public GradientModel getGradientAndPositions() {
-        // TODO: What was the dimensions of the image when the template was applied
-        // TODO: What is the dimension of the image when it is retrieved from memory and being processed
-
         InterestPointModel leftEyeMax = GetMaxMinSpotInRoi(leftEye, "max");
         InterestPointModel rightEyeMax = GetMaxMinSpotInRoi(rightEye, "max");
         InterestPointModel noseMin = GetMaxMinSpotInRoi(nose, "min");
@@ -47,10 +51,18 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
         SaveDuplicateImageForTestingPurpose();
 
         if (leftEyeMax.getValue() > rightEyeMax.getValue()) {
-            return new GradientModel(leftEyeMax.getValue() - noseMin.getValue(), leftEyeMax.getPosition(), noseMin.getPosition());
+            Log.e("TEST 1 (getGradientAndPositions)", "left eye x: " + leftEyeMax.getPosition()[0] + ", left eye y: " + leftEyeMax.getPosition()[1]
+                    + ". nose x: " + noseMin.getPosition()[0] + ", nose y: " + noseMin.getPosition()[1]
+                    + ". original image x: " + capturedImageBitmap.getWidth() + ", original image y: " + capturedImageBitmap.getHeight());
+            GradientModel myModel = new GradientModel(leftEyeMax.getValue() - noseMin.getValue(), leftEyeMax.getPosition(), noseMin.getPosition());
+            return myModel;
         }
         else {
-            return new GradientModel(rightEyeMax.getValue() - noseMin.getValue(), rightEyeMax.getPosition(), noseMin.getPosition());
+            Log.e("TEST 1 (getGradientAndPositions)", "right eye x: " + rightEyeMax.getPosition()[0] + ", right eye y: " + rightEyeMax.getPosition()[1]
+                    + ". nose x: " + noseMin.getPosition()[0] + ", nose y: " + noseMin.getPosition()[1]
+                    + ". original image x: " + capturedImageBitmap.getWidth() + ", original image y: " + capturedImageBitmap.getHeight());
+            GradientModel myModel = new GradientModel(rightEyeMax.getValue() - noseMin.getValue(), rightEyeMax.getPosition(), noseMin.getPosition());
+            return myModel;
         }
     }
 
@@ -77,12 +89,16 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
                     double colorSum = Color.red(targetPixel) + Color.green(targetPixel) + Color.blue(targetPixel);
 
                     if (category.equals("max")) {
-                        maxValue = Math.max(colorSum, maxValue);
-                        position = new int[]{x, y};
+                        if (colorSum > maxValue) {
+                            maxValue = colorSum;
+                            position = new int[]{x, y};
+                        }
                     }
                     else {
-                        minValue = Math.min(colorSum, minValue);
-                        position = new int[]{x, y};
+                        if (colorSum < minValue) {
+                            minValue = colorSum;
+                            position = new int[]{x, y};
+                        }
                     }
 
                     modifiedBitmap.setPixel(x, y, Color.YELLOW);

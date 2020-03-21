@@ -45,18 +45,19 @@ import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 public class CameraActivity extends AppCompatActivity {
     private static final String TAG = CameraActivity.class.getSimpleName();
     private View rootView;
-    private CameraView cameraViewFinder;
+    private CameraView cameraView_rgbViewFinder;
     private boolean isThermalCameraOn = true;
     private MyCameraManager myCameraManager;
     private PermissionManager permissionManager;
     private String filepath;
+    ImageView imageView_thermalViewFinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
-        cameraViewFinder = findViewById(R.id.cameraView_RgbViewFinder);
+        cameraView_rgbViewFinder = findViewById(R.id.cameraView_rgbViewFinder);
         myCameraManager = new MyCameraManager(getApplicationContext());
         permissionManager = new PermissionManager();
 
@@ -126,17 +127,22 @@ public class CameraActivity extends AppCompatActivity {
                 ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
                 ImageView imageView_rightEye = findViewById(R.id.imageView_RightEye);
                 ImageView imageView_nose = findViewById(R.id.imageView_Nose);
+                View cameraPreviewElement = isThermalCameraOn ? imageView_thermalViewFinder : cameraView_rgbViewFinder;
                 int[] leftEyeLocation = new int[2];
                 int[] rightEyeLocation = new int[2];
                 int[] noseLocation = new int[2];
+                int[] cameraPreviewLocation = new int[2];
                 imageView_leftEye.getLocationOnScreen(leftEyeLocation);
                 imageView_rightEye.getLocationOnScreen(rightEyeLocation);
                 imageView_nose.getLocationOnScreen(noseLocation);
+                cameraPreviewElement.getLocationOnScreen(cameraPreviewLocation);
+
                 MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
                         filepath,
                         new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_leftEye.getWidth()),
                         new RoiModel(rightEyeLocation, imageView_rightEye.getHeight(), imageView_rightEye.getWidth()),
-                        new RoiModel(noseLocation, imageView_nose.getHeight(), imageView_nose.getWidth())
+                        new RoiModel(noseLocation, imageView_nose.getHeight(), imageView_nose.getWidth()),
+                        new RoiModel(cameraPreviewLocation, cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight())
                 );
                 gradientAndPositions = minMaxAlgorithm.getGradientAndPositions();
                 break;
@@ -172,22 +178,22 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void showNativeCamera() {
-        ImageView imageView = findViewById(R.id.imageView_thermalViewFinder);
-        if (imageView.getVisibility() == View.VISIBLE) {
-            imageView.setVisibility(View.GONE);
+        imageView_thermalViewFinder = findViewById(R.id.imageView_thermalViewFinder);
+        if (imageView_thermalViewFinder.getVisibility() == View.VISIBLE) {
+            imageView_thermalViewFinder.setVisibility(View.GONE);
         }
         isThermalCameraOn = false;
-        cameraViewFinder.setVisibility(View.VISIBLE);
-        cameraViewFinder.bindToLifecycle(this);
+        cameraView_rgbViewFinder.setVisibility(View.VISIBLE);
+        cameraView_rgbViewFinder.bindToLifecycle(this);
         Log.i(TAG, "showNativeCamera: Showing Native Camera");
     }
 
     private void showThermalViewfinder() {
-        if (cameraViewFinder.getVisibility() == View.VISIBLE) {
-            cameraViewFinder.setVisibility(View.GONE);
+        if (cameraView_rgbViewFinder.getVisibility() == View.VISIBLE) {
+            cameraView_rgbViewFinder.setVisibility(View.GONE);
         }
-        ImageView imageView = findViewById(R.id.imageView_thermalViewFinder);
-        imageView.setVisibility(View.VISIBLE);
+        imageView_thermalViewFinder = findViewById(R.id.imageView_thermalViewFinder);
+        imageView_thermalViewFinder.setVisibility(View.VISIBLE);
         isThermalCameraOn = true;
     }
 
@@ -220,33 +226,26 @@ public class CameraActivity extends AppCompatActivity {
                         Log.i(TAG, "onDisconnection: ERROR: " + errorCode.toString());
                     }
                 });
-
-
             }
 
             @Override
-            public void onDisconnecting(ConnectionStatus connectionStatus) {
-
-            }
+            public void onDisconnecting(ConnectionStatus connectionStatus) {}
 
             @Override
             public void onConnecting(ConnectionStatus connectionStatus) {
                 runOnUiThread(() -> {
                     Snackbar.make(rootView, "Camera connecting", Snackbar.LENGTH_LONG).show();
                 });
-
             }
 
             @Override
-            public void identityFound(Identity identity) {
-            }
+            public void identityFound(Identity identity) {}
 
             @Override
             public void permissionError(UsbPermissionHandler.UsbPermissionListener.ErrorType errorType, Identity identity) {
                 runOnUiThread(() -> {
                     Snackbar.make(rootView, "Permission error: " + errorType.name(), Snackbar.LENGTH_INDEFINITE).show();
                 });
-
             }
 
             @Override
@@ -256,8 +255,6 @@ public class CameraActivity extends AppCompatActivity {
                 });
             }
         });
-
-
     }
 
     public void backOnClick(View view) {
@@ -294,10 +291,7 @@ public class CameraActivity extends AppCompatActivity {
             catch (IOException e) {
                 Log.d(TAG, "takeAndSaveThermalImage: ERROR: " + e);
             }
-
         });
-
-
     }
 
     private void takeAndSaveRGBImage() {
@@ -311,7 +305,7 @@ public class CameraActivity extends AppCompatActivity {
             File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/Masterthesisimages", fileName + ".jpg");
             filepath = file.getPath();
 
-            cameraViewFinder.takePicture(file, Runnable::run, new ImageCapture.OnImageSavedCallback() {
+            cameraView_rgbViewFinder.takePicture(file, Runnable::run, new ImageCapture.OnImageSavedCallback() {
                 @Override
                 public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                     Log.i(TAG, "onImageSaved: Picture saved! path: " + filepath);
@@ -323,7 +317,6 @@ public class CameraActivity extends AppCompatActivity {
                     Log.e(TAG, "onError: " + exception);
                 }
             });
-
         }
         else {
             Log.e(TAG, "TakePictureOnClick: There is an error with creating dir!");
@@ -331,9 +324,19 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void goToMarkerActivity(String imageFilePath, boolean isThermalImage, GradientModel gradientAndPositions) {
+        RelativeLayout relativeLayout_cameraPreview = findViewById(R.id.relativeLayout_cameraPreview);
+        int[] coordinates = new int[2];
+        relativeLayout_cameraPreview.getLocationOnScreen(coordinates);
+        int imageViewVerticalOffset = coordinates[1];
+        int imageHeight = relativeLayout_cameraPreview.getHeight();
+        int imageWidth = relativeLayout_cameraPreview.getWidth();
+
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
         intent.putExtra("isThermalImage", isThermalImage);
         intent.putExtra("filename", imageFilePath);
+        intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
+        intent.putExtra("imageHeight", imageHeight);
+        intent.putExtra("imageWidth", imageWidth);
         Bundle bundle = new Bundle();
         bundle.putSerializable("gradientAndPositions", gradientAndPositions);
         intent.putExtras(bundle);
