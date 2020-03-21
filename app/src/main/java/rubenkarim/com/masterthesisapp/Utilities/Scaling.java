@@ -16,7 +16,7 @@ public class Scaling {
         double scalingFactorX = (double)imageOriginalDimensions[0] / (double)imageViewDimensions[0];
         double scalingFactorY = (double)imageOriginalDimensions[1] / (double)imageViewDimensions[1];
         double positionX = (double)markerPosition[0] / scalingFactorX;
-        double positionY = (double)markerPosition[1] / scalingFactorY + horizontalOffset;
+        double positionY = (double)markerPosition[1] / scalingFactorY;
 
         return new int[]{(int)positionX, (int)positionY};
     }
