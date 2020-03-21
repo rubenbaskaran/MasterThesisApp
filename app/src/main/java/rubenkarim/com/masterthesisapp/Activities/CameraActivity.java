@@ -324,9 +324,19 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void goToMarkerActivity(String imageFilePath, boolean isThermalImage, GradientModel gradientAndPositions) {
+        RelativeLayout relativeLayout_cameraPreview = findViewById(R.id.relativeLayout_cameraPreview);
+        int[] coordinates = new int[2];
+        relativeLayout_cameraPreview.getLocationOnScreen(coordinates);
+        int imageViewVerticalOffset = coordinates[1];
+        int imageHeight = relativeLayout_cameraPreview.getHeight();
+        int imageWidth = relativeLayout_cameraPreview.getWidth();
+
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
         intent.putExtra("isThermalImage", isThermalImage);
         intent.putExtra("filename", imageFilePath);
+        intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
+        intent.putExtra("imageHeight", imageHeight);
+        intent.putExtra("imageWidth", imageWidth);
         Bundle bundle = new Bundle();
         bundle.putSerializable("gradientAndPositions", gradientAndPositions);
         intent.putExtras(bundle);

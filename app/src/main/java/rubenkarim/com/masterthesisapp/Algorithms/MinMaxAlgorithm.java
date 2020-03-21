@@ -27,11 +27,9 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     public MinMaxAlgorithm(String imagePath, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) {
         this.imagePath = imagePath;
         ImageProcessing.FixImageOrientation(imagePath);
-        // TODO: Use test image instead of camera image
         capturedImageBitmap = ImageProcessing.convertToBitmap(imagePath);
         modifiedBitmap = capturedImageBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
-        // TODO: Move following 5 lines to Scaling class
         int[] imageOriginalDimensions = new int[]{capturedImageBitmap.getWidth(), capturedImageBitmap.getHeight()};
         int[] cameraPreviewDimensions = new int[]{cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight()};
 
