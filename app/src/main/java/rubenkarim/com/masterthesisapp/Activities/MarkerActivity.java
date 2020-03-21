@@ -148,6 +148,11 @@ public class MarkerActivity extends AppCompatActivity {
         noseParams.leftMargin = scaledNoseMarkerPosition[0] - markerWidthHeight/2;
         noseParams.topMargin = scaledNoseMarkerPosition[1] - markerWidthHeight/2;
         relativeLayout_markers.addView(imageView_noseMarker, noseParams);
+
+        Log.e("TEST 2 (addMarkers)", "eye x: " + eyeParams.leftMargin + ", eye y: " + eyeParams.topMargin
+                + ". nose x: " + noseParams.leftMargin + ", nose y: " + noseParams.topMargin
+                + ". imageView x: " + imageWidth + ", imageView y: " + imageHeight
+                + ". markerWidth: " + markerWidthHeight + ". horizontal offset: " + horizontalOffset);
     }
 
     private void getCoordinates(ImageView marker) {

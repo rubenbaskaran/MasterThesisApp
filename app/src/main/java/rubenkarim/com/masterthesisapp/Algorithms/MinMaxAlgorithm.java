@@ -27,6 +27,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     public MinMaxAlgorithm(String imagePath, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) {
         this.imagePath = imagePath;
         ImageProcessing.FixImageOrientation(imagePath);
+        // TODO: Use test image instead of camera image
         capturedImageBitmap = ImageProcessing.convertToBitmap(imagePath);
         modifiedBitmap = capturedImageBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
@@ -52,10 +53,18 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
         SaveDuplicateImageForTestingPurpose();
 
         if (leftEyeMax.getValue() > rightEyeMax.getValue()) {
-            return new GradientModel(leftEyeMax.getValue() - noseMin.getValue(), leftEyeMax.getPosition(), noseMin.getPosition());
+            Log.e("TEST 1 (getGradientAndPositions)", "left eye x: " + leftEyeMax.getPosition()[0] + ", left eye y: " + leftEyeMax.getPosition()[1]
+                    + ". nose x: " + noseMin.getPosition()[0] + ", nose y: " + noseMin.getPosition()[1]
+                    + ". original image x: " + capturedImageBitmap.getWidth() + ", original image y: " + capturedImageBitmap.getHeight());
+            GradientModel myModel = new GradientModel(leftEyeMax.getValue() - noseMin.getValue(), leftEyeMax.getPosition(), noseMin.getPosition());
+            return myModel;
         }
         else {
-            return new GradientModel(rightEyeMax.getValue() - noseMin.getValue(), rightEyeMax.getPosition(), noseMin.getPosition());
+            Log.e("TEST 1 (getGradientAndPositions)", "right eye x: " + rightEyeMax.getPosition()[0] + ", right eye y: " + rightEyeMax.getPosition()[1]
+                    + ". nose x: " + noseMin.getPosition()[0] + ", nose y: " + noseMin.getPosition()[1]
+                    + ". original image x: " + capturedImageBitmap.getWidth() + ", original image y: " + capturedImageBitmap.getHeight());
+            GradientModel myModel = new GradientModel(rightEyeMax.getValue() - noseMin.getValue(), rightEyeMax.getPosition(), noseMin.getPosition());
+            return myModel;
         }
     }
 
@@ -82,12 +91,16 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
                     double colorSum = Color.red(targetPixel) + Color.green(targetPixel) + Color.blue(targetPixel);
 
                     if (category.equals("max")) {
-                        maxValue = Math.max(colorSum, maxValue);
-                        position = new int[]{x, y};
+                        if (colorSum > maxValue) {
+                            maxValue = colorSum;
+                            position = new int[]{x, y};
+                        }
                     }
                     else {
-                        minValue = Math.min(colorSum, minValue);
-                        position = new int[]{x, y};
+                        if (colorSum < minValue) {
+                            minValue = colorSum;
+                            position = new int[]{x, y};
+                        }
                     }
 
                     modifiedBitmap.setPixel(x, y, Color.YELLOW);
@@ -98,7 +111,6 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
         Log.e("totalCounter", String.valueOf(totalCounter));
         Log.e("Counter", String.valueOf(counter));
 
-        modifiedBitmap.setPixel(position[0], position[1], Color.RED);
         return new InterestPointModel(category.equals("max") ? maxValue : minValue, position);
     }
 
