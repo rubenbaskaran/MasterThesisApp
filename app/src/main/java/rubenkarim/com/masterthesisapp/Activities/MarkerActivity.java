@@ -37,6 +37,7 @@ public class MarkerActivity extends AppCompatActivity {
     int imageViewVerticalOffset;
     int imageHeight;
     int imageWidth;
+    int markerWidthHeight = 100;
     View container;
     GradientModel gradientAndPositions;
 
@@ -134,18 +135,18 @@ public class MarkerActivity extends AppCompatActivity {
         SetOnTouchListener(imageView_noseMarker);
         SetOnTouchListener(imageView_eyeMarker);
 
-        RelativeLayout.LayoutParams eyeParams = new RelativeLayout.LayoutParams(100, 100);
+        RelativeLayout.LayoutParams eyeParams = new RelativeLayout.LayoutParams(markerWidthHeight, markerWidthHeight);
         // TODO: Debug
         int[] scaledEyeMarkerPosition = Scaling.getScaledMarkerPosition(gradientAndPositions.getEyePosition(), imageOriginalDimensions, imageViewDimensions, horizontalOffset);
-        eyeParams.leftMargin = scaledEyeMarkerPosition[0];
-        eyeParams.topMargin = scaledEyeMarkerPosition[1];
+        eyeParams.leftMargin = scaledEyeMarkerPosition[0] - markerWidthHeight/2;
+        eyeParams.topMargin = scaledEyeMarkerPosition[1] - markerWidthHeight/2;
         relativeLayout_markers.addView(imageView_eyeMarker, eyeParams);
 
-        RelativeLayout.LayoutParams noseParams = new RelativeLayout.LayoutParams(100, 100);
+        RelativeLayout.LayoutParams noseParams = new RelativeLayout.LayoutParams(markerWidthHeight, markerWidthHeight);
         // TODO: Debug
         int[] scaledNoseMarkerPosition = Scaling.getScaledMarkerPosition(gradientAndPositions.getNosePosition(), imageOriginalDimensions, imageViewDimensions, horizontalOffset);
-        noseParams.leftMargin = scaledNoseMarkerPosition[0];
-        noseParams.topMargin = scaledNoseMarkerPosition[1];
+        noseParams.leftMargin = scaledNoseMarkerPosition[0] - markerWidthHeight/2;
+        noseParams.topMargin = scaledNoseMarkerPosition[1] - markerWidthHeight/2;
         relativeLayout_markers.addView(imageView_noseMarker, noseParams);
     }
 
@@ -182,7 +183,7 @@ public class MarkerActivity extends AppCompatActivity {
         imageHeight = imageView_markerImage.getHeight();
         imageWidth = imageView_markerImage.getWidth();
         Log.e("Image dimensions", "x: " + imageWidth + ", y: " + imageHeight);
-        setPicture();
+        setPicture(); // TODO: Move to onCreate and get image dimension from cameraactivity instead
     }
 
     //region Navigation buttons

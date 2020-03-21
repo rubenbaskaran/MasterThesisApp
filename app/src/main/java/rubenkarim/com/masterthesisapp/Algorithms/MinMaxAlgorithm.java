@@ -98,6 +98,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
         Log.e("totalCounter", String.valueOf(totalCounter));
         Log.e("Counter", String.valueOf(counter));
 
+        modifiedBitmap.setPixel(position[0], position[1], Color.RED);
         return new InterestPointModel(category.equals("max") ? maxValue : minValue, position);
     }
 
