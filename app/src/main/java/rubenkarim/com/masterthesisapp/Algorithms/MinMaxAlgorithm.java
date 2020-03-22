@@ -8,8 +8,10 @@ import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.Models.InterestPointModel;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
+import rubenkarim.com.masterthesisapp.Utilities.Logging;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
+// TODO: Add try-catch
 public class MinMaxAlgorithm extends AbstractAlgorithm {
 
     //region Properties
@@ -24,24 +26,29 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     //endregion
 
     public MinMaxAlgorithm(String imagePath, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) {
-        ImageProcessing.FixImageOrientation(imagePath);
-        capturedImageBitmap = ImageProcessing.convertToBitmap(imagePath);
+        try {
+            ImageProcessing.FixImageOrientation(imagePath);
+            capturedImageBitmap = ImageProcessing.convertToBitmap(imagePath);
 
-        int[] imageOriginalDimensions = new int[]{capturedImageBitmap.getWidth(), capturedImageBitmap.getHeight()};
-        int[] cameraPreviewDimensions = new int[]{cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight()};
+            int[] imageOriginalDimensions = new int[]{capturedImageBitmap.getWidth(), capturedImageBitmap.getHeight()};
+            int[] cameraPreviewDimensions = new int[]{cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight()};
 
-        double scalingFactorX = (double) imageOriginalDimensions[0] / (double) cameraPreviewDimensions[0];
-        double scalingFactorY = (double) imageOriginalDimensions[1] / (double) cameraPreviewDimensions[1];
-        int horizontalOffset = cameraPreviewElement.getUpperLeftCornerLocation()[1];
+            double scalingFactorX = (double) imageOriginalDimensions[0] / (double) cameraPreviewDimensions[0];
+            double scalingFactorY = (double) imageOriginalDimensions[1] / (double) cameraPreviewDimensions[1];
+            int horizontalOffset = cameraPreviewElement.getUpperLeftCornerLocation()[1];
 
-        this.leftEye = Scaling.getScaledRoiObject(leftEye, scalingFactorX, scalingFactorY, horizontalOffset);
-        this.rightEye = Scaling.getScaledRoiObject(rightEye, scalingFactorX, scalingFactorY, horizontalOffset);
-        this.nose = Scaling.getScaledRoiObject(nose, scalingFactorX, scalingFactorY, horizontalOffset);
+            this.leftEye = Scaling.getScaledRoiObject(leftEye, scalingFactorX, scalingFactorY, horizontalOffset);
+            this.rightEye = Scaling.getScaledRoiObject(rightEye, scalingFactorX, scalingFactorY, horizontalOffset);
+            this.nose = Scaling.getScaledRoiObject(nose, scalingFactorX, scalingFactorY, horizontalOffset);
 
-        // All ROI circles have identical dimensions, hence arbitrary RoiModel is used
-        width = this.leftEye.getWidth();
-        height = this.leftEye.getHeight();
-        radius = this.leftEye.getWidth() / 2;
+            // All ROI circles have identical dimensions, hence arbitrary RoiModel is used
+            width = this.leftEye.getWidth();
+            height = this.leftEye.getHeight();
+            radius = this.leftEye.getWidth() / 2;
+        }
+        catch (Exception e) {
+            Logging.error("MinMaxAlgorithm", e);
+        }
     }
 
     @Override
