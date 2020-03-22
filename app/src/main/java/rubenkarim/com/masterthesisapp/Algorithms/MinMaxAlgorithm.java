@@ -11,7 +11,6 @@ import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
-// TODO: Add try-catch
 public class MinMaxAlgorithm extends AbstractAlgorithm {
 
     //region Properties
@@ -53,59 +52,77 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
 
     @Override
     public GradientModel getGradientAndPositions() {
-        InterestPointModel leftEyeMax = getMaxMinSpotInRoi(leftEye, "max");
-        InterestPointModel rightEyeMax = getMaxMinSpotInRoi(rightEye, "max");
-        InterestPointModel noseMin = getMaxMinSpotInRoi(nose, "min");
+        try {
+            InterestPointModel leftEyeMax = getMaxMinSpotInRoi(leftEye, "max");
+            InterestPointModel rightEyeMax = getMaxMinSpotInRoi(rightEye, "max");
+            InterestPointModel noseMin = getMaxMinSpotInRoi(nose, "min");
 
-        if (leftEyeMax.getValue() > rightEyeMax.getValue()) {
-            Log.e("MinMaxAlgorithm - getGradientAndPositions - returned", "left eye x: " + leftEyeMax.getPosition()[0] + ", left eye y: " + leftEyeMax.getPosition()[1]
-                    + ". nose x: " + noseMin.getPosition()[0] + ", nose y: " + noseMin.getPosition()[1]
-                    + ". original image x: " + capturedImageBitmap.getWidth() + ", original image y: " + capturedImageBitmap.getHeight());
-            return new GradientModel(leftEyeMax.getValue() - noseMin.getValue(), leftEyeMax.getPosition(), noseMin.getPosition());
+            if (leftEyeMax.getValue() > rightEyeMax.getValue()) {
+                Log.e("MinMaxAlgorithm - getGradientAndPositions - returned", "left eye x: " + leftEyeMax.getPosition()[0] + ", left eye y: " + leftEyeMax.getPosition()[1]
+                        + ". nose x: " + noseMin.getPosition()[0] + ", nose y: " + noseMin.getPosition()[1]
+                        + ". original image x: " + capturedImageBitmap.getWidth() + ", original image y: " + capturedImageBitmap.getHeight());
+                return new GradientModel(leftEyeMax.getValue() - noseMin.getValue(), leftEyeMax.getPosition(), noseMin.getPosition());
+            }
+            else {
+                Log.e("MinMaxAlgorithm - getGradientAndPositions - returned", "right eye x: " + rightEyeMax.getPosition()[0] + ", right eye y: " + rightEyeMax.getPosition()[1]
+                        + ". nose x: " + noseMin.getPosition()[0] + ", nose y: " + noseMin.getPosition()[1]
+                        + ". original image x: " + capturedImageBitmap.getWidth() + ", original image y: " + capturedImageBitmap.getHeight());
+                return new GradientModel(rightEyeMax.getValue() - noseMin.getValue(), rightEyeMax.getPosition(), noseMin.getPosition());
+            }
         }
-        else {
-            Log.e("MinMaxAlgorithm - getGradientAndPositions - returned", "right eye x: " + rightEyeMax.getPosition()[0] + ", right eye y: " + rightEyeMax.getPosition()[1]
-                    + ". nose x: " + noseMin.getPosition()[0] + ", nose y: " + noseMin.getPosition()[1]
-                    + ". original image x: " + capturedImageBitmap.getWidth() + ", original image y: " + capturedImageBitmap.getHeight());
-            return new GradientModel(rightEyeMax.getValue() - noseMin.getValue(), rightEyeMax.getPosition(), noseMin.getPosition());
+        catch (Exception e) {
+            Logging.error("getGradientAndPositions", e);
+            return null;
         }
     }
 
     private InterestPointModel getMaxMinSpotInRoi(RoiModel roiCircle, String category) {
-        int[] leftUpperCornerLocation = roiCircle.getUpperLeftCornerLocation();
-        center = new int[]{leftUpperCornerLocation[0] + radius, leftUpperCornerLocation[1] + radius};
-        int[] position = new int[2];
-        double maxValue = 0;
-        double minValue = 765;
-        double colorSum;
-        int targetPixel;
+        try {
+            int[] leftUpperCornerLocation = roiCircle.getUpperLeftCornerLocation();
+            center = new int[]{leftUpperCornerLocation[0] + radius, leftUpperCornerLocation[1] + radius};
+            int[] position = new int[2];
+            double maxValue = 0;
+            double minValue = 765;
+            double colorSum;
+            int targetPixel;
 
-        for (int x = leftUpperCornerLocation[0]; x <= leftUpperCornerLocation[0] + width; x++) {
-            for (int y = leftUpperCornerLocation[1]; y <= leftUpperCornerLocation[1] + height; y++) {
-                if (isPixelInsideRoi(x, y)) {
-                    targetPixel = capturedImageBitmap.getPixel(x, y);
-                    colorSum = Color.red(targetPixel) + Color.green(targetPixel) + Color.blue(targetPixel);
+            for (int x = leftUpperCornerLocation[0]; x <= leftUpperCornerLocation[0] + width; x++) {
+                for (int y = leftUpperCornerLocation[1]; y <= leftUpperCornerLocation[1] + height; y++) {
+                    if (isPixelInsideRoi(x, y)) {
+                        targetPixel = capturedImageBitmap.getPixel(x, y);
+                        colorSum = Color.red(targetPixel) + Color.green(targetPixel) + Color.blue(targetPixel);
 
-                    if (category.equals("max")) {
-                        if (colorSum > maxValue) {
-                            maxValue = colorSum;
-                            position = new int[]{x, y};
+                        if (category.equals("max")) {
+                            if (colorSum > maxValue) {
+                                maxValue = colorSum;
+                                position = new int[]{x, y};
+                            }
                         }
-                    }
-                    else {
-                        if (colorSum < minValue) {
-                            minValue = colorSum;
-                            position = new int[]{x, y};
+                        else {
+                            if (colorSum < minValue) {
+                                minValue = colorSum;
+                                position = new int[]{x, y};
+                            }
                         }
                     }
                 }
             }
-        }
 
-        return new InterestPointModel(category.equals("max") ? maxValue : minValue, position);
+            return new InterestPointModel(category.equals("max") ? maxValue : minValue, position);
+        }
+        catch (Exception e) {
+            Logging.error("getMaxMinSpotInRoi", e);
+            throw e;
+        }
     }
 
     private boolean isPixelInsideRoi(int pixelX, int pixelY) {
-        return (Math.sqrt(Math.pow(center[0] - pixelX, 2) + Math.pow(center[1] - pixelY, 2))) < radius;
+        try {
+            return (Math.sqrt(Math.pow(center[0] - pixelX, 2) + Math.pow(center[1] - pixelY, 2))) < radius;
+        }
+        catch (Exception e) {
+            Logging.error("isPixelInsideRoi", e);
+            throw e;
+        }
     }
 }
