@@ -16,6 +16,8 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     private RoiModel leftEye;
     private RoiModel rightEye;
     private RoiModel nose;
+    private int width;
+    private int height;
     private int[] center;
     private int radius;
     private Bitmap capturedImageBitmap;
@@ -35,6 +37,11 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
         this.leftEye = Scaling.getScaledRoiObject(leftEye, scalingFactorX, scalingFactorY, horizontalOffset);
         this.rightEye = Scaling.getScaledRoiObject(rightEye, scalingFactorX, scalingFactorY, horizontalOffset);
         this.nose = Scaling.getScaledRoiObject(nose, scalingFactorX, scalingFactorY, horizontalOffset);
+
+        // All ROI circles have identical dimensions, hence arbitrary RoiModel is used
+        width = this.leftEye.getWidth();
+        height = this.leftEye.getHeight();
+        radius = this.leftEye.getWidth() / 2;
     }
 
     @Override
@@ -58,20 +65,19 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     }
 
     private InterestPointModel getMaxMinSpotInRoi(RoiModel roiCircle, String category) {
-        int width = roiCircle.getWidth();
-        int height = roiCircle.getHeight();
-        radius = roiCircle.getWidth() / 2;
         int[] leftUpperCornerLocation = roiCircle.getUpperLeftCornerLocation();
         center = new int[]{leftUpperCornerLocation[0] + radius, leftUpperCornerLocation[1] + radius};
         int[] position = new int[2];
         double maxValue = 0;
         double minValue = 765;
+        double colorSum;
+        int targetPixel;
 
         for (int x = leftUpperCornerLocation[0]; x <= leftUpperCornerLocation[0] + width; x++) {
             for (int y = leftUpperCornerLocation[1]; y <= leftUpperCornerLocation[1] + height; y++) {
                 if (isPixelInsideRoi(x, y)) {
-                    int targetPixel = capturedImageBitmap.getPixel(x, y);
-                    double colorSum = Color.red(targetPixel) + Color.green(targetPixel) + Color.blue(targetPixel);
+                    targetPixel = capturedImageBitmap.getPixel(x, y);
+                    colorSum = Color.red(targetPixel) + Color.green(targetPixel) + Color.blue(targetPixel);
 
                     if (category.equals("max")) {
                         if (colorSum > maxValue) {
@@ -93,7 +99,6 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     }
 
     private boolean isPixelInsideRoi(int pixelX, int pixelY) {
-        double distanceFromCenterToPixel = Math.sqrt(Math.pow(center[0] - pixelX, 2) + Math.pow(center[1] - pixelY, 2));
-        return distanceFromCenterToPixel < radius;
+        return (Math.sqrt(Math.pow(center[0] - pixelX, 2) + Math.pow(center[1] - pixelY, 2))) < radius;
     }
 }
