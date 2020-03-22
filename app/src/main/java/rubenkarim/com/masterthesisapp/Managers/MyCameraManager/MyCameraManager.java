@@ -1,4 +1,4 @@
-package rubenkarim.com.masterthesisapp.MyCameraManager;
+package rubenkarim.com.masterthesisapp.Managers.MyCameraManager;
 
 import android.content.Context;
 import android.util.Log;
@@ -8,7 +8,6 @@ import com.flir.thermalsdk.androidsdk.ThermalSdkAndroid;
 import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
 import com.flir.thermalsdk.image.ThermalImage;
 import com.flir.thermalsdk.live.Camera;
-import com.flir.thermalsdk.live.CameraType;
 import com.flir.thermalsdk.live.CommunicationInterface;
 import com.flir.thermalsdk.live.Identity;
 import com.flir.thermalsdk.live.connectivity.ConnectionStatus;

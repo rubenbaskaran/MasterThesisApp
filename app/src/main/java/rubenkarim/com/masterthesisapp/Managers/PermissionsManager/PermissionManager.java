@@ -1,4 +1,4 @@
-package rubenkarim.com.masterthesisapp.PermissionsManager;
+package rubenkarim.com.masterthesisapp.Managers.PermissionsManager;
 
 import android.app.Activity;
 import android.content.Context;
