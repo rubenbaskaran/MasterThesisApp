@@ -47,6 +47,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
         }
         catch (Exception e) {
             Logging.error("MinMaxAlgorithm", e);
+            throw e;
         }
     }
 
@@ -72,7 +73,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
         }
         catch (Exception e) {
             Logging.error("getGradientAndPositions", e);
-            return null;
+            throw e;
         }
     }
 
