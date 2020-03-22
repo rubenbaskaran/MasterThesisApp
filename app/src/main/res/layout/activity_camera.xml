@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout_CameraActivity"
     android:layout_width="match_parent"
@@ -25,7 +24,7 @@
             android:id="@+id/imageView_thermalViewFinder"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible"/>
+            android:visibility="visible" />
 
         <ImageView
             android:id="@+id/imageView_head"
@@ -50,11 +49,17 @@
                 android:layout_height="60dp"
                 android:src="@drawable/detailed_face_template" />
 
+            <Space
+                android:id="@+id/space_betweenEyes"
+                android:layout_width="5dp"
+                android:layout_height="60dp"
+                android:layout_toEndOf="@id/imageView_leftEye"/>
+
             <ImageView
                 android:id="@+id/imageView_RightEye"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_toEndOf="@id/imageView_leftEye"
+                android:layout_toEndOf="@id/space_betweenEyes"
                 android:src="@drawable/detailed_face_template" />
 
             <ImageView
@@ -63,8 +68,8 @@
                 android:layout_height="60dp"
                 android:layout_below="@id/imageView_leftEye"
                 android:layout_centerHorizontal="true"
-                android:src="@drawable/detailed_face_template"
-                android:layout_marginTop="-10dp"/>
+                android:layout_marginTop="-5dp"
+                android:src="@drawable/detailed_face_template" />
         </RelativeLayout>
     </RelativeLayout>
 
