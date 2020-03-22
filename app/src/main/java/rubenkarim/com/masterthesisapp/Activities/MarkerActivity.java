@@ -27,6 +27,7 @@ import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
+// TODO: Refactor and optimize
 public class MarkerActivity extends AppCompatActivity {
     ImageView imageView_markerImage;
     String filename = "default_picture";
