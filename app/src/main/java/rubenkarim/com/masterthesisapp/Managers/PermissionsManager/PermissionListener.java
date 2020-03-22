@@ -1,4 +1,4 @@
-package rubenkarim.com.masterthesisapp.PermissionsManager;
+package rubenkarim.com.masterthesisapp.Managers.PermissionsManager;
 
 public interface PermissionListener {
     void permissionGranted(String[] permissions);

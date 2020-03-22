@@ -35,10 +35,10 @@ import androidx.camera.view.CameraView;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
-import rubenkarim.com.masterthesisapp.MyCameraManager.FlirConnectionListener;
-import rubenkarim.com.masterthesisapp.MyCameraManager.MyCameraManager;
-import rubenkarim.com.masterthesisapp.PermissionsManager.PermissionListener;
-import rubenkarim.com.masterthesisapp.PermissionsManager.PermissionManager;
+import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.FlirConnectionListener;
+import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.MyCameraManager;
+import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionListener;
+import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionManager;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 

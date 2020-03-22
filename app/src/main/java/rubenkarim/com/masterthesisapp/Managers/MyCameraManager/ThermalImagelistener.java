@@ -1,4 +1,4 @@
-package rubenkarim.com.masterthesisapp.MyCameraManager;
+package rubenkarim.com.masterthesisapp.Managers.MyCameraManager;
 
 import com.flir.thermalsdk.image.ThermalImage;
 
