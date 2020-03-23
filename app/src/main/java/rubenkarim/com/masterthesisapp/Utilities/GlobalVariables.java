@@ -20,6 +20,6 @@ public class GlobalVariables
         CurrentAlgorithm = currentAlgorithm;
     }
 
-    private static Algorithms CurrentAlgorithm;
+    private static Algorithms CurrentAlgorithm = null;
 
 }

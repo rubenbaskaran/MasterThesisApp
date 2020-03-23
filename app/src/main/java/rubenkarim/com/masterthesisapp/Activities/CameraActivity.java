@@ -33,12 +33,12 @@ import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.view.CameraView;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
-import rubenkarim.com.masterthesisapp.Models.GradientModel;
-import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.FlirConnectionListener;
 import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.MyCameraManager;
 import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionListener;
 import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionManager;
+import rubenkarim.com.masterthesisapp.Models.GradientModel;
+import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 
@@ -91,6 +91,12 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void SetupAlgorithm() {
+        // Fix for Android Studio bug (returning to previous activity on "stop app")
+        if (GlobalVariables.getCurrentAlgorithm() == null) {
+            Snackbar.make(rootView, "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
         switch (GlobalVariables.getCurrentAlgorithm()) {
             case CNN:
                 // Add setup for CNN
@@ -111,6 +117,12 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void ExecuteAlgorithm() {
+        // Fix for Android Studio bug (returning to previous activity on "stop app")
+        if (GlobalVariables.getCurrentAlgorithm() == null) {
+            Snackbar.make(rootView, "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
         GradientModel gradientAndPositions = null;
 
         switch (GlobalVariables.getCurrentAlgorithm()) {
@@ -166,8 +178,10 @@ public class CameraActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        myCameraManager.close();
-        myCameraManager = null;
+        if (myCameraManager != null) {
+            myCameraManager.close();
+            myCameraManager = null;
+        }
         super.onPause();
     }
 
@@ -229,7 +243,8 @@ public class CameraActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onDisconnecting(ConnectionStatus connectionStatus) {}
+            public void onDisconnecting(ConnectionStatus connectionStatus) {
+            }
 
             @Override
             public void onConnecting(ConnectionStatus connectionStatus) {
@@ -239,7 +254,8 @@ public class CameraActivity extends AppCompatActivity {
             }
 
             @Override
-            public void identityFound(Identity identity) {}
+            public void identityFound(Identity identity) {
+            }
 
             @Override
             public void permissionError(UsbPermissionHandler.UsbPermissionListener.ErrorType errorType, Identity identity) {
