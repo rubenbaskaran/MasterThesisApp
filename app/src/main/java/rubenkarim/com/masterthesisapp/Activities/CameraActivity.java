@@ -4,8 +4,11 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -19,13 +22,23 @@ import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
 import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.live.Identity;
 import com.flir.thermalsdk.live.connectivity.ConnectionStatus;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.face.FirebaseVisionFace;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,6 +54,7 @@ import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
+import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 
 public class CameraActivity extends AppCompatActivity {
     private static final String TAG = CameraActivity.class.getSimpleName();
@@ -133,7 +147,7 @@ public class CameraActivity extends AppCompatActivity {
                 // Add execution for CNN with transfer learning
                 break;
             case RgbThermalMapping:
-                // Add execution for RgbThermalMapping
+                detectFaces();
                 break;
             case MaxMinTemplate:
                 ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
@@ -157,10 +171,9 @@ public class CameraActivity extends AppCompatActivity {
                         new RoiModel(cameraPreviewLocation, cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight())
                 );
                 gradientAndPositions = minMaxAlgorithm.getGradientAndPositions();
+                goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
                 break;
         }
-
-        goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
     }
 
     private void startView(HashMap<String, UsbDevice> deviceList) {
@@ -357,5 +370,61 @@ public class CameraActivity extends AppCompatActivity {
         bundle.putSerializable("gradientAndPositions", gradientAndPositions);
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    private void detectFaces() {
+        Bitmap imageBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.default_picture);
+        FirebaseVisionImage image = ImageProcessing.convertToFirebaseVisionImage(imageBitmap);
+        GradientModel gradientAndPositions = new GradientModel(100, null, null);
+
+        FirebaseVisionFaceDetectorOptions options =
+                new FirebaseVisionFaceDetectorOptions.Builder()
+                        .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+                        .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
+                        .setContourMode(FirebaseVisionFaceDetectorOptions.NO_CONTOURS)
+                        .setClassificationMode(FirebaseVisionFaceDetectorOptions.NO_CLASSIFICATIONS)
+                        .setMinFaceSize(0.15f)
+                        .build();
+
+        FirebaseVisionFaceDetector detector = FirebaseVision.getInstance()
+                .getVisionFaceDetector(options);
+
+        Task<List<FirebaseVisionFace>> result =
+                detector.detectInImage(image)
+                        .addOnSuccessListener(
+                                new OnSuccessListener<List<FirebaseVisionFace>>() {
+                                    @Override
+                                    public void onSuccess(List<FirebaseVisionFace> faces) {
+                                        // Task completed successfully
+                                        // [START_EXCLUDE]
+                                        // [START get_face_info]
+                                        if (!faces.isEmpty()) {
+                                            Rect bounds = faces.get(0).getBoundingBox();
+                                            float rotY = faces.get(0).getHeadEulerAngleY();  // Head is rotated to the right rotY degrees
+                                            float rotZ = faces.get(0).getHeadEulerAngleZ();  // Head is tilted sideways rotZ degrees
+
+                                            FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
+                                            if (leftEye != null) {
+                                                gradientAndPositions.setEyePosition(new int[]{(int) ((float) leftEye.getPosition().getX()), (int) ((float) leftEye.getPosition().getY())});
+                                            }
+                                            FirebaseVisionFaceLandmark nose = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE);
+                                            if (nose != null) {
+                                                gradientAndPositions.setNosePosition(new int[]{(int) ((float) nose.getPosition().getX()), (int) ((float) nose.getPosition().getY())});
+                                            }
+
+                                            goToMarkerActivity((Uri.parse("android.resource://rubenkarim.com.masterthesisapp/drawable/" + R.drawable.default_picture)).toString(), isThermalCameraOn, gradientAndPositions);
+                                        }
+                                        else {
+                                            Snackbar.make(rootView, "No faces found", Snackbar.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                })
+                        .addOnFailureListener(
+                                new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Snackbar.make(rootView, "Face detection error", Snackbar.LENGTH_SHORT).show();
+                                    }
+                                });
     }
 }

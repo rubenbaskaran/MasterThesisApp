@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 29
@@ -49,4 +50,6 @@ dependencies {
     implementation project(path: ':androidsdk-release')
     implementation project(path: ':thermalsdk-release')
     implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
+    implementation 'com.google.firebase:firebase-ml-vision-face-model:19.0.0'
 }

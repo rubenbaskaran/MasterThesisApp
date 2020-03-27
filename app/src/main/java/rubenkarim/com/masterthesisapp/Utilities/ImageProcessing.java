@@ -1,5 +1,6 @@
 package rubenkarim.com.masterthesisapp.Utilities;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -7,7 +8,11 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.view.View;
 
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+
 import java.io.FileOutputStream;
+
+import rubenkarim.com.masterthesisapp.R;
 
 /**
  * Source: https://stackoverflow.com/questions/14066038/why-does-an-image-captured-using-camera-intent-gets-rotated-on-some-devices-on-a
@@ -95,5 +100,10 @@ public class ImageProcessing {
 
     public static Bitmap convertToBitmap(String imagePath) {
         return BitmapFactory.decodeFile(imagePath);
+    }
+
+    //Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_picture)
+    public static FirebaseVisionImage convertToFirebaseVisionImage(Bitmap bitmap) {
+        return FirebaseVisionImage.fromBitmap(bitmap);
     }
 }

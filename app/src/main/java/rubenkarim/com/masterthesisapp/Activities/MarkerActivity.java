@@ -3,6 +3,7 @@ package rubenkarim.com.masterthesisapp.Activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
@@ -101,7 +102,7 @@ public class MarkerActivity extends AppCompatActivity {
             }
             else {
                 imageView_markerImage.setImageURI(Uri.parse(filename));
-                Bitmap originalRgbImageBitmap = ImageProcessing.convertToBitmap(filename);
+                Bitmap originalRgbImageBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.default_picture);
                 imageOriginalDimensions = new int[]{originalRgbImageBitmap.getWidth(), originalRgbImageBitmap.getHeight()};
             }
 
