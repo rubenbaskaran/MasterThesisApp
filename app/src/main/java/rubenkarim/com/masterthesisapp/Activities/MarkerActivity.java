@@ -102,7 +102,7 @@ public class MarkerActivity extends AppCompatActivity {
             }
             else {
                 imageView_markerImage.setImageURI(Uri.parse(filename));
-                Bitmap originalRgbImageBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.default_picture);
+                Bitmap originalRgbImageBitmap = ImageProcessing.convertToBitmap(filename);
                 imageOriginalDimensions = new int[]{originalRgbImageBitmap.getWidth(), originalRgbImageBitmap.getHeight()};
             }
 

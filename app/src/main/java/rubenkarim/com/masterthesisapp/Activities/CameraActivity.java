@@ -373,7 +373,8 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void detectFaces() {
-        Bitmap imageBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.default_picture);
+        ImageProcessing.FixImageOrientation(filepath);
+        Bitmap imageBitmap = ImageProcessing.convertToBitmap(filepath);
         FirebaseVisionImage image = ImageProcessing.convertToFirebaseVisionImage(imageBitmap);
         GradientModel gradientAndPositions = new GradientModel(100, null, null);
 
@@ -412,7 +413,7 @@ public class CameraActivity extends AppCompatActivity {
                                                 gradientAndPositions.setNosePosition(new int[]{(int) ((float) nose.getPosition().getX()), (int) ((float) nose.getPosition().getY())});
                                             }
 
-                                            goToMarkerActivity((Uri.parse("android.resource://rubenkarim.com.masterthesisapp/drawable/" + R.drawable.default_picture)).toString(), isThermalCameraOn, gradientAndPositions);
+                                            goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
                                         }
                                         else {
                                             Snackbar.make(rootView, "No faces found", Snackbar.LENGTH_SHORT).show();
