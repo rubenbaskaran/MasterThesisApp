@@ -18,6 +18,8 @@ public class OverviewActivity extends AppCompatActivity {
     GradientModel gradientAndPositions;
     private boolean useDefaultPicture;
     private Uri defaultThermalPictureUri;
+    private int imageHeight;
+    private int imageWidth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,12 @@ public class OverviewActivity extends AppCompatActivity {
         }
         if (receivedIntent.hasExtra("isThermalImage")) {
             isThermalPicture = receivedIntent.getBooleanExtra("isThermalImage", true);
+        }
+        if (receivedIntent.hasExtra("imageHeight")) {
+            imageHeight = receivedIntent.getIntExtra("imageHeight", 0);
+        }
+        if (receivedIntent.hasExtra("imageWidth")) {
+            imageWidth = receivedIntent.getIntExtra("imageWidth", 0);
         }
         if (receivedIntent.hasExtra("useDefaultPicture")) {
             useDefaultPicture = receivedIntent.getBooleanExtra("useDefaultPicture", false);
@@ -57,6 +65,9 @@ public class OverviewActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
         intent.putExtra("filename", filename);
         intent.putExtra("isThermalImage", isThermalPicture);
+        intent.putExtra("imageHeight", imageHeight);
+        intent.putExtra("imageWidth", imageWidth);
+        intent.putExtra("useDefaultPicture", useDefaultPicture);
         Bundle bundle = new Bundle();
         bundle.putSerializable("gradientAndPositions", gradientAndPositions);
         intent.putExtras(bundle);

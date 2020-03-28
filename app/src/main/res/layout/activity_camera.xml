@@ -14,6 +14,14 @@
         android:layout_height="0dp"
         android:layout_weight="4">
 
+        <ProgressBar
+            android:id="@+id/progressBar_loadingAnimation"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_centerInParent="true"
+            android:translationZ="2dp"
+            android:visibility="invisible" />
+
         <androidx.camera.view.CameraView
             android:id="@+id/cameraView_rgbViewFinder"
             android:layout_width="match_parent"
@@ -53,7 +61,7 @@
                 android:id="@+id/space_betweenEyes"
                 android:layout_width="5dp"
                 android:layout_height="60dp"
-                android:layout_toEndOf="@id/imageView_leftEye"/>
+                android:layout_toEndOf="@id/imageView_leftEye" />
 
             <ImageView
                 android:id="@+id/imageView_RightEye"
