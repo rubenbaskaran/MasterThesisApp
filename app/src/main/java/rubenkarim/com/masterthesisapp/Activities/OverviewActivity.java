@@ -16,6 +16,8 @@ public class OverviewActivity extends AppCompatActivity {
     String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "default_picture";
     Boolean isThermalPicture = false;
     GradientModel gradientAndPositions;
+    private boolean useDefaultPicture;
+    private Uri defaultThermalPictureUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,12 @@ public class OverviewActivity extends AppCompatActivity {
         if (receivedIntent.hasExtra("isThermalImage")) {
             isThermalPicture = receivedIntent.getBooleanExtra("isThermalImage", true);
         }
+        if (receivedIntent.hasExtra("useDefaultPicture")) {
+            useDefaultPicture = receivedIntent.getBooleanExtra("useDefaultPicture", false);
+            if (useDefaultPicture) {
+                defaultThermalPictureUri = Uri.parse("android.resource://" + this.getPackageName() + "/drawable/thermal_picture");
+            }
+        }
 
         Bundle bundle = receivedIntent.getExtras();
         if (bundle != null) {
@@ -38,14 +46,11 @@ public class OverviewActivity extends AppCompatActivity {
             textView_gradient.setText(String.valueOf(gradientAndPositions.getGradient()));
         }
 
-        // TODO: If chosen algorithm is RgbThermalMapping and no FLIR connected then add drawable path to filepath
-        // TODO: Uri.parse("android.resource://" + this.getPackageName() + R.drawable.thermal_picture).getPath();
-
         setPicture();
     }
 
     private void setPicture() {
-        imageView_patientImage.setImageURI(Uri.parse(filename));
+        imageView_patientImage.setImageURI(useDefaultPicture ? defaultThermalPictureUri : Uri.parse(filename));
     }
 
     public void backOnClick(View view) {

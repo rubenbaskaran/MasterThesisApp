@@ -4,11 +4,9 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -66,6 +64,7 @@ public class CameraActivity extends AppCompatActivity {
     private MyCameraManager myCameraManager;
     private PermissionManager permissionManager;
     private String filepath;
+    private boolean useDefaultPicture = false;
     ImageView imageView_thermalViewFinder;
 
     @Override
@@ -149,8 +148,9 @@ public class CameraActivity extends AppCompatActivity {
                 // Add execution for CNN with transfer learning
                 break;
             case RgbThermalMapping:
-                // TODO: If chosen algorithm is RgbThermalMapping and no FLIR connected then add drawable path to filepath
-                // TODO: Uri.parse("android.resource://" + this.getPackageName() + R.drawable.rgb_picture).getPath();
+                if (!isThermalCameraOn) {
+                    useDefaultPicture = true;
+                }
                 detectFaces();
                 break;
             case MaxMinTemplate:
@@ -370,20 +370,33 @@ public class CameraActivity extends AppCompatActivity {
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
+        intent.putExtra("useDefaultPicture", useDefaultPicture);
         Bundle bundle = new Bundle();
         bundle.putSerializable("gradientAndPositions", gradientAndPositions);
         intent.putExtras(bundle);
         startActivity(intent);
     }
 
-    // TODO: Add the following code
-    //    if (ThermalImageFile.isThermalImage(filename)) {
-    //        ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filename);
-    //        JavaImageBuffer rgbImage = thermalImageFile.getFusion().getPhoto()
-    //        Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
     private void detectFaces() {
-        ImageProcessing.FixImageOrientation(filepath);
-        Bitmap imageBitmap = ImageProcessing.convertToBitmap(filepath);
+        Bitmap imageBitmap = null;
+
+        if (useDefaultPicture) {
+            imageBitmap = ImageProcessing.convertDrawableToBitmap(this, R.drawable.rgb_picture);
+        }
+        else {
+            if (ThermalImageFile.isThermalImage(filepath)) {
+                try {
+                    ImageProcessing.FixImageOrientation(filepath);
+                    ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filepath);
+                    JavaImageBuffer rgbImage = thermalImageFile.getFusion().getPhoto();
+                    imageBitmap = BitmapAndroid.createBitmap(rgbImage).getBitMap();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         FirebaseVisionImage image = ImageProcessing.convertToFirebaseVisionImage(imageBitmap);
         GradientModel gradientAndPositions = new GradientModel(100, null, null);
 
@@ -413,7 +426,7 @@ public class CameraActivity extends AppCompatActivity {
                                             float rotY = faces.get(0).getHeadEulerAngleY();  // Head is rotated to the right rotY degrees
                                             float rotZ = faces.get(0).getHeadEulerAngleZ();  // Head is tilted sideways rotZ degrees
 
-                                            FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
+                                            FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
                                             if (leftEye != null) {
                                                 gradientAndPositions.setEyePosition(new int[]{(int) ((float) leftEye.getPosition().getX()), (int) ((float) leftEye.getPosition().getY())});
                                             }
