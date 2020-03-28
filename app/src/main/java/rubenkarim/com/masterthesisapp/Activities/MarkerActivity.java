@@ -38,6 +38,8 @@ public class MarkerActivity extends AppCompatActivity {
     private int imageWidth;
     private ImageView imageView_markerImage;
     private GradientModel gradientAndPositions;
+    private boolean useDefaultPicture = false;
+    private Uri defaultThermalPictureUri = null;
     //endregion
 
     @Override
@@ -62,6 +64,12 @@ public class MarkerActivity extends AppCompatActivity {
             }
             if (receivedIntent.hasExtra("imageWidth")) {
                 imageWidth = receivedIntent.getIntExtra("imageWidth", 0);
+            }
+            if (receivedIntent.hasExtra("useDefaultPicture")) {
+                useDefaultPicture = receivedIntent.getBooleanExtra("useDefaultPicture", false);
+                if (useDefaultPicture) {
+                    defaultThermalPictureUri = Uri.parse("android.resource://" + this.getPackageName() + "/drawable/thermal_picture");
+                }
             }
 
             Bundle bundle = receivedIntent.getExtras();
@@ -100,8 +108,10 @@ public class MarkerActivity extends AppCompatActivity {
                 }
             }
             else {
-                imageView_markerImage.setImageURI(Uri.parse(filename));
-                Bitmap originalRgbImageBitmap = ImageProcessing.convertToBitmap(filename);
+                imageView_markerImage.setImageURI(useDefaultPicture ? defaultThermalPictureUri : Uri.parse(filename));
+                Bitmap originalRgbImageBitmap = useDefaultPicture ?
+                        ImageProcessing.convertDrawableToBitmap(this, R.drawable.rgb_picture)
+                        : ImageProcessing.convertToBitmap(filename);
                 imageOriginalDimensions = new int[]{originalRgbImageBitmap.getWidth(), originalRgbImageBitmap.getHeight()};
             }
 
@@ -242,6 +252,7 @@ public class MarkerActivity extends AppCompatActivity {
             Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
             intent.putExtra("filename", filename);
             intent.putExtra("isThermalImage", isThermalPicture);
+            intent.putExtra("useDefaultPicture", useDefaultPicture);
             Bundle bundle = new Bundle();
             bundle.putSerializable("gradientAndPositions", gradientAndPositions);
             intent.putExtras(bundle);

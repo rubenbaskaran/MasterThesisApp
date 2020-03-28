@@ -36,4 +36,7 @@ public class GradientModel implements Serializable {
         this.eyePosition = eyePosition;
         this.nosePosition = nosePosition;
     }
+
+    public GradientModel() {
+    }
 }
