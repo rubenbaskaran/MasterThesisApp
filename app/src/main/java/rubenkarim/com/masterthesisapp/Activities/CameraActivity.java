@@ -74,7 +74,6 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
         cameraView_rgbViewFinder = findViewById(R.id.cameraView_rgbViewFinder);
-        myCameraManager = new MyCameraManager(getApplicationContext());
         permissionManager = new PermissionManager();
 
         //CheckforUsbDevice
@@ -182,6 +181,8 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void startView(HashMap<String, UsbDevice> deviceList) {
+        myCameraManager = new MyCameraManager(getApplicationContext());
+
         if (!deviceList.isEmpty()) {
             Snackbar.make(rootView, "USB device is detected trying to connect", Snackbar.LENGTH_SHORT).show();
             showThermalViewfinder();
@@ -196,11 +197,15 @@ public class CameraActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        resetThermalCamera();
+        super.onPause();
+    }
+
+    private void resetThermalCamera(){
         if (myCameraManager != null) {
             myCameraManager.close();
             myCameraManager = null;
         }
-        super.onPause();
     }
 
     @Override
@@ -245,9 +250,8 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onConnected(ConnectionStatus connectionStatus) {
                 runOnUiThread(() -> {
-
+                    Snackbar.make(rootView, "Camera connected", Snackbar.LENGTH_SHORT).show();
                 });
-                Snackbar.make(rootView, "Camera connected", Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
@@ -317,6 +321,7 @@ public class CameraActivity extends AppCompatActivity {
                     String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
                     filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                     thermalImage.saveAs(filepath);
+                    resetThermalCamera();
                     ExecuteAlgorithm();
                 }
                 else {
