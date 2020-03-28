@@ -62,7 +62,7 @@ public class CameraActivity extends AppCompatActivity {
     private View rootView;
     private CameraView cameraView_rgbViewFinder;
     private boolean isThermalCameraOn = true;
-    private MyCameraManager myCameraManager;
+    private MyCameraManager myCameraManager = null;
     private PermissionManager permissionManager;
     private String filepath;
     private boolean useDefaultPicture = false;
@@ -201,7 +201,7 @@ public class CameraActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    private void resetThermalCamera(){
+    private void resetThermalCamera() {
         if (myCameraManager != null) {
             myCameraManager.close();
             myCameraManager = null;
@@ -312,6 +312,10 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void takeAndSaveThermalImage() {
+
+        if (myCameraManager == null) {
+            return;
+        }
 
         myCameraManager.addThermalImageListener((thermalImage) -> {
             File ImageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
