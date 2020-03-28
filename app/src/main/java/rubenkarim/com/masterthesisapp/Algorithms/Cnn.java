@@ -62,6 +62,8 @@ public class Cnn extends AbstractAlgorithm {
         //Get predictions 9109909
         mTflite.run(tensorImage.getBuffer(), tensorBufferOutput.getBuffer().rewind());
 
+        float[] results = tensorBufferOutput.getFloatArray();
+
         return null;
     }
 

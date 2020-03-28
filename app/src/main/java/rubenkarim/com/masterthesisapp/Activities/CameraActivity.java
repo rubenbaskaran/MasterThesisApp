@@ -155,7 +155,7 @@ public class CameraActivity extends AppCompatActivity {
                     JavaImageBuffer javaBuffer = thermalImageFile.getImage();
                     Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
 
-                    String cnnModelFile = "myModelBlackAndWhite.tflite";
+                    String cnnModelFile = "RGB_yinguobingWideDens.tflite";
                     Cnn cnn = new Cnn(loadModelFile(this, cnnModelFile), originalThermalImageBitmap);
                     gradientAndPositions = cnn.getGradientAndPositions();
                 } catch (IOException e) {
