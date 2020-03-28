@@ -39,3 +39,4 @@ obj/
 /.idea/codeStyles/Project.xml
 /app/build/generated/source/buildConfig/debug/rubenkarim/com/masterthesisapp/BuildConfig.java
 /app/build/
+/app/src/main/assets/*.tflite
