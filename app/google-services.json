@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "456467071716",
+    "firebase_url": "https://mlkittest-78771.firebaseio.com",
+    "project_id": "mlkittest-78771",
+    "storage_bucket": "mlkittest-78771.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:456467071716:android:863e38d14b1b637544a2f1",
+        "android_client_info": {
+          "package_name": "rubenkarim.com.masterthesisapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "456467071716-k2ne9ii70hpn3qa7vt4mos74k7m90uet.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIBZ4dvyuyv08tuY4lrG2ASKL5Lj2cqEo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "456467071716-k2ne9ii70hpn3qa7vt4mos74k7m90uet.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
