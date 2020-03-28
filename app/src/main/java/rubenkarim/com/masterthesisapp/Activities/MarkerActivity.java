@@ -70,6 +70,9 @@ public class MarkerActivity extends AppCompatActivity {
                 gradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
             }
 
+            // TODO: If chosen algorithm is RgbThermalMapping and no FLIR connected then add drawable path to filepath
+            // TODO: Uri.parse("android.resource://" + this.getPackageName() + R.drawable.thermal_picture).getPath();
+
             setPicture();
         }
         catch (Exception e) {

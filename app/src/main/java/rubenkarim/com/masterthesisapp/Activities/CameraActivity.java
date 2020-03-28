@@ -19,7 +19,9 @@ import android.widget.RelativeLayout;
 import com.flir.thermalsdk.ErrorCode;
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
+import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
+import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.live.Identity;
 import com.flir.thermalsdk.live.connectivity.ConnectionStatus;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -147,6 +149,8 @@ public class CameraActivity extends AppCompatActivity {
                 // Add execution for CNN with transfer learning
                 break;
             case RgbThermalMapping:
+                // TODO: If chosen algorithm is RgbThermalMapping and no FLIR connected then add drawable path to filepath
+                // TODO: Uri.parse("android.resource://" + this.getPackageName() + R.drawable.rgb_picture).getPath();
                 detectFaces();
                 break;
             case MaxMinTemplate:
@@ -372,6 +376,11 @@ public class CameraActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // TODO: Add the following code
+    //    if (ThermalImageFile.isThermalImage(filename)) {
+    //        ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filename);
+    //        JavaImageBuffer rgbImage = thermalImageFile.getFusion().getPhoto()
+    //        Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
     private void detectFaces() {
         ImageProcessing.FixImageOrientation(filepath);
         Bitmap imageBitmap = ImageProcessing.convertToBitmap(filepath);

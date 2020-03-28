@@ -38,6 +38,9 @@ public class OverviewActivity extends AppCompatActivity {
             textView_gradient.setText(String.valueOf(gradientAndPositions.getGradient()));
         }
 
+        // TODO: If chosen algorithm is RgbThermalMapping and no FLIR connected then add drawable path to filepath
+        // TODO: Uri.parse("android.resource://" + this.getPackageName() + R.drawable.thermal_picture).getPath();
+
         setPicture();
     }
 
