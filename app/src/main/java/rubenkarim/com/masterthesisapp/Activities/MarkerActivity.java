@@ -32,7 +32,7 @@ public class MarkerActivity extends AppCompatActivity {
 
     //region Properties
     private String filename;
-    private Boolean isThermalPicture = false;
+    private Boolean isThermalCameraOn = false;
     private int imageViewVerticalOffset;
     private int imageHeight;
     private int imageWidth;
@@ -53,8 +53,8 @@ public class MarkerActivity extends AppCompatActivity {
             if (receivedIntent.hasExtra("filename")) {
                 filename = receivedIntent.getStringExtra("filename");
             }
-            if (receivedIntent.hasExtra("isThermalImage")) {
-                isThermalPicture = receivedIntent.getBooleanExtra("isThermalImage", true);
+            if (receivedIntent.hasExtra("isThermalCameraOn")) {
+                isThermalCameraOn = receivedIntent.getBooleanExtra("isThermalCameraOn", false);
             }
             if (receivedIntent.hasExtra("imageViewVerticalOffset")) {
                 imageViewVerticalOffset = receivedIntent.getIntExtra("imageViewVerticalOffset", 0);
@@ -90,7 +90,7 @@ public class MarkerActivity extends AppCompatActivity {
             ImageProcessing.FixImageOrientation(filename);
             int[] imageOriginalDimensions = null;
 
-            if (isThermalPicture) {
+            if (isThermalCameraOn) {
                 try {
                     if (ThermalImageFile.isThermalImage(filename)) {
                         ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filename);
@@ -251,7 +251,7 @@ public class MarkerActivity extends AppCompatActivity {
         try {
             Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
             intent.putExtra("filename", filename);
-            intent.putExtra("isThermalImage", isThermalPicture);
+            intent.putExtra("isThermalCameraOn", isThermalCameraOn);
             intent.putExtra("useDefaultPicture", useDefaultPicture);
             intent.putExtra("imageHeight", imageHeight);
             intent.putExtra("imageWidth", imageWidth);

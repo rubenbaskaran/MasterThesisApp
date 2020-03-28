@@ -14,7 +14,7 @@ import rubenkarim.com.masterthesisapp.R;
 public class OverviewActivity extends AppCompatActivity {
     ImageView imageView_patientImage;
     String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "default_picture";
-    Boolean isThermalPicture = false;
+    Boolean isThermalCameraOn = false;
     GradientModel gradientAndPositions;
     private boolean useDefaultPicture;
     private Uri defaultThermalPictureUri;
@@ -32,8 +32,8 @@ public class OverviewActivity extends AppCompatActivity {
         if (receivedIntent.hasExtra("filename")) {
             filename = receivedIntent.getStringExtra("filename");
         }
-        if (receivedIntent.hasExtra("isThermalImage")) {
-            isThermalPicture = receivedIntent.getBooleanExtra("isThermalImage", true);
+        if (receivedIntent.hasExtra("isThermalCameraOn")) {
+            isThermalCameraOn = receivedIntent.getBooleanExtra("isThermalCameraOn", false);
         }
         if (receivedIntent.hasExtra("imageHeight")) {
             imageHeight = receivedIntent.getIntExtra("imageHeight", 0);
@@ -64,7 +64,7 @@ public class OverviewActivity extends AppCompatActivity {
     public void backOnClick(View view) {
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
         intent.putExtra("filename", filename);
-        intent.putExtra("isThermalImage", isThermalPicture);
+        intent.putExtra("isThermalCameraOn", isThermalCameraOn);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
         intent.putExtra("useDefaultPicture", useDefaultPicture);

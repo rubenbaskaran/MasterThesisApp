@@ -61,12 +61,12 @@ public class CameraActivity extends AppCompatActivity {
     private static final String TAG = CameraActivity.class.getSimpleName();
     private View rootView;
     private CameraView cameraView_rgbViewFinder;
-    private boolean isThermalCameraOn = true;
+    private boolean isThermalCameraOn = false;
     private MyCameraManager myCameraManager;
     private PermissionManager permissionManager;
     private String filepath;
     private boolean useDefaultPicture = false;
-    ImageView imageView_thermalViewFinder;
+    private ImageView imageView_thermalViewFinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +132,7 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
+    // TODO: Add custom exceptions
     private void ExecuteAlgorithm() {
         // Fix for Android Studio bug (returning to previous activity on "stop app")
         if (GlobalVariables.getCurrentAlgorithm() == null) {
@@ -176,7 +177,7 @@ public class CameraActivity extends AppCompatActivity {
                         new RoiModel(cameraPreviewLocation, cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight())
                 );
                 gradientAndPositions = minMaxAlgorithm.getGradientAndPositions();
-                goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
+                goToMarkerActivity(filepath, gradientAndPositions);
                 break;
         }
     }
@@ -363,7 +364,7 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    private void goToMarkerActivity(String imageFilePath, boolean isThermalImage, GradientModel gradientAndPositions) {
+    private void goToMarkerActivity(String imageFilePath, GradientModel gradientAndPositions) {
         RelativeLayout relativeLayout_cameraPreview = findViewById(R.id.relativeLayout_cameraPreview);
         int[] coordinates = new int[2];
         relativeLayout_cameraPreview.getLocationOnScreen(coordinates);
@@ -372,7 +373,7 @@ public class CameraActivity extends AppCompatActivity {
         int imageWidth = relativeLayout_cameraPreview.getWidth();
 
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
-        intent.putExtra("isThermalImage", isThermalImage);
+        intent.putExtra("isThermalCameraOn", isThermalCameraOn);
         intent.putExtra("filename", imageFilePath);
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         intent.putExtra("imageHeight", imageHeight);
@@ -434,6 +435,7 @@ public class CameraActivity extends AppCompatActivity {
                                             float rotY = faces.get(0).getHeadEulerAngleY();  // Head is rotated to the right rotY degrees
                                             float rotZ = faces.get(0).getHeadEulerAngleZ();  // Head is tilted sideways rotZ degrees
 
+                                            //TODO: Get inside of eye instead of center
                                             FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
                                             if (leftEye != null) {
                                                 gradientAndPositions.setEyePosition(new int[]{(int) ((float) leftEye.getPosition().getX()), (int) ((float) leftEye.getPosition().getY()) + horizontalOffset});
@@ -443,7 +445,7 @@ public class CameraActivity extends AppCompatActivity {
                                                 gradientAndPositions.setNosePosition(new int[]{(int) ((float) nose.getPosition().getX()), (int) ((float) nose.getPosition().getY()) + horizontalOffset});
                                             }
 
-                                            goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
+                                            goToMarkerActivity(filepath, gradientAndPositions);
                                         }
                                         else {
                                             Snackbar.make(rootView, "No faces found", Snackbar.LENGTH_SHORT).show();
