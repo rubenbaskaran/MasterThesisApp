@@ -422,7 +422,7 @@ public class CameraActivity extends AppCompatActivity {
 
         Task<List<FirebaseVisionFace>> result =
                 detector.detectInImage(image)
-                        .addOnSuccessListener(
+                        .addOnSuccessListener(this,
                                 new OnSuccessListener<List<FirebaseVisionFace>>() {
                                     @Override
                                     public void onSuccess(List<FirebaseVisionFace> faces) {
