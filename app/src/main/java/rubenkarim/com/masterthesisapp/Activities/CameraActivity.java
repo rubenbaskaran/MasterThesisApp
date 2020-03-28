@@ -455,6 +455,7 @@ public class CameraActivity extends AppCompatActivity {
                                             goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
                                         }
                                         else {
+                                            // TODO: Add re-instantiation of myCameraManager
                                             Snackbar.make(rootView, "No faces found", Snackbar.LENGTH_SHORT).show();
                                             hideLoadingAnimation();
                                         }
@@ -464,6 +465,7 @@ public class CameraActivity extends AppCompatActivity {
                                 new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
+                                        // TODO: Add re-instantiation of myCameraManager
                                         Snackbar.make(rootView, "Face detection error", Snackbar.LENGTH_SHORT).show();
                                         hideLoadingAnimation();
                                     }
