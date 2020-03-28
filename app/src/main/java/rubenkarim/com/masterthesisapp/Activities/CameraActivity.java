@@ -388,6 +388,7 @@ public class CameraActivity extends AppCompatActivity {
     private void detectFaces() {
         Bitmap imageBitmap = null;
         int horizontalOffset = 50;
+        int verticalOffset = 50;
 
         if (useDefaultPicture) {
             imageBitmap = ImageProcessing.convertDrawableToBitmap(this, R.drawable.rgb_picture);
@@ -435,10 +436,9 @@ public class CameraActivity extends AppCompatActivity {
                                             float rotY = faces.get(0).getHeadEulerAngleY();  // Head is rotated to the right rotY degrees
                                             float rotZ = faces.get(0).getHeadEulerAngleZ();  // Head is tilted sideways rotZ degrees
 
-                                            //TODO: Get inside of eye instead of center
-                                            FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
+                                            FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
                                             if (leftEye != null) {
-                                                gradientAndPositions.setEyePosition(new int[]{(int) ((float) leftEye.getPosition().getX()), (int) ((float) leftEye.getPosition().getY()) + horizontalOffset});
+                                                gradientAndPositions.setEyePosition(new int[]{(int) ((float) leftEye.getPosition().getX()) + verticalOffset, (int) ((float) leftEye.getPosition().getY()) + horizontalOffset});
                                             }
                                             FirebaseVisionFaceLandmark nose = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE);
                                             if (nose != null) {
