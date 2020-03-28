@@ -45,7 +45,7 @@ public class Cnn extends AbstractAlgorithm {
         int[] imgShapeInput = mTflite.getInputTensor(0).shape(); // {1, 240, 320, 1}
         DataType dataTypeInput = mTflite.getInputTensor(0).dataType(); //FLOAT32
         TensorImage inputImageBuffer = new TensorImage(dataTypeInput);
-        mthermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+        mthermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
         //Bitmap grayBitmap = toGrayscale(mImageBitmap);
         Bitmap thermalImage = getBitmap(mthermalImageFile);
         inputImageBuffer.load(thermalImage);
@@ -61,7 +61,7 @@ public class Cnn extends AbstractAlgorithm {
         DataType probabilityDataTypeOutput = mTflite.getOutputTensor(0).dataType(); //FLOAT32
         TensorBuffer tensorBufferOutput = TensorBuffer.createFixedSize(probabilityShapeOutput, probabilityDataTypeOutput);
 
-        //Get predictions 9109909
+        //Get predictions
         mTflite.run(tensorImage.getBuffer(), tensorBufferOutput.getBuffer().rewind());
 
         float[] scaledResults = tensorBufferOutput.getFloatArray();

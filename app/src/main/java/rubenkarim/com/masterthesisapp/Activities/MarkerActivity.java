@@ -18,6 +18,7 @@ import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.fusion.FusionMode;
 
 import java.io.IOException;
 
@@ -94,6 +95,7 @@ public class MarkerActivity extends AppCompatActivity {
                 try {
                     if (ThermalImageFile.isThermalImage(filename)) {
                         ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filename);
+                        thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
                         JavaImageBuffer javaBuffer = thermalImageFile.getImage();
                         Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
                         imageView_markerImage.setImageBitmap(originalThermalImageBitmap);
