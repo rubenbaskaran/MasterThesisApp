@@ -253,6 +253,8 @@ public class MarkerActivity extends AppCompatActivity {
             intent.putExtra("filename", filename);
             intent.putExtra("isThermalImage", isThermalPicture);
             intent.putExtra("useDefaultPicture", useDefaultPicture);
+            intent.putExtra("imageHeight", imageHeight);
+            intent.putExtra("imageWidth", imageWidth);
             Bundle bundle = new Bundle();
             bundle.putSerializable("gradientAndPositions", gradientAndPositions);
             intent.putExtras(bundle);

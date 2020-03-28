@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.flir.thermalsdk.ErrorCode;
@@ -67,7 +68,7 @@ public class CameraActivity extends AppCompatActivity {
     private View rootView;
     private CameraView cameraView_rgbViewFinder;
     private boolean isThermalCameraOn = true;
-    private MyCameraManager myCameraManager;
+    private MyCameraManager myCameraManager = null;
     private PermissionManager permissionManager;
     private String filepath;
     private boolean useDefaultPicture = false;
@@ -79,7 +80,6 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
         cameraView_rgbViewFinder = findViewById(R.id.cameraView_rgbViewFinder);
-        myCameraManager = new MyCameraManager(getApplicationContext());
         permissionManager = new PermissionManager();
 
         //CheckforUsbDevice
@@ -141,7 +141,7 @@ public class CameraActivity extends AppCompatActivity {
         // Fix for Android Studio bug (returning to previous activity on "stop app")
         if (GlobalVariables.getCurrentAlgorithm() == null) {
             Snackbar.make(rootView, "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
-            return;
+            backOnClick(null);
         }
 
         GradientModel gradientAndPositions = null;
@@ -208,6 +208,8 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void startView(HashMap<String, UsbDevice> deviceList) {
+        myCameraManager = new MyCameraManager(getApplicationContext());
+
         if (!deviceList.isEmpty()) {
             Snackbar.make(rootView, "USB device is detected trying to connect", Snackbar.LENGTH_SHORT).show();
             showThermalViewfinder();
@@ -222,11 +224,15 @@ public class CameraActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        resetThermalCamera();
+        super.onPause();
+    }
+
+    private void resetThermalCamera() {
         if (myCameraManager != null) {
             myCameraManager.close();
             myCameraManager = null;
         }
-        super.onPause();
     }
 
     @Override
@@ -271,9 +277,8 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onConnected(ConnectionStatus connectionStatus) {
                 runOnUiThread(() -> {
-
+                    Snackbar.make(rootView, "Camera connected", Snackbar.LENGTH_SHORT).show();
                 });
-                Snackbar.make(rootView, "Camera connected", Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
@@ -323,6 +328,8 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void takePictureOnClick(View view) {
+        showLoadingAnimation();
+
         if (isThermalCameraOn) {
             takeAndSaveThermalImage();
         }
@@ -333,6 +340,10 @@ public class CameraActivity extends AppCompatActivity {
 
     private void takeAndSaveThermalImage() {
 
+        if (myCameraManager == null) {
+            return;
+        }
+
         myCameraManager.addThermalImageListener((thermalImage) -> {
             File ImageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
             boolean isDirectoryCreated = ImageDir.exists() || ImageDir.mkdirs();
@@ -341,15 +352,18 @@ public class CameraActivity extends AppCompatActivity {
                     String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
                     filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                     thermalImage.saveAs(filepath);
+                    resetThermalCamera();
                     ExecuteAlgorithm();
                 }
                 else {
                     Log.i(TAG, "takeAndSaveThermalImage: ERROR! IMAGE DIR NOT CREATED");
+                    hideLoadingAnimation();
                     throw new IOException("Image Directory not created");
                 }
             }
             catch (IOException e) {
                 Log.d(TAG, "takeAndSaveThermalImage: ERROR: " + e);
+                hideLoadingAnimation();
             }
         });
     }
@@ -375,11 +389,13 @@ public class CameraActivity extends AppCompatActivity {
                 @Override
                 public void onError(@NonNull ImageCaptureException exception) {
                     Log.e(TAG, "onError: " + exception);
+                    hideLoadingAnimation();
                 }
             });
         }
         else {
             Log.e(TAG, "TakePictureOnClick: There is an error with creating dir!");
+            hideLoadingAnimation();
         }
     }
 
@@ -406,6 +422,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private void detectFaces() {
         Bitmap imageBitmap = null;
+        int horizontalOffset = 50;
 
         if (useDefaultPicture) {
             imageBitmap = ImageProcessing.convertDrawableToBitmap(this, R.drawable.rgb_picture);
@@ -441,7 +458,7 @@ public class CameraActivity extends AppCompatActivity {
 
         Task<List<FirebaseVisionFace>> result =
                 detector.detectInImage(image)
-                        .addOnSuccessListener(
+                        .addOnSuccessListener(this,
                                 new OnSuccessListener<List<FirebaseVisionFace>>() {
                                     @Override
                                     public void onSuccess(List<FirebaseVisionFace> faces) {
@@ -455,17 +472,19 @@ public class CameraActivity extends AppCompatActivity {
 
                                             FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
                                             if (leftEye != null) {
-                                                gradientAndPositions.setEyePosition(new int[]{(int) ((float) leftEye.getPosition().getX()), (int) ((float) leftEye.getPosition().getY())});
+                                                gradientAndPositions.setEyePosition(new int[]{(int) ((float) leftEye.getPosition().getX()), (int) ((float) leftEye.getPosition().getY()) + horizontalOffset});
                                             }
                                             FirebaseVisionFaceLandmark nose = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE);
                                             if (nose != null) {
-                                                gradientAndPositions.setNosePosition(new int[]{(int) ((float) nose.getPosition().getX()), (int) ((float) nose.getPosition().getY())});
+                                                gradientAndPositions.setNosePosition(new int[]{(int) ((float) nose.getPosition().getX()), (int) ((float) nose.getPosition().getY()) + horizontalOffset});
                                             }
 
                                             goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
                                         }
                                         else {
+                                            // TODO: Add re-instantiation of myCameraManager
                                             Snackbar.make(rootView, "No faces found", Snackbar.LENGTH_SHORT).show();
+                                            hideLoadingAnimation();
                                         }
                                     }
                                 })
@@ -473,8 +492,52 @@ public class CameraActivity extends AppCompatActivity {
                                 new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
+                                        // TODO: Add re-instantiation of myCameraManager
                                         Snackbar.make(rootView, "Face detection error", Snackbar.LENGTH_SHORT).show();
+                                        hideLoadingAnimation();
                                     }
                                 });
+    }
+
+    private void showLoadingAnimation() {
+        ProgressBar progressBar_loadingAnimation = findViewById(R.id.progressBar_loadingAnimation);
+        if (progressBar_loadingAnimation.getVisibility() == View.INVISIBLE) {
+            progressBar_loadingAnimation.setVisibility(View.VISIBLE);
+        }
+
+        if (GlobalVariables.getCurrentAlgorithm() != GlobalVariables.Algorithms.MaxMinTemplate) {
+            ImageView headTemplate = findViewById(R.id.imageView_head);
+            if (headTemplate.getVisibility() == View.VISIBLE) {
+                headTemplate.setVisibility(View.INVISIBLE);
+            }
+        }
+
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
+            RelativeLayout eyeNoseTemplate = findViewById(R.id.relativeLayout_minMaxTemplate);
+            if (eyeNoseTemplate.getVisibility() == View.VISIBLE) {
+                eyeNoseTemplate.setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    private void hideLoadingAnimation() {
+        ProgressBar progressBar_loadingAnimation = findViewById(R.id.progressBar_loadingAnimation);
+        if (progressBar_loadingAnimation.getVisibility() == View.VISIBLE) {
+            progressBar_loadingAnimation.setVisibility(View.INVISIBLE);
+        }
+
+        if (GlobalVariables.getCurrentAlgorithm() != GlobalVariables.Algorithms.MaxMinTemplate) {
+            ImageView headTemplate = findViewById(R.id.imageView_head);
+            if (headTemplate.getVisibility() == View.INVISIBLE) {
+                headTemplate.setVisibility(View.VISIBLE);
+            }
+        }
+
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
+            RelativeLayout eyeNoseTemplate = findViewById(R.id.relativeLayout_minMaxTemplate);
+            if (eyeNoseTemplate.getVisibility() == View.INVISIBLE) {
+                eyeNoseTemplate.setVisibility(View.VISIBLE);
+            }
+        }
     }
 }
