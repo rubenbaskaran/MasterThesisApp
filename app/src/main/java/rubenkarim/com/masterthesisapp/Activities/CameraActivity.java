@@ -156,8 +156,9 @@ public class CameraActivity extends AppCompatActivity {
                     Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
 
                     String cnnModelFile = "RGB_yinguobingWideDens.tflite";
-                    Cnn cnn = new Cnn(loadModelFile(this, cnnModelFile), originalThermalImageBitmap, thermalImageFile);
+                    Cnn cnn = new Cnn(loadModelFile(this, cnnModelFile), thermalImageFile);
                     gradientAndPositions = cnn.getGradientAndPositions();
+                    goToMarkerActivity(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() +  "/Masterthesisimages/" + fileName, true, gradientAndPositions);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
