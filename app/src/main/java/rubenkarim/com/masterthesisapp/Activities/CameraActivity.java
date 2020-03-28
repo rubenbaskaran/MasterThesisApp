@@ -61,12 +61,12 @@ public class CameraActivity extends AppCompatActivity {
     private static final String TAG = CameraActivity.class.getSimpleName();
     private View rootView;
     private CameraView cameraView_rgbViewFinder;
-    private boolean isThermalCameraOn = true;
-    private MyCameraManager myCameraManager = null;
+    private boolean isThermalCameraOn = false;
+    private MyCameraManager myCameraManager;
     private PermissionManager permissionManager;
     private String filepath;
     private boolean useDefaultPicture = false;
-    ImageView imageView_thermalViewFinder;
+    private ImageView imageView_thermalViewFinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +74,7 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
         cameraView_rgbViewFinder = findViewById(R.id.cameraView_rgbViewFinder);
+        myCameraManager = new MyCameraManager(getApplicationContext());
         permissionManager = new PermissionManager();
 
         //CheckforUsbDevice
@@ -131,6 +132,7 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
+    // TODO: Add custom exceptions
     private void ExecuteAlgorithm() {
         // Fix for Android Studio bug (returning to previous activity on "stop app")
         if (GlobalVariables.getCurrentAlgorithm() == null) {
@@ -175,14 +177,12 @@ public class CameraActivity extends AppCompatActivity {
                         new RoiModel(cameraPreviewLocation, cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight())
                 );
                 gradientAndPositions = minMaxAlgorithm.getGradientAndPositions();
-                goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
+                goToMarkerActivity(filepath, gradientAndPositions);
                 break;
         }
     }
 
     private void startView(HashMap<String, UsbDevice> deviceList) {
-        myCameraManager = new MyCameraManager(getApplicationContext());
-
         if (!deviceList.isEmpty()) {
             Snackbar.make(rootView, "USB device is detected trying to connect", Snackbar.LENGTH_SHORT).show();
             showThermalViewfinder();
@@ -197,15 +197,11 @@ public class CameraActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        resetThermalCamera();
-        super.onPause();
-    }
-
-    private void resetThermalCamera() {
         if (myCameraManager != null) {
             myCameraManager.close();
             myCameraManager = null;
         }
+        super.onPause();
     }
 
     @Override
@@ -250,8 +246,9 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void onConnected(ConnectionStatus connectionStatus) {
                 runOnUiThread(() -> {
-                    Snackbar.make(rootView, "Camera connected", Snackbar.LENGTH_SHORT).show();
+
                 });
+                Snackbar.make(rootView, "Camera connected", Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
@@ -313,10 +310,6 @@ public class CameraActivity extends AppCompatActivity {
 
     private void takeAndSaveThermalImage() {
 
-        if (myCameraManager == null) {
-            return;
-        }
-
         myCameraManager.addThermalImageListener((thermalImage) -> {
             File ImageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
             boolean isDirectoryCreated = ImageDir.exists() || ImageDir.mkdirs();
@@ -325,7 +318,6 @@ public class CameraActivity extends AppCompatActivity {
                     String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
                     filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                     thermalImage.saveAs(filepath);
-                    resetThermalCamera();
                     ExecuteAlgorithm();
                 }
                 else {
@@ -372,7 +364,7 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    private void goToMarkerActivity(String imageFilePath, boolean isThermalImage, GradientModel gradientAndPositions) {
+    private void goToMarkerActivity(String imageFilePath, GradientModel gradientAndPositions) {
         RelativeLayout relativeLayout_cameraPreview = findViewById(R.id.relativeLayout_cameraPreview);
         int[] coordinates = new int[2];
         relativeLayout_cameraPreview.getLocationOnScreen(coordinates);
@@ -381,7 +373,7 @@ public class CameraActivity extends AppCompatActivity {
         int imageWidth = relativeLayout_cameraPreview.getWidth();
 
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
-        intent.putExtra("isThermalImage", isThermalImage);
+        intent.putExtra("isThermalCameraOn", isThermalCameraOn);
         intent.putExtra("filename", imageFilePath);
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         intent.putExtra("imageHeight", imageHeight);
@@ -431,7 +423,7 @@ public class CameraActivity extends AppCompatActivity {
 
         Task<List<FirebaseVisionFace>> result =
                 detector.detectInImage(image)
-                        .addOnSuccessListener(this,
+                        .addOnSuccessListener(
                                 new OnSuccessListener<List<FirebaseVisionFace>>() {
                                     @Override
                                     public void onSuccess(List<FirebaseVisionFace> faces) {
@@ -443,6 +435,7 @@ public class CameraActivity extends AppCompatActivity {
                                             float rotY = faces.get(0).getHeadEulerAngleY();  // Head is rotated to the right rotY degrees
                                             float rotZ = faces.get(0).getHeadEulerAngleZ();  // Head is tilted sideways rotZ degrees
 
+                                            //TODO: Get inside of eye instead of center
                                             FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
                                             if (leftEye != null) {
                                                 gradientAndPositions.setEyePosition(new int[]{(int) ((float) leftEye.getPosition().getX()), (int) ((float) leftEye.getPosition().getY()) + horizontalOffset});
@@ -452,10 +445,9 @@ public class CameraActivity extends AppCompatActivity {
                                                 gradientAndPositions.setNosePosition(new int[]{(int) ((float) nose.getPosition().getX()), (int) ((float) nose.getPosition().getY()) + horizontalOffset});
                                             }
 
-                                            goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
+                                            goToMarkerActivity(filepath, gradientAndPositions);
                                         }
                                         else {
-                                            // TODO: Add re-instantiation of myCameraManager
                                             Snackbar.make(rootView, "No faces found", Snackbar.LENGTH_SHORT).show();
                                             hideLoadingAnimation();
                                         }
@@ -465,7 +457,6 @@ public class CameraActivity extends AppCompatActivity {
                                 new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        // TODO: Add re-instantiation of myCameraManager
                                         Snackbar.make(rootView, "Face detection error", Snackbar.LENGTH_SHORT).show();
                                         hideLoadingAnimation();
                                     }
