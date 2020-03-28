@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Bitmap;
 
 import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.ThermalValue;
 
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 
@@ -69,11 +70,7 @@ public class Cnn extends AbstractAlgorithm {
 
         float[] results = tensorBufferOutput.getFloatArray();
 
-        getGradient(results);
-
-        GradientModel gradientModel = new GradientModel()
-
-        return ;
+        return super.calculateGradient(results, thermalImageFile);
     }
 
     public Bitmap toGrayscale(Bitmap bmpOriginal)

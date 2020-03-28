@@ -11,12 +11,12 @@ public abstract class AbstractAlgorithm {
 
     public abstract GradientModel getGradientAndPositions();
 
-    private ThermalValue getGradient(Float[] coordinates, ThermalImageFile thermalImageFile){
-        return getGradient(coordinates[0].intValue(), coordinates[1].intValue(), coordinates[2].intValue(),
-                coordinates[3].intValue(),coordinates[4].intValue(), coordinates[5].intValue(), thermalImageFile);
+    protected GradientModel calculateGradient(float[] coordinates, ThermalImageFile thermalImageFile){
+        return calculateGradient((int) coordinates[0], (int) coordinates[1], (int) coordinates[2],
+                (int) coordinates[3], (int) coordinates[4], (int) coordinates[5], thermalImageFile);
     }
 
-    private ThermalValue getGradient(int rigthEyeX, int rigthEyeY, int leftEyeX, int leftEyeY, int noseX, int noseY, ThermalImageFile thermalImageFile){
+    protected GradientModel calculateGradient(int rigthEyeX, int rigthEyeY, int leftEyeX, int leftEyeY, int noseX, int noseY, ThermalImageFile thermalImageFile){
 
         thermalImageFile.getMeasurements().addSpot(rigthEyeX, rigthEyeY);
         thermalImageFile.getMeasurements().addSpot(leftEyeX, leftEyeY);
@@ -31,9 +31,13 @@ public abstract class AbstractAlgorithm {
         final double temperatureNose = nose.getValue().value;
 
         if( temperatureRightEye > temperatureLeftEye){
-            return new ThermalValue((temperatureRightEye - temperatureNose), nose.getValue().unit);
+            return new GradientModel((temperatureRightEye - temperatureNose),
+                    new int[]{rigthEye.getPosition().x, rigthEye.getPosition().y},
+                    new int[]{nose.getPosition().x, nose.getPosition().y});
         } else {
-            return new ThermalValue((temperatureLeftEye - temperatureNose), nose.getValue().unit);
+            return new GradientModel((temperatureLeftEye - temperatureNose),
+                    new int[]{leftEye.getPosition().x, leftEye.getPosition().y},
+                    new int[]{nose.getPosition().x, nose.getPosition().y});
         }
 
     }
