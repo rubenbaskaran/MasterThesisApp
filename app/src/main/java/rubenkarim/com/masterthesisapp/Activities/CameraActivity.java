@@ -45,6 +45,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.view.CameraView;
+import rubenkarim.com.masterthesisapp.Algorithms.Cnn;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
 import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.FlirConnectionListener;
 import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.MyCameraManager;
@@ -143,6 +144,18 @@ public class CameraActivity extends AppCompatActivity {
         switch (GlobalVariables.getCurrentAlgorithm()) {
             case CNN:
                 // Add execution for CNN
+                try {
+                    String fileName = "14:28:27Thermal.jpg";
+                    ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() +  "/Masterthesisimages/" + fileName);
+                    JavaImageBuffer javaBuffer = thermalImageFile.getImage();
+                    Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
+
+                    String cnnModelFile = "myModelBlackAndWhite.tflite";
+                    Cnn cnn = new Cnn(loadModelFile(this, cnnModelFile), originalThermalImageBitmap);
+                    gradientAndPositions = cnn.getGradientAndPositions();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 break;
             case CNNWithTransferLearning:
                 // Add execution for CNN with transfer learning
