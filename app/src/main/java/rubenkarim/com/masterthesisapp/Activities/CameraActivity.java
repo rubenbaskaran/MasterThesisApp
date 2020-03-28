@@ -379,6 +379,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private void detectFaces() {
         Bitmap imageBitmap = null;
+        int horizontalOffset = 50;
 
         if (useDefaultPicture) {
             imageBitmap = ImageProcessing.convertDrawableToBitmap(this, R.drawable.rgb_picture);
@@ -428,11 +429,11 @@ public class CameraActivity extends AppCompatActivity {
 
                                             FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
                                             if (leftEye != null) {
-                                                gradientAndPositions.setEyePosition(new int[]{(int) ((float) leftEye.getPosition().getX()), (int) ((float) leftEye.getPosition().getY())});
+                                                gradientAndPositions.setEyePosition(new int[]{(int) ((float) leftEye.getPosition().getX()), (int) ((float) leftEye.getPosition().getY()) + horizontalOffset});
                                             }
                                             FirebaseVisionFaceLandmark nose = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE);
                                             if (nose != null) {
-                                                gradientAndPositions.setNosePosition(new int[]{(int) ((float) nose.getPosition().getX()), (int) ((float) nose.getPosition().getY())});
+                                                gradientAndPositions.setNosePosition(new int[]{(int) ((float) nose.getPosition().getX()), (int) ((float) nose.getPosition().getY()) + horizontalOffset});
                                             }
 
                                             goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
