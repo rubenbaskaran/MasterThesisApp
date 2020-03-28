@@ -9,6 +9,8 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Bitmap;
 
+import com.flir.thermalsdk.image.ThermalImageFile;
+
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 
 import org.tensorflow.lite.DataType;
@@ -29,14 +31,17 @@ public class Cnn extends AbstractAlgorithm {
 
     private final Interpreter mTflite;
     private Bitmap mImageBitmap;
+    private ThermalImageFile thermalImageFile;
 
-    public Cnn(File modelFile, Bitmap imagefile){
+    public Cnn(File modelFile, Bitmap imagefile, ThermalImageFile thermalImageFile){
         mTflite = new Interpreter(modelFile);
         this.mImageBitmap = imagefile;
+        this.thermalImageFile = thermalImageFile;
     }
-    public Cnn(ByteBuffer modelFile, Bitmap imageFile){
+    public Cnn(ByteBuffer modelFile, Bitmap imageFile, ThermalImageFile thermalImageFile){
         mTflite = new Interpreter(modelFile);
         this.mImageBitmap = imageFile;
+        this.thermalImageFile = thermalImageFile;
     }
 
     @Override
@@ -64,7 +69,11 @@ public class Cnn extends AbstractAlgorithm {
 
         float[] results = tensorBufferOutput.getFloatArray();
 
-        return null;
+        getGradient(results);
+
+        GradientModel gradientModel = new GradientModel()
+
+        return ;
     }
 
     public Bitmap toGrayscale(Bitmap bmpOriginal)
