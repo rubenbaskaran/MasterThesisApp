@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.flir.thermalsdk.ErrorCode;
@@ -135,7 +136,7 @@ public class CameraActivity extends AppCompatActivity {
         // Fix for Android Studio bug (returning to previous activity on "stop app")
         if (GlobalVariables.getCurrentAlgorithm() == null) {
             Snackbar.make(rootView, "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
-            return;
+            backOnClick(null);
         }
 
         GradientModel gradientAndPositions = null;
@@ -296,6 +297,8 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void takePictureOnClick(View view) {
+        showLoadingAnimation();
+
         if (isThermalCameraOn) {
             takeAndSaveThermalImage();
         }
@@ -318,11 +321,13 @@ public class CameraActivity extends AppCompatActivity {
                 }
                 else {
                     Log.i(TAG, "takeAndSaveThermalImage: ERROR! IMAGE DIR NOT CREATED");
+                    hideLoadingAnimation();
                     throw new IOException("Image Directory not created");
                 }
             }
             catch (IOException e) {
                 Log.d(TAG, "takeAndSaveThermalImage: ERROR: " + e);
+                hideLoadingAnimation();
             }
         });
     }
@@ -348,11 +353,13 @@ public class CameraActivity extends AppCompatActivity {
                 @Override
                 public void onError(@NonNull ImageCaptureException exception) {
                     Log.e(TAG, "onError: " + exception);
+                    hideLoadingAnimation();
                 }
             });
         }
         else {
             Log.e(TAG, "TakePictureOnClick: There is an error with creating dir!");
+            hideLoadingAnimation();
         }
     }
 
@@ -440,6 +447,7 @@ public class CameraActivity extends AppCompatActivity {
                                         }
                                         else {
                                             Snackbar.make(rootView, "No faces found", Snackbar.LENGTH_SHORT).show();
+                                            hideLoadingAnimation();
                                         }
                                     }
                                 })
@@ -448,7 +456,50 @@ public class CameraActivity extends AppCompatActivity {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         Snackbar.make(rootView, "Face detection error", Snackbar.LENGTH_SHORT).show();
+                                        hideLoadingAnimation();
                                     }
                                 });
+    }
+
+    private void showLoadingAnimation() {
+        ProgressBar progressBar_loadingAnimation = findViewById(R.id.progressBar_loadingAnimation);
+        if (progressBar_loadingAnimation.getVisibility() == View.INVISIBLE) {
+            progressBar_loadingAnimation.setVisibility(View.VISIBLE);
+        }
+
+        if (GlobalVariables.getCurrentAlgorithm() != GlobalVariables.Algorithms.MaxMinTemplate) {
+            ImageView headTemplate = findViewById(R.id.imageView_head);
+            if (headTemplate.getVisibility() == View.VISIBLE) {
+                headTemplate.setVisibility(View.INVISIBLE);
+            }
+        }
+
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
+            RelativeLayout eyeNoseTemplate = findViewById(R.id.relativeLayout_minMaxTemplate);
+            if (eyeNoseTemplate.getVisibility() == View.VISIBLE) {
+                eyeNoseTemplate.setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    private void hideLoadingAnimation() {
+        ProgressBar progressBar_loadingAnimation = findViewById(R.id.progressBar_loadingAnimation);
+        if (progressBar_loadingAnimation.getVisibility() == View.VISIBLE) {
+            progressBar_loadingAnimation.setVisibility(View.INVISIBLE);
+        }
+
+        if (GlobalVariables.getCurrentAlgorithm() != GlobalVariables.Algorithms.MaxMinTemplate) {
+            ImageView headTemplate = findViewById(R.id.imageView_head);
+            if (headTemplate.getVisibility() == View.INVISIBLE) {
+                headTemplate.setVisibility(View.VISIBLE);
+            }
+        }
+
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
+            RelativeLayout eyeNoseTemplate = findViewById(R.id.relativeLayout_minMaxTemplate);
+            if (eyeNoseTemplate.getVisibility() == View.INVISIBLE) {
+                eyeNoseTemplate.setVisibility(View.VISIBLE);
+            }
+        }
     }
 }
