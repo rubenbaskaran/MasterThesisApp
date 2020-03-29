@@ -20,6 +20,7 @@ import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.flir.thermalsdk.live.Identity;
 import com.flir.thermalsdk.live.connectivity.ConnectionStatus;
 import com.google.android.material.snackbar.Snackbar;
@@ -119,6 +120,7 @@ public class CameraActivity extends AppCompatActivity {
             try {
                 String defaultImageName = "Thermal_Test_Img3.jpg";
                 ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open(defaultImageName));
+                thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
                 thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + defaultImageName;
                 thermalImageFile.saveAs(thermalImagePath);
                 JavaImageBuffer javaBuffer = thermalImageFile.getImage();
