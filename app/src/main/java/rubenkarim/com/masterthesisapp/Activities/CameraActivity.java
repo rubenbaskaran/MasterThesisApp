@@ -40,6 +40,7 @@ import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
+import rubenkarim.com.masterthesisapp.Utilities.MinMaxDataTransferContainer;
 
 public class CameraActivity extends AppCompatActivity {
 
@@ -54,6 +55,7 @@ public class CameraActivity extends AppCompatActivity {
     private ImageView imageView_faceTemplate;
     private RelativeLayout relativeLayout_eyeNoseTemplate;
     private ProgressBar progressBar_loadingAnimation;
+    private MinMaxDataTransferContainer minMaxDataTransferContainer;
     //endregion
 
     @Override
@@ -106,7 +108,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void startCameraPreview(HashMap<String, UsbDevice> deviceList) {
-        setupCameraPreviewUi();
+        setupMinMaxAlgorithmIfChosen();
         myCameraManager = new MyCameraManager(getApplicationContext());
 
         if (!deviceList.isEmpty()) {
@@ -132,8 +134,8 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    private void setupCameraPreviewUi() {
-        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
+    private void setupMinMaxAlgorithmIfChosen() {
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
             relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
             imageView_faceTemplate.setVisibility(View.INVISIBLE);
         }
@@ -251,8 +253,23 @@ public class CameraActivity extends AppCompatActivity {
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
+        addMinMaxDataIfChosen(intent);
 
         startActivity(intent);
+    }
+
+    private void addMinMaxDataIfChosen(Intent intent) {
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
+            minMaxDataTransferContainer = new MinMaxDataTransferContainer(
+                    findViewById(R.id.imageView_leftEye),
+                    findViewById(R.id.imageView_RightEye),
+                    findViewById(R.id.imageView_Nose),
+                    findViewById(R.id.imageView_cameraPreviewContainer));
+
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("minMaxData", minMaxDataTransferContainer);
+            intent.putExtras(bundle);
+        }
     }
 
     public void backOnClick(View view) {

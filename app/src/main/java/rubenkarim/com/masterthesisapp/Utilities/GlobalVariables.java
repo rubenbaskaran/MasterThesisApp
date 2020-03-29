@@ -7,7 +7,7 @@ public class GlobalVariables
         CNN,
         CNNWithTransferLearning,
         RgbThermalMapping,
-        MaxMinTemplate
+        MinMaxTemplate
     }
 
     public static Algorithms getCurrentAlgorithm()
