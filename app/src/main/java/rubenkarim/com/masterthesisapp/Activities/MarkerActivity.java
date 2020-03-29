@@ -1,7 +1,9 @@
 package rubenkarim.com.masterthesisapp.Activities;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PointF;
@@ -19,12 +21,20 @@ import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
+import com.google.android.material.snackbar.Snackbar;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 
 import androidx.appcompat.app.AppCompatActivity;
+import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
+import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithm;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
+import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.R;
+import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
@@ -33,7 +43,7 @@ public class MarkerActivity extends AppCompatActivity {
 
     //region Properties
     private static final String TAG = MarkerActivity.class.getSimpleName();
-    private String filename;
+    private String filepath;
     private int imageViewVerticalOffset;
     private int imageHeight;
     private int imageWidth;
@@ -49,8 +59,8 @@ public class MarkerActivity extends AppCompatActivity {
             imageView_markerImage = findViewById(R.id.imageView_markerImage);
 
             Intent receivedIntent = getIntent();
-            if (receivedIntent.hasExtra("filename")) {
-                filename = receivedIntent.getStringExtra("filename");
+            if (receivedIntent.hasExtra("filepath")) {
+                filepath = receivedIntent.getStringExtra("filepath");
             }
             if (receivedIntent.hasExtra("imageViewVerticalOffset")) {
                 imageViewVerticalOffset = receivedIntent.getIntExtra("imageViewVerticalOffset", 0);
@@ -67,22 +77,111 @@ public class MarkerActivity extends AppCompatActivity {
                 gradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
             }
 
-            setPicture();
+            ExecuteAlgorithm();
         } catch (Exception e) {
             Logging.error("onCreate", e);
             //throw e; //TODO: Dont throw in onCreating the app will crash!
         }
     }
 
-
-
-    private void setPicture() throws Exception {
+    private void ExecuteAlgorithm() {
         try {
-            ImageProcessing.FixImageOrientation(filename);
+            // Fix for Android Studio bug (returning to previous activity on "stop app")
+            if (GlobalVariables.getCurrentAlgorithm() == null) {
+                Snackbar.make(findViewById(R.id.linearLayout_MarkerActivity), "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
+                backOnClick(null);
+            }
+
+            GradientModel gradientAndPositions = null;
+
+            switch (GlobalVariables.getCurrentAlgorithm()) {
+                case CNN:
+                    // TODO: Karim - Erstat thermal image file med filepath
+                    // Add execution for CNN
+//                    try {
+//                        ThermalImageFile thermalImageFile;
+//                        thermalImageFile = (ThermalImageFile) mThermalImage;
+//                        JavaImageBuffer javaBuffer = thermalImageFile.getImage();
+//                        Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
+//
+//                        String cnnModelFile = "RGB_yinguobingWideDens.tflite";
+//                        Cnn cnn = new Cnn(loadModelFile(this, cnnModelFile), thermalImageFile);
+//                        gradientAndPositions = cnn.getGradientAndPositions();
+//                        setPicture(gradientAndPositions);
+//                    }
+//                    catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+                    break;
+                case CNNWithTransferLearning:
+                    // Add execution for CNN with transfer learning
+                    break;
+                case RgbThermalMapping:
+                    RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(this);
+                    rgbThermalAlgorithm.getGradientAndPositions(filepath);
+                    break;
+                case MaxMinTemplate:
+                    ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
+                    ImageView imageView_rightEye = findViewById(R.id.imageView_RightEye);
+                    ImageView imageView_nose = findViewById(R.id.imageView_Nose);
+                    RelativeLayout cameraPreviewElement = findViewById(R.id.relativeLayout_markers);
+                    int[] leftEyeLocation = new int[2];
+                    int[] rightEyeLocation = new int[2];
+                    int[] noseLocation = new int[2];
+                    int[] cameraPreviewLocation = new int[2];
+                    imageView_leftEye.getLocationOnScreen(leftEyeLocation);
+                    imageView_rightEye.getLocationOnScreen(rightEyeLocation);
+                    imageView_nose.getLocationOnScreen(noseLocation);
+                    cameraPreviewElement.getLocationOnScreen(cameraPreviewLocation);
+
+                    MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
+                            filepath,
+                            new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_leftEye.getWidth()),
+                            new RoiModel(rightEyeLocation, imageView_rightEye.getHeight(), imageView_rightEye.getWidth()),
+                            new RoiModel(noseLocation, imageView_nose.getHeight(), imageView_nose.getWidth()),
+                            new RoiModel(cameraPreviewLocation, cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight())
+                    );
+                    setPicture(minMaxAlgorithm.getGradientAndPositions());
+                    break;
+            }
+        }
+        // TODO: Un-comment following four catch clauses when algorithms have been added and throws appropriate custom exceptions
+//        catch (CnnException e) {
+//            Logging.error("ExecuteAlgorithm", e);
+//        }
+//        catch (CnnWithTransferLearningException e) {
+//            Logging.error("ExecuteAlgorithm", e);
+//        }
+//        catch (RgbThermalMappingException e) {
+//            Logging.error("ExecuteAlgorithm", e);
+//        }
+//        catch (MaxMinTemplateException e) {
+//            Logging.error("ExecuteAlgorithm", e);
+//        }
+        catch (Exception e) {
+            Logging.error("ExecuteAlgorithm", e);
+        }
+    }
+
+    // TODO: Karim - Flyt over i CnnAlgorithm klassen
+    private MappedByteBuffer loadModelFile(Activity activity, String MODEL_FILE) throws IOException {
+        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(MODEL_FILE);
+        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+        FileChannel fileChannel = inputStream.getChannel();
+        long startOffset = fileDescriptor.getStartOffset();
+        long declaredLength = fileDescriptor.getDeclaredLength();
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+    }
+
+    public void setPicture(GradientModel gradientAndPositions) {
+        try {
+            this.gradientAndPositions = gradientAndPositions;
+
+            ImageProcessing.FixImageOrientation(filepath);
             int[] imageOriginalDimensions = null;
 
-            if (ThermalImageFile.isThermalImage(filename)) {
-                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filename);
+            if (ThermalImageFile.isThermalImage(filepath)) {
+                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filepath);
                 thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY); //Is showing only Thermal picture wit resolution of 480x640
                 JavaImageBuffer javaBuffer = thermalImageFile.getImage();
                 Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
@@ -95,7 +194,6 @@ public class MarkerActivity extends AppCompatActivity {
             addMarkers(imageOriginalDimensions, new int[]{imageWidth, imageHeight}, imageViewVerticalOffset);
         } catch (Exception e) {
             Logging.error("setPicture", e);
-            throw e;
         }
     }
 
@@ -221,7 +319,7 @@ public class MarkerActivity extends AppCompatActivity {
     public void submitOnClick(View view) {
         try {
             Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
-            intent.putExtra("filename", filename);
+            intent.putExtra("filename", filepath);
             intent.putExtra("imageHeight", imageHeight);
             intent.putExtra("imageWidth", imageWidth);
             Bundle bundle = new Bundle();

@@ -130,15 +130,6 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    private MappedByteBuffer loadModelFile(Activity activity, String MODEL_FILE) throws IOException {
-        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(MODEL_FILE);
-        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-        FileChannel fileChannel = inputStream.getChannel();
-        long startOffset = fileDescriptor.getStartOffset();
-        long declaredLength = fileDescriptor.getDeclaredLength();
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
-    }
-
     private void startView(HashMap<String, UsbDevice> deviceList) {
         if (!deviceList.isEmpty()) {
             Snackbar.make(rootView, "USB device is detected trying to connect", Snackbar.LENGTH_SHORT).show();
@@ -286,7 +277,7 @@ public class CameraActivity extends AppCompatActivity {
         int imageWidth = relativeLayout_cameraPreview.getWidth();
 
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
-        intent.putExtra("filename", imageFilePath);
+        intent.putExtra("filepath", imageFilePath);
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
