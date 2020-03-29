@@ -44,6 +44,10 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
+import rubenkarim.com.masterthesisapp.Exceptions.CnnException;
+import rubenkarim.com.masterthesisapp.Exceptions.CnnWithTransferLearningException;
+import rubenkarim.com.masterthesisapp.Exceptions.MaxMinTemplateException;
+import rubenkarim.com.masterthesisapp.Exceptions.RgbThermalMappingException;
 import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.FlirConnectionListener;
 import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.MyCameraManager;
 import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionListener;
@@ -53,6 +57,7 @@ import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
+import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 public class CameraActivity extends AppCompatActivity {
     private static final String TAG = CameraActivity.class.getSimpleName();
@@ -126,15 +131,15 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    // TODO: Add custom exceptions
     private void ExecuteAlgorithm() {
-        // Fix for Android Studio bug (returning to previous activity on "stop app")
-        if (GlobalVariables.getCurrentAlgorithm() == null) {
-            Snackbar.make(rootView, "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
-            backOnClick(null);
-        }
+        try {
+            // Fix for Android Studio bug (returning to previous activity on "stop app")
+            if (GlobalVariables.getCurrentAlgorithm() == null) {
+                Snackbar.make(rootView, "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
+                backOnClick(null);
+            }
 
-        GradientModel gradientAndPositions = null;
+            GradientModel gradientAndPositions = null;
 
         switch (GlobalVariables.getCurrentAlgorithm()) {
             case CNN:
@@ -160,16 +165,33 @@ public class CameraActivity extends AppCompatActivity {
                 imageView_nose.getLocationOnScreen(noseLocation);
                 cameraPreviewElement.getLocationOnScreen(cameraPreviewLocation);
 
-                MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
-                        filepath,
-                        new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_leftEye.getWidth()),
-                        new RoiModel(rightEyeLocation, imageView_rightEye.getHeight(), imageView_rightEye.getWidth()),
-                        new RoiModel(noseLocation, imageView_nose.getHeight(), imageView_nose.getWidth()),
-                        new RoiModel(cameraPreviewLocation, cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight())
-                );
-                gradientAndPositions = minMaxAlgorithm.getGradientAndPositions();
-                goToMarkerActivity(filepath, gradientAndPositions);
-                break;
+                    MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
+                            filepath,
+                            new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_leftEye.getWidth()),
+                            new RoiModel(rightEyeLocation, imageView_rightEye.getHeight(), imageView_rightEye.getWidth()),
+                            new RoiModel(noseLocation, imageView_nose.getHeight(), imageView_nose.getWidth()),
+                            new RoiModel(cameraPreviewLocation, cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight())
+                    );
+                    gradientAndPositions = minMaxAlgorithm.getGradientAndPositions();
+                    goToMarkerActivity(filepath, gradientAndPositions);
+                    break;
+            }
+        }
+        // TODO: Un-comment following four catch clauses when algorithms have been added and throws appropriate custom exceptions
+//        catch (CnnException e) {
+//            Logging.error("ExecuteAlgorithm", e);
+//        }
+//        catch (CnnWithTransferLearningException e) {
+//            Logging.error("ExecuteAlgorithm", e);
+//        }
+//        catch (RgbThermalMappingException e) {
+//            Logging.error("ExecuteAlgorithm", e);
+//        }
+//        catch (MaxMinTemplateException e) {
+//            Logging.error("ExecuteAlgorithm", e);
+//        }
+        catch(Exception e){
+            Logging.error("ExecuteAlgorithm", e);
         }
     }
 
