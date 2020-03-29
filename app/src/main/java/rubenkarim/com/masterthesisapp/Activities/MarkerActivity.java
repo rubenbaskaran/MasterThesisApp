@@ -18,6 +18,7 @@ import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.fusion.FusionMode;
 
 import java.io.IOException;
 
@@ -33,14 +34,11 @@ public class MarkerActivity extends AppCompatActivity {
     //region Properties
     private static final String TAG = MarkerActivity.class.getSimpleName();
     private String filename;
-    private Boolean isThermalCameraOn = false;
     private int imageViewVerticalOffset;
     private int imageHeight;
     private int imageWidth;
     private ImageView imageView_markerImage;
     private GradientModel gradientAndPositions;
-    private boolean useDefaultPicture = false;
-    private Uri defaultThermalPictureUri = null;
     //endregion
 
     @Override
@@ -53,9 +51,6 @@ public class MarkerActivity extends AppCompatActivity {
             Intent receivedIntent = getIntent();
             if (receivedIntent.hasExtra("filename")) {
                 filename = receivedIntent.getStringExtra("filename");
-            }
-            if (receivedIntent.hasExtra("isThermalCameraOn")) {
-                isThermalCameraOn = receivedIntent.getBooleanExtra("isThermalCameraOn", false);
             }
             if (receivedIntent.hasExtra("imageViewVerticalOffset")) {
                 imageViewVerticalOffset = receivedIntent.getIntExtra("imageViewVerticalOffset", 0);
@@ -86,6 +81,7 @@ public class MarkerActivity extends AppCompatActivity {
 
             if (ThermalImageFile.isThermalImage(filename)) {
                 ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filename);
+                thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY); //Is showing only Thermal picture wit resolution of 480x640
                 JavaImageBuffer javaBuffer = thermalImageFile.getImage();
                 Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
                 imageView_markerImage.setImageBitmap(originalThermalImageBitmap);
@@ -224,7 +220,6 @@ public class MarkerActivity extends AppCompatActivity {
         try {
             Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
             intent.putExtra("filename", filename);
-            intent.putExtra("isThermalCameraOn", isThermalCameraOn);
             intent.putExtra("imageHeight", imageHeight);
             intent.putExtra("imageWidth", imageWidth);
             Bundle bundle = new Bundle();
