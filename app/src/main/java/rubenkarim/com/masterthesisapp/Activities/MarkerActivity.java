@@ -15,11 +15,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.ImageFactory;
-import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
-import com.flir.thermalsdk.image.fusion.FusionMode;
 
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.Cnn;
@@ -137,26 +134,11 @@ public class MarkerActivity extends AppCompatActivity {
     public void setPicture(GradientModel gradientAndPositions) {
         try {
             this.gradientAndPositions = gradientAndPositions;
-
             ImageProcessing.FixImageOrientation(thermalImagePath);
-            int[] imageOriginalDimensions = null;
-
-            // TODO: Undersøg om dette kan fjernes
-//            if (ThermalImageFile.isThermalImage(thermalImagePath)) {
-//                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
-//                thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY); //Is showing only Thermal picture wit resolution of 480x640
-//                JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-//                originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
-//                imageView_thermalImageContainer.setImageBitmap(originalThermalImageBitmap);
-//                imageOriginalDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
-//            }
-//            else {
-//                Log.e("SetPicture", "IS NOT A THERMAL PICTURE");
-//            }
 
             Bitmap originalThermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
             imageView_thermalImageContainer.setImageBitmap(originalThermalImageBitmap);
-            imageOriginalDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
+            int[] imageOriginalDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
 
             addMarkers(imageOriginalDimensions, new int[]{imageWidth, imageHeight}, imageViewVerticalOffset);
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
@@ -294,11 +276,18 @@ public class MarkerActivity extends AppCompatActivity {
             intent.putExtra("imageWidth", imageWidth);
             Bundle bundle = new Bundle();
             bundle.putSerializable("gradientAndPositions", gradientAndPositions);
+            addMinMaxDataIfChosen(bundle);
             intent.putExtras(bundle);
             startActivity(intent);
         }
         catch (Exception e) {
             Logging.error("submitOnClick", e);
+        }
+    }
+
+    private void addMinMaxDataIfChosen(Bundle bundle) {
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
+            bundle.putSerializable("minMaxData", minMaxData);
         }
     }
     //endregion

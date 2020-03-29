@@ -102,11 +102,6 @@ public class ImageProcessing {
         return BitmapFactory.decodeFile(imagePath);
     }
 
-    public static Bitmap convertDrawableToBitmap(Context context, int resourceId) {
-        return BitmapFactory.decodeResource(context.getResources(), resourceId);
-    }
-
-    //Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_picture)
     public static FirebaseVisionImage convertToFirebaseVisionImage(Bitmap bitmap) {
         return FirebaseVisionImage.fromBitmap(bitmap);
     }
