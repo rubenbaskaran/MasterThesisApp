@@ -63,6 +63,8 @@ public class MarkerActivity extends AppCompatActivity {
             Intent receivedIntent = getIntent();
             if (receivedIntent.hasExtra("filepath")) {
                 filepath = receivedIntent.getStringExtra("filepath");
+                assert filepath != null;
+                mThermalImage = (ThermalImageFile) ImageFactory.createImage(filepath);
 
             }
             if (receivedIntent.hasExtra("imageViewVerticalOffset")) {
@@ -83,7 +85,7 @@ public class MarkerActivity extends AppCompatActivity {
             ExecuteAlgorithm();
         } catch (Exception e) {
             Logging.error("onCreate", e);
-            //throw e; //TODO: Dont throw in onCreating the app will crash!
+            //throw e; //TODO: Dont throw in onCreating the app will crash! Handle the error instead
         }
     }
 
