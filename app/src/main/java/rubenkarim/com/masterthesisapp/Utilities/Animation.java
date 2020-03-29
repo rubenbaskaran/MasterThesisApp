@@ -11,13 +11,13 @@ public class Animation {
             progressBar_loadingAnimation.setVisibility(View.VISIBLE);
         }
 
-        if (GlobalVariables.getCurrentAlgorithm() != GlobalVariables.Algorithms.MaxMinTemplate) {
+        if (faceTemplate != null && GlobalVariables.getCurrentAlgorithm() != GlobalVariables.Algorithms.MaxMinTemplate) {
             if (faceTemplate.getVisibility() == View.VISIBLE) {
                 faceTemplate.setVisibility(View.INVISIBLE);
             }
         }
 
-        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
+        if (eyeNoseTemplate != null && GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
             if (eyeNoseTemplate.getVisibility() == View.VISIBLE) {
                 eyeNoseTemplate.setVisibility(View.INVISIBLE);
             }
@@ -29,13 +29,13 @@ public class Animation {
             progressBar_loadingAnimation.setVisibility(View.INVISIBLE);
         }
 
-        if (GlobalVariables.getCurrentAlgorithm() != GlobalVariables.Algorithms.MaxMinTemplate) {
+        if (faceTemplate != null && GlobalVariables.getCurrentAlgorithm() != GlobalVariables.Algorithms.MaxMinTemplate) {
             if (faceTemplate.getVisibility() == View.INVISIBLE) {
                 faceTemplate.setVisibility(View.VISIBLE);
             }
         }
 
-        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
+        if (eyeNoseTemplate != null && GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
             if (eyeNoseTemplate.getVisibility() == View.INVISIBLE) {
                 eyeNoseTemplate.setVisibility(View.VISIBLE);
             }

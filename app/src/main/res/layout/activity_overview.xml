@@ -15,37 +15,41 @@
         android:background="@color/colorPrimaryDark"
         android:scaleType="fitXY" />
 
-    <TextView
-        android:id="@+id/textView_gradient"
+    <EditText
+        android:id="@+id/textView_cprNumber"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.5"
-        android:background="@color/colorAccent"
         android:gravity="center"
-        android:text="Gradient" />
+        android:hint="Enter CPR number..."
+        android:inputType="number"
+        android:maxLength="10"
+        android:background="@null"/>
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.5"
-        android:background="@color/colorPrimary"
-        android:gravity="center"
-        android:text="Health rating" />
+        android:orientation="horizontal"
+        android:weightSum="1">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="CPR-nummer">
+        <TextView
+            android:id="@+id/textView_gradient"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:background="@color/colorAccent"
+            android:gravity="center"
+            android:text="Gradient" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/cprTextField"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:maxLength="3"
-            android:singleLine="true" />
-
-    </com.google.android.material.textfield.TextInputLayout>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:text="Health rating" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

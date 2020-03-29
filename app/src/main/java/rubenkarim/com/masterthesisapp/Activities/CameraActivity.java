@@ -39,6 +39,7 @@ import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionMana
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
+import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 public class CameraActivity extends AppCompatActivity {
 
@@ -49,7 +50,7 @@ public class CameraActivity extends AppCompatActivity {
     private MyCameraManager myCameraManager;
     private PermissionManager permissionManager;
     private String thermalImagePath;
-    private ImageView imageView_thermalCameraPreview;
+    private ImageView imageView_cameraPreviewContainer;
     private ImageView imageView_faceTemplate;
     private RelativeLayout relativeLayout_eyeNoseTemplate;
     private ProgressBar progressBar_loadingAnimation;
@@ -62,8 +63,8 @@ public class CameraActivity extends AppCompatActivity {
         rootView = findViewById(R.id.linearLayout_CameraActivity);
         relativeLayout_eyeNoseTemplate = findViewById(R.id.relativeLayout_eyeNoseTemplate);
         imageView_faceTemplate = findViewById(R.id.imageView_faceTemplate);
-        progressBar_loadingAnimation = findViewById(R.id.progressBar_loadingAnimation);
-        imageView_thermalCameraPreview = findViewById(R.id.imageView_thermalCameraPreview);
+        progressBar_loadingAnimation = findViewById(R.id.progressBar_cameraViewLoadingAnimation);
+        imageView_cameraPreviewContainer = findViewById(R.id.imageView_cameraPreviewContainer);
 
         checkPermissions(getListOfUsbDevices());
     }
@@ -120,13 +121,13 @@ public class CameraActivity extends AppCompatActivity {
                 thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                 thermalImageFile.saveAs(thermalImagePath);
                 JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-                imageView_thermalCameraPreview.setImageBitmap(BitmapAndroid.createBitmap(javaBuffer).getBitMap());
+                imageView_cameraPreviewContainer.setImageBitmap(BitmapAndroid.createBitmap(javaBuffer).getBitMap());
                 useDebugImage = true;
                 Snackbar.make(rootView, "Cant find USB device opening phones camera using default img", Snackbar.LENGTH_SHORT).show();
             }
             catch (IOException e) {
                 Snackbar.make(rootView, "an error accrued when open default img", Snackbar.LENGTH_SHORT).show();
-                e.printStackTrace();
+                Logging.error("startCameraPreview", e);
             }
         }
     }
@@ -145,7 +146,7 @@ public class CameraActivity extends AppCompatActivity {
             final Bitmap bitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
 
             runOnUiThread(() -> {
-                imageView_thermalCameraPreview.setImageBitmap(bitmap);
+                imageView_cameraPreviewContainer.setImageBitmap(bitmap);
             });
         });
 
@@ -155,7 +156,6 @@ public class CameraActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     Snackbar.make(rootView, "Camera connected", Snackbar.LENGTH_SHORT).show();
                 });
-
             }
 
             @Override
@@ -241,13 +241,13 @@ public class CameraActivity extends AppCompatActivity {
 
     private void goToMarkerActivity() {
         int[] coordinates = new int[2];
-        imageView_thermalCameraPreview.getLocationOnScreen(coordinates);
+        imageView_cameraPreviewContainer.getLocationOnScreen(coordinates);
         int imageViewVerticalOffset = coordinates[1];
-        int imageHeight = imageView_thermalCameraPreview.getHeight();
-        int imageWidth = imageView_thermalCameraPreview.getWidth();
+        int imageHeight = imageView_cameraPreviewContainer.getHeight();
+        int imageWidth = imageView_cameraPreviewContainer.getWidth();
 
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
-        intent.putExtra("filepath", thermalImagePath);
+        intent.putExtra("thermalImagePath", thermalImagePath);
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
