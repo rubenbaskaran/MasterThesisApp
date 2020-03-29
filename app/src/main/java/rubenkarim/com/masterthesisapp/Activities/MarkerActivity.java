@@ -102,7 +102,7 @@ public class MarkerActivity extends AppCompatActivity {
             switch (GlobalVariables.getCurrentAlgorithm()) {
                 case CNN:
                     String cnnModelFile = "RGB_yinguobingWideDens.tflite";
-                    Cnn cnn = new Cnn(loadModelFile(this, cnnModelFile), mThermalImage);
+                    Cnn cnn = new Cnn(this, cnnModelFile, mThermalImage);
                     gradientAndPositions = cnn.getGradientAndPositions();
                     setPicture(gradientAndPositions);
                     break;
@@ -154,16 +154,6 @@ public class MarkerActivity extends AppCompatActivity {
         catch (Exception e) {
             Logging.error("ExecuteAlgorithm", e);
         }
-    }
-
-    // TODO: Karim - Flyt over i CnnAlgorithm klassen
-    private MappedByteBuffer loadModelFile(Activity activity, String MODEL_FILE) throws IOException {
-        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(MODEL_FILE);
-        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-        FileChannel fileChannel = inputStream.getChannel();
-        long startOffset = fileDescriptor.getStartOffset();
-        long declaredLength = fileDescriptor.getDeclaredLength();
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
 
     public void setPicture(GradientModel gradientAndPositions) {
