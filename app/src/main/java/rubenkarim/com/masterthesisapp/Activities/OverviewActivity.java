@@ -16,8 +16,6 @@ public class OverviewActivity extends AppCompatActivity {
     String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "default_picture";
     Boolean isThermalCameraOn = false;
     GradientModel gradientAndPositions;
-    private boolean useDefaultPicture;
-    private Uri defaultThermalPictureUri;
     private int imageHeight;
     private int imageWidth;
 
@@ -41,12 +39,6 @@ public class OverviewActivity extends AppCompatActivity {
         if (receivedIntent.hasExtra("imageWidth")) {
             imageWidth = receivedIntent.getIntExtra("imageWidth", 0);
         }
-        if (receivedIntent.hasExtra("useDefaultPicture")) {
-            useDefaultPicture = receivedIntent.getBooleanExtra("useDefaultPicture", false);
-            if (useDefaultPicture) {
-                defaultThermalPictureUri = Uri.parse("android.resource://" + this.getPackageName() + "/drawable/thermal_picture");
-            }
-        }
 
         Bundle bundle = receivedIntent.getExtras();
         if (bundle != null) {
@@ -58,7 +50,7 @@ public class OverviewActivity extends AppCompatActivity {
     }
 
     private void setPicture() {
-        imageView_patientImage.setImageURI(useDefaultPicture ? defaultThermalPictureUri : Uri.parse(filename));
+        imageView_patientImage.setImageURI(Uri.parse(filename));
     }
 
     public void backOnClick(View view) {
@@ -67,7 +59,6 @@ public class OverviewActivity extends AppCompatActivity {
         intent.putExtra("isThermalCameraOn", isThermalCameraOn);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
-        intent.putExtra("useDefaultPicture", useDefaultPicture);
         Bundle bundle = new Bundle();
         bundle.putSerializable("gradientAndPositions", gradientAndPositions);
         intent.putExtras(bundle);

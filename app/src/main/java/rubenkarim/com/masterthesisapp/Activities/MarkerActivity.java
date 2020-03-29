@@ -31,6 +31,7 @@ import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 public class MarkerActivity extends AppCompatActivity {
 
     //region Properties
+    private static final String TAG = MarkerActivity.class.getSimpleName();
     private String filename;
     private Boolean isThermalCameraOn = false;
     private int imageViewVerticalOffset;
@@ -65,12 +66,6 @@ public class MarkerActivity extends AppCompatActivity {
             if (receivedIntent.hasExtra("imageWidth")) {
                 imageWidth = receivedIntent.getIntExtra("imageWidth", 0);
             }
-            if (receivedIntent.hasExtra("useDefaultPicture")) {
-                useDefaultPicture = receivedIntent.getBooleanExtra("useDefaultPicture", false);
-                if (useDefaultPicture) {
-                    defaultThermalPictureUri = Uri.parse("android.resource://" + this.getPackageName() + "/drawable/thermal_picture");
-                }
-            }
 
             Bundle bundle = receivedIntent.getExtras();
             if (bundle != null) {
@@ -78,46 +73,29 @@ public class MarkerActivity extends AppCompatActivity {
             }
 
             setPicture();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("onCreate", e);
-            throw e;
+            //throw e; //TODO: Dont throw in onCreating the app will crash!
         }
     }
 
-    private void setPicture() {
+    private void setPicture() throws Exception {
         try {
             ImageProcessing.FixImageOrientation(filename);
             int[] imageOriginalDimensions = null;
 
-            if (isThermalCameraOn) {
-                try {
-                    if (ThermalImageFile.isThermalImage(filename)) {
-                        ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filename);
-                        JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-                        Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
-                        imageView_markerImage.setImageBitmap(originalThermalImageBitmap);
-                        imageOriginalDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
-                    }
-                    else {
-                        Log.e("SetPicture", "IS NOT A THERMAL PICTURE");
-                    }
-                }
-                catch (IOException e) {
-                    Log.e("setPicture", "IO ERROR: " + e.toString());
-                }
-            }
-            else {
-                imageView_markerImage.setImageURI(useDefaultPicture ? defaultThermalPictureUri : Uri.parse(filename));
-                Bitmap originalRgbImageBitmap = useDefaultPicture ?
-                        ImageProcessing.convertDrawableToBitmap(this, R.drawable.rgb_picture)
-                        : ImageProcessing.convertToBitmap(filename);
-                imageOriginalDimensions = new int[]{originalRgbImageBitmap.getWidth(), originalRgbImageBitmap.getHeight()};
+            if (ThermalImageFile.isThermalImage(filename)) {
+                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filename);
+                JavaImageBuffer javaBuffer = thermalImageFile.getImage();
+                Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
+                imageView_markerImage.setImageBitmap(originalThermalImageBitmap);
+                imageOriginalDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
+            } else {
+                Log.e("SetPicture", "IS NOT A THERMAL PICTURE");
             }
 
             addMarkers(imageOriginalDimensions, new int[]{imageWidth, imageHeight}, imageViewVerticalOffset);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("setPicture", e);
             throw e;
         }
@@ -153,8 +131,7 @@ public class MarkerActivity extends AppCompatActivity {
                     + ". nose x: " + noseParams.leftMargin + ", nose y: " + noseParams.topMargin
                     + ". imageView x: " + imageWidth + ", imageView y: " + imageHeight
                     + ". markerWidth: " + markerWidthHeight + ". horizontal offset: " + horizontalOffset);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("addMarkers", e);
             throw e;
         }
@@ -173,8 +150,7 @@ public class MarkerActivity extends AppCompatActivity {
             // TODO: Save new coordinate for eye/nose in gradientAndPositions object (remember to scale to original image dimensions before saving)
             Log.e(String.valueOf(marker.getTag()), "x: " + x + ", y: " + y);
             getPixelColor(x, y);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("getCoordinates", e);
             throw e;
         }
@@ -193,8 +169,7 @@ public class MarkerActivity extends AppCompatActivity {
             Log.e("Target pixel", "x: " + x + ", y: " + y);
             // TODO: Calculate new gradient based on adjusted value for eye/nose and save in gradientAndPositions object
             Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("getPixelColor", e);
             throw e;
         }
@@ -228,8 +203,7 @@ public class MarkerActivity extends AppCompatActivity {
                     return true;
                 }
             });
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("SetOnTouchListener", e);
             throw e;
         }
@@ -240,8 +214,7 @@ public class MarkerActivity extends AppCompatActivity {
         try {
             Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
             startActivity(intent);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("backOnClick", e);
             throw e;
         }
@@ -252,15 +225,13 @@ public class MarkerActivity extends AppCompatActivity {
             Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
             intent.putExtra("filename", filename);
             intent.putExtra("isThermalCameraOn", isThermalCameraOn);
-            intent.putExtra("useDefaultPicture", useDefaultPicture);
             intent.putExtra("imageHeight", imageHeight);
             intent.putExtra("imageWidth", imageWidth);
             Bundle bundle = new Bundle();
             bundle.putSerializable("gradientAndPositions", gradientAndPositions);
             intent.putExtras(bundle);
             startActivity(intent);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("submitOnClick", e);
             throw e;
         }
