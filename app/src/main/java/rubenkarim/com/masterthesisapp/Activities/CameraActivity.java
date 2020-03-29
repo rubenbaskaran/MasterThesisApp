@@ -109,6 +109,7 @@ public class CameraActivity extends AppCompatActivity {
         SetupAlgorithm();
     }
 
+    // TODO: Move to MarkerActivity
     private void SetupAlgorithm() {
         // Fix for Android Studio bug (returning to previous activity on "stop app")
         if (GlobalVariables.getCurrentAlgorithm() == null) {
@@ -135,6 +136,7 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
+    // TODO: Move to MarkerActivity
     private void ExecuteAlgorithm() {
         try {
             // Fix for Android Studio bug (returning to previous activity on "stop app")
@@ -378,6 +380,7 @@ public class CameraActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // TODO: Move to RgbThermalAlgorithm class
     private void detectFaces() {
         Bitmap imageBitmap = null;
         int horizontalOffset = 50;
@@ -450,6 +453,7 @@ public class CameraActivity extends AppCompatActivity {
                                 });
     }
 
+    // TODO: Move to utility class and receive progressbar instans as argument
     private void showLoadingAnimation() {
         ProgressBar progressBar_loadingAnimation = findViewById(R.id.progressBar_loadingAnimation);
         if (progressBar_loadingAnimation.getVisibility() == View.INVISIBLE) {
@@ -471,6 +475,7 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
+    // TODO: Move to utility class and receive progressbar instans as argument
     private void hideLoadingAnimation() {
         ProgressBar progressBar_loadingAnimation = findViewById(R.id.progressBar_loadingAnimation);
         if (progressBar_loadingAnimation.getVisibility() == View.VISIBLE) {
