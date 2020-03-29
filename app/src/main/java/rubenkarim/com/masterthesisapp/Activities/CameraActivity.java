@@ -56,7 +56,6 @@ public class CameraActivity extends AppCompatActivity {
     private String mThermalImgPath;
     private boolean useDebugImg = false;
     private ImageView imageView_thermalViewFinder;
-    private ThermalImage mThermalImage;
     private RelativeLayout relativeLayout_eyeNoseTemplate;
     private ImageView imageView_faceTemplate;
     private ProgressBar progressBar_loadingAnimation;
@@ -125,13 +124,12 @@ public class CameraActivity extends AppCompatActivity {
             SetupFlirCamera();
         }
         else {
-            ThermalImageFile thermalImageFile = null;
+            //Setup of Flir Test Image
             try {
-                thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open("Thermal_Test_Img.jpg"));
+                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open("Thermal_Test_Img.jpg"));
                 String fileName = "Thermal_Test_Img.jpg";
                 mThermalImgPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                 thermalImageFile.saveAs(mThermalImgPath);
-                mThermalImage = thermalImageFile;
                 JavaImageBuffer javaBuffer = thermalImageFile.getImage();
                 imageView_thermalViewFinder.setImageBitmap(BitmapAndroid.createBitmap(javaBuffer).getBitMap());
                 useDebugImg = true;
@@ -240,7 +238,6 @@ public class CameraActivity extends AppCompatActivity {
                         String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
                         mThermalImgPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                         thermalImage.saveAs(mThermalImgPath);
-                        mThermalImage = thermalImage;
                         goToMarkerActivity(mThermalImgPath);
                     }
                     else {
