@@ -44,14 +44,14 @@ public class CameraActivity extends AppCompatActivity {
 
     //region Properties
     private static final String TAG = CameraActivity.class.getSimpleName();
+    private boolean useDebugImage = false;
     private View rootView;
     private MyCameraManager myCameraManager;
     private PermissionManager permissionManager;
-    private String mThermalImgPath;
-    private boolean useDebugImg = false;
+    private String thermalImagePath;
     private ImageView imageView_thermalCameraPreview;
-    private RelativeLayout relativeLayout_eyeNoseTemplate;
     private ImageView imageView_faceTemplate;
+    private RelativeLayout relativeLayout_eyeNoseTemplate;
     private ProgressBar progressBar_loadingAnimation;
     //endregion
 
@@ -60,35 +60,26 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         rootView = findViewById(R.id.linearLayout_CameraActivity);
-
-        // Fix for Android Studio bug (returning to previous activity on "stop app")
-        if (GlobalVariables.getCurrentAlgorithm() == null) {
-            Snackbar.make(rootView, "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
-            backOnClick(null);
-        }
-
         relativeLayout_eyeNoseTemplate = findViewById(R.id.relativeLayout_eyeNoseTemplate);
         imageView_faceTemplate = findViewById(R.id.imageView_faceTemplate);
         progressBar_loadingAnimation = findViewById(R.id.progressBar_loadingAnimation);
-
         imageView_thermalCameraPreview = findViewById(R.id.imageView_thermalCameraPreview);
-        myCameraManager = new MyCameraManager(getApplicationContext());
-        permissionManager = new PermissionManager();
 
         checkPermissions(getListOfUsbDevices());
-        setupCameraPreviewUi();
     }
 
     private void checkPermissions(HashMap<String, UsbDevice> deviceList) {
+        permissionManager = new PermissionManager();
+
         if (PermissionManager.checkPermissions(this, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            startView(deviceList);
+            startCameraPreview(deviceList);
         }
         else {
             permissionManager.requestPermissions(this, new PermissionListener() {
                         @Override
                         public void permissionGranted(String[] permissions) {
                             Snackbar.make(rootView, "permissions allowed", Snackbar.LENGTH_SHORT).show();
-                            startView(deviceList);
+                            startCameraPreview(deviceList);
                         }
 
                         @Override
@@ -102,25 +93,21 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
+    private HashMap<String, UsbDevice> getListOfUsbDevices() {
+        UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        return manager.getDeviceList();
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         permissionManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void setupCameraPreviewUi() {
-        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
-            relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
-            imageView_faceTemplate.setVisibility(View.INVISIBLE);
-        }
-    }
+    private void startCameraPreview(HashMap<String, UsbDevice> deviceList) {
+        setupCameraPreviewUi();
+        myCameraManager = new MyCameraManager(getApplicationContext());
 
-    private HashMap<String, UsbDevice> getListOfUsbDevices(){
-        UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        return manager.getDeviceList();
-    }
-
-    private void startView(HashMap<String, UsbDevice> deviceList) {
         if (!deviceList.isEmpty()) {
             Snackbar.make(rootView, "USB device is detected trying to connect", Snackbar.LENGTH_SHORT).show();
             setupFlirCamera();
@@ -130,17 +117,24 @@ public class CameraActivity extends AppCompatActivity {
             try {
                 ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open("Thermal_Test_Img.jpg"));
                 String fileName = "Thermal_Test_Img.jpg";
-                mThermalImgPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
-                thermalImageFile.saveAs(mThermalImgPath);
+                thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
+                thermalImageFile.saveAs(thermalImagePath);
                 JavaImageBuffer javaBuffer = thermalImageFile.getImage();
                 imageView_thermalCameraPreview.setImageBitmap(BitmapAndroid.createBitmap(javaBuffer).getBitMap());
-                useDebugImg = true;
+                useDebugImage = true;
                 Snackbar.make(rootView, "Cant find USB device opening phones camera using default img", Snackbar.LENGTH_SHORT).show();
             }
             catch (IOException e) {
                 Snackbar.make(rootView, "an error accrued when open default img", Snackbar.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void setupCameraPreviewUi() {
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
+            relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
+            imageView_faceTemplate.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -206,14 +200,19 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void takePictureOnClick(View view) {
+        // Fix for Android Studio bug (returning to previous activity on "stop app")
+        if (GlobalVariables.getCurrentAlgorithm() == null) {
+            Snackbar.make(rootView, "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
         Animation.showLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
         saveThermalImage();
     }
 
     private void saveThermalImage() {
-
-        if (useDebugImg) {
-            goToMarkerActivity(mThermalImgPath);
+        if (useDebugImage) {
+            goToMarkerActivity();
         }
         else {
             myCameraManager.addThermalImageListener((thermalImage) -> {
@@ -222,9 +221,9 @@ public class CameraActivity extends AppCompatActivity {
                 try {
                     if (isDirectoryCreated) {
                         String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
-                        mThermalImgPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
-                        thermalImage.saveAs(mThermalImgPath);
-                        goToMarkerActivity(mThermalImgPath);
+                        thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
+                        thermalImage.saveAs(thermalImagePath);
+                        goToMarkerActivity();
                     }
                     else {
                         Log.i(TAG, "takeAndSaveThermalImage: ERROR! IMAGE DIR NOT CREATED");
@@ -240,16 +239,15 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    private void goToMarkerActivity(String imageFilePath) {
-        RelativeLayout relativeLayout_cameraPreview = findViewById(R.id.relativeLayout_cameraPreview);
+    private void goToMarkerActivity() {
         int[] coordinates = new int[2];
-        relativeLayout_cameraPreview.getLocationOnScreen(coordinates);
+        imageView_thermalCameraPreview.getLocationOnScreen(coordinates);
         int imageViewVerticalOffset = coordinates[1];
-        int imageHeight = relativeLayout_cameraPreview.getHeight();
-        int imageWidth = relativeLayout_cameraPreview.getWidth();
+        int imageHeight = imageView_thermalCameraPreview.getHeight();
+        int imageWidth = imageView_thermalCameraPreview.getWidth();
 
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
-        intent.putExtra("filepath", imageFilePath);
+        intent.putExtra("filepath", thermalImagePath);
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
