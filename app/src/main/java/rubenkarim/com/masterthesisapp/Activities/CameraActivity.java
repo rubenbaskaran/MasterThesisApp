@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -44,9 +43,6 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.ImageCapture;
-import androidx.camera.core.ImageCaptureException;
-import androidx.camera.view.CameraView;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
 import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.FlirConnectionListener;
 import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.MyCameraManager;
@@ -64,7 +60,7 @@ public class CameraActivity extends AppCompatActivity {
     private MyCameraManager myCameraManager;
     private PermissionManager permissionManager;
     private String filepath;
-    private boolean useDefaultPicture = false;
+    private boolean useDebugImg = false;
     private ImageView imageView_thermalViewFinder;
 
     @Override
@@ -190,7 +186,7 @@ public class CameraActivity extends AppCompatActivity {
                 thermalImageFile.saveAs(filepath);
                 JavaImageBuffer javaBuffer = thermalImageFile.getImage();
                 imageView_thermalViewFinder.setImageBitmap(BitmapAndroid.createBitmap(javaBuffer).getBitMap());
-                useDefaultPicture = true;
+                useDebugImg = true;
                 Snackbar.make(rootView, "Cant find USB device opening phones camera using default img", Snackbar.LENGTH_SHORT).show();
             } catch (IOException e) {
                 Snackbar.make(rootView, "an error accrued when open default img", Snackbar.LENGTH_SHORT).show();
@@ -288,7 +284,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private void takeAndSaveThermalImage() {
 
-        if (useDefaultPicture) {
+        if (useDebugImg) {
             ExecuteAlgorithm();
         } else {
             myCameraManager.addThermalImageListener((thermalImage) -> {
