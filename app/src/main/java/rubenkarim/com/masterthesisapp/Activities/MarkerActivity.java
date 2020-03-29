@@ -29,6 +29,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 import androidx.appcompat.app.AppCompatActivity;
+import rubenkarim.com.masterthesisapp.Algorithms.Cnn;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
 import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithm;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
@@ -49,6 +50,7 @@ public class MarkerActivity extends AppCompatActivity {
     private int imageWidth;
     private ImageView imageView_markerImage;
     private GradientModel gradientAndPositions;
+    private ThermalImageFile mThermalImage;
     //endregion
 
     @Override
@@ -61,6 +63,7 @@ public class MarkerActivity extends AppCompatActivity {
             Intent receivedIntent = getIntent();
             if (receivedIntent.hasExtra("filepath")) {
                 filepath = receivedIntent.getStringExtra("filepath");
+
             }
             if (receivedIntent.hasExtra("imageViewVerticalOffset")) {
                 imageViewVerticalOffset = receivedIntent.getIntExtra("imageViewVerticalOffset", 0);
@@ -96,22 +99,15 @@ public class MarkerActivity extends AppCompatActivity {
 
             switch (GlobalVariables.getCurrentAlgorithm()) {
                 case CNN:
-                    // TODO: Karim - Erstat thermal image file med filepath
-                    // Add execution for CNN
-//                    try {
-//                        ThermalImageFile thermalImageFile;
-//                        thermalImageFile = (ThermalImageFile) mThermalImage;
-//                        JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-//                        Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
-//
-//                        String cnnModelFile = "RGB_yinguobingWideDens.tflite";
-//                        Cnn cnn = new Cnn(loadModelFile(this, cnnModelFile), thermalImageFile);
-//                        gradientAndPositions = cnn.getGradientAndPositions();
-//                        setPicture(gradientAndPositions);
-//                    }
-//                    catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
+                    try {
+                        String cnnModelFile = "RGB_yinguobingWideDens.tflite";
+                        Cnn cnn = new Cnn(loadModelFile(this, cnnModelFile), mThermalImage);
+                        gradientAndPositions = cnn.getGradientAndPositions();
+                        setPicture(gradientAndPositions);
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case CNNWithTransferLearning:
                     // Add execution for CNN with transfer learning

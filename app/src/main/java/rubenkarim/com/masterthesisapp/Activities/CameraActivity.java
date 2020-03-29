@@ -113,20 +113,9 @@ public class CameraActivity extends AppCompatActivity {
             return;
         }
 
-        switch (GlobalVariables.getCurrentAlgorithm()) {
-            case CNN:
-                // Add setup for CNN
-                break;
-            case CNNWithTransferLearning:
-                // Add setup for CNN with transfer learning
-                break;
-            case RgbThermalMapping:
-                // Add setup for RgbThermalMapping
-                break;
-            case MaxMinTemplate:
-                relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
-                imageView_faceTemplate.setVisibility(View.INVISIBLE);
-                break;
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
+            relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
+            imageView_faceTemplate.setVisibility(View.INVISIBLE);
         }
     }
 
