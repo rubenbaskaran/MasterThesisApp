@@ -32,6 +32,19 @@
         android:gravity="center"
         android:text="Health rating" />
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/cprTextField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="CPR-nummer">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"

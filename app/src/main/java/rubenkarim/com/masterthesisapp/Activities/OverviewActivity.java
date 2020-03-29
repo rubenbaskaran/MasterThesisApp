@@ -12,17 +12,20 @@ import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.R;
 
 public class OverviewActivity extends AppCompatActivity {
-    ImageView imageView_patientImage;
-    String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "default_picture";
-    Boolean isThermalCameraOn = false;
-    GradientModel gradientAndPositions;
+    private ImageView imageView_patientImage;
+    private String filename = "android.resource://rubenkarim.com.masterthesisapp/drawable/" + "default_picture";
+    private Boolean isThermalCameraOn = false;
+    private GradientModel gradientAndPositions;
     private int imageHeight;
     private int imageWidth;
+    private TextView cprTextField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_overview);
+
+        cprTextField = findViewById(R.id.cprTextField);
         imageView_patientImage = findViewById(R.id.imageView_patientImage);
         TextView textView_gradient = findViewById(R.id.textView_gradient);
 
@@ -66,6 +69,7 @@ public class OverviewActivity extends AppCompatActivity {
     }
 
     public void saveOnClick(View view) {
+
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
     }
