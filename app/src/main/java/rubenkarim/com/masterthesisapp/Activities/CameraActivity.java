@@ -58,11 +58,14 @@ import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionMana
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.R;
+import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 public class CameraActivity extends AppCompatActivity {
+
+    //region Properties
     private static final String TAG = CameraActivity.class.getSimpleName();
     private View rootView;
     private MyCameraManager myCameraManager;
@@ -71,11 +74,19 @@ public class CameraActivity extends AppCompatActivity {
     private boolean useDebugImg = false;
     private ImageView imageView_thermalViewFinder;
     private ThermalImage mThermalImage;
+    private RelativeLayout relativeLayout_eyeNoseTemplate;
+    private ImageView imageView_faceTemplate;
+    private ProgressBar progressBar_loadingAnimation;
+    //endregion
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+        relativeLayout_eyeNoseTemplate = findViewById(R.id.relativeLayout_eyeNoseTemplate);
+        imageView_faceTemplate = findViewById(R.id.imageView_faceTemplate);
+        progressBar_loadingAnimation = findViewById(R.id.progressBar_loadingAnimation);
+
         rootView = findViewById(R.id.linearLayout_CameraActivity);
         imageView_thermalViewFinder = findViewById(R.id.imageView_thermalViewFinder);
         myCameraManager = new MyCameraManager(getApplicationContext());
@@ -88,7 +99,8 @@ public class CameraActivity extends AppCompatActivity {
         //Check Permissions:
         if (PermissionManager.checkPermissions(this, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             startView(deviceList);
-        } else {
+        }
+        else {
             permissionManager.requestPermissions(this, new PermissionListener() {
                         @Override
                         public void permissionGranted(String[] permissions) {
@@ -128,10 +140,8 @@ public class CameraActivity extends AppCompatActivity {
                 // Add setup for RgbThermalMapping
                 break;
             case MaxMinTemplate:
-                RelativeLayout relativeLayout_minMaxTemplate = findViewById(R.id.relativeLayout_minMaxTemplate);
-                ImageView imageView_head = findViewById(R.id.imageView_head);
-                relativeLayout_minMaxTemplate.setVisibility(View.VISIBLE);
-                imageView_head.setVisibility(View.INVISIBLE);
+                relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
+                imageView_faceTemplate.setVisibility(View.INVISIBLE);
                 break;
         }
     }
@@ -147,42 +157,43 @@ public class CameraActivity extends AppCompatActivity {
 
             GradientModel gradientAndPositions = null;
 
-        switch (GlobalVariables.getCurrentAlgorithm()) {
-            case CNN:
-                // Add execution for CNN
-                try {
-                    ThermalImageFile thermalImageFile;
-                    thermalImageFile = (ThermalImageFile) mThermalImage;
-                    JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-                    Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
+            switch (GlobalVariables.getCurrentAlgorithm()) {
+                case CNN:
+                    // Add execution for CNN
+                    try {
+                        ThermalImageFile thermalImageFile;
+                        thermalImageFile = (ThermalImageFile) mThermalImage;
+                        JavaImageBuffer javaBuffer = thermalImageFile.getImage();
+                        Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
 
-                    String cnnModelFile = "RGB_yinguobingWideDens.tflite";
-                    Cnn cnn = new Cnn(loadModelFile(this, cnnModelFile), thermalImageFile);
-                    gradientAndPositions = cnn.getGradientAndPositions();
-                    goToMarkerActivity(mThermalImgPath, gradientAndPositions);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case CNNWithTransferLearning:
-                // Add execution for CNN with transfer learning
-                break;
-            case RgbThermalMapping:
-                detectFaces();
-                break;
-            case MaxMinTemplate:
-                ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
-                ImageView imageView_rightEye = findViewById(R.id.imageView_RightEye);
-                ImageView imageView_nose = findViewById(R.id.imageView_Nose);
-                View cameraPreviewElement = imageView_thermalViewFinder;
-                int[] leftEyeLocation = new int[2];
-                int[] rightEyeLocation = new int[2];
-                int[] noseLocation = new int[2];
-                int[] cameraPreviewLocation = new int[2];
-                imageView_leftEye.getLocationOnScreen(leftEyeLocation);
-                imageView_rightEye.getLocationOnScreen(rightEyeLocation);
-                imageView_nose.getLocationOnScreen(noseLocation);
-                cameraPreviewElement.getLocationOnScreen(cameraPreviewLocation);
+                        String cnnModelFile = "RGB_yinguobingWideDens.tflite";
+                        Cnn cnn = new Cnn(loadModelFile(this, cnnModelFile), thermalImageFile);
+                        gradientAndPositions = cnn.getGradientAndPositions();
+                        goToMarkerActivity(mThermalImgPath, gradientAndPositions);
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case CNNWithTransferLearning:
+                    // Add execution for CNN with transfer learning
+                    break;
+                case RgbThermalMapping:
+                    detectFaces();
+                    break;
+                case MaxMinTemplate:
+                    ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
+                    ImageView imageView_rightEye = findViewById(R.id.imageView_RightEye);
+                    ImageView imageView_nose = findViewById(R.id.imageView_Nose);
+                    View cameraPreviewElement = imageView_thermalViewFinder;
+                    int[] leftEyeLocation = new int[2];
+                    int[] rightEyeLocation = new int[2];
+                    int[] noseLocation = new int[2];
+                    int[] cameraPreviewLocation = new int[2];
+                    imageView_leftEye.getLocationOnScreen(leftEyeLocation);
+                    imageView_rightEye.getLocationOnScreen(rightEyeLocation);
+                    imageView_nose.getLocationOnScreen(noseLocation);
+                    cameraPreviewElement.getLocationOnScreen(cameraPreviewLocation);
 
                     MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
                             mThermalImgPath,
@@ -209,7 +220,7 @@ public class CameraActivity extends AppCompatActivity {
 //        catch (MaxMinTemplateException e) {
 //            Logging.error("ExecuteAlgorithm", e);
 //        }
-        catch(Exception e){
+        catch (Exception e) {
             Logging.error("ExecuteAlgorithm", e);
         }
     }
@@ -227,7 +238,8 @@ public class CameraActivity extends AppCompatActivity {
         if (!deviceList.isEmpty()) {
             Snackbar.make(rootView, "USB device is detected trying to connect", Snackbar.LENGTH_SHORT).show();
             flirCamera();
-        } else {
+        }
+        else {
             ThermalImageFile thermalImageFile = null;
             try {
                 thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open("Thermal_Test_Img.jpg"));
@@ -239,7 +251,8 @@ public class CameraActivity extends AppCompatActivity {
                 imageView_thermalViewFinder.setImageBitmap(BitmapAndroid.createBitmap(javaBuffer).getBitMap());
                 useDebugImg = true;
                 Snackbar.make(rootView, "Cant find USB device opening phones camera using default img", Snackbar.LENGTH_SHORT).show();
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 Snackbar.make(rootView, "an error accrued when open default img", Snackbar.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
@@ -329,7 +342,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void takePictureOnClick(View view) {
-        showLoadingAnimation();
+        Animation.showLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
         takeAndSaveThermalImage();
     }
 
@@ -337,7 +350,8 @@ public class CameraActivity extends AppCompatActivity {
 
         if (useDebugImg) {
             ExecuteAlgorithm();
-        } else {
+        }
+        else {
             myCameraManager.addThermalImageListener((thermalImage) -> {
                 File ImageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
                 boolean isDirectoryCreated = ImageDir.exists() || ImageDir.mkdirs();
@@ -348,14 +362,16 @@ public class CameraActivity extends AppCompatActivity {
                         thermalImage.saveAs(mThermalImgPath);
                         mThermalImage = thermalImage;
                         ExecuteAlgorithm();
-                    } else {
+                    }
+                    else {
                         Log.i(TAG, "takeAndSaveThermalImage: ERROR! IMAGE DIR NOT CREATED");
-                        hideLoadingAnimation();
+                        Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
                         throw new IOException("Image Directory not created");
                     }
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     Log.d(TAG, "takeAndSaveThermalImage: ERROR: " + e);
-                    hideLoadingAnimation();
+                    Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
                 }
             });
         }
@@ -393,7 +409,8 @@ public class CameraActivity extends AppCompatActivity {
                 ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(mThermalImgPath);
                 JavaImageBuffer rgbImage = thermalImageFile.getFusion().getPhoto();
                 imageBitmap = BitmapAndroid.createBitmap(rgbImage).getBitMap();
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -437,9 +454,10 @@ public class CameraActivity extends AppCompatActivity {
                                             }
 
                                             goToMarkerActivity(mThermalImgPath, gradientAndPositions);
-                                        } else {
+                                        }
+                                        else {
                                             Snackbar.make(rootView, "No faces found", Snackbar.LENGTH_SHORT).show();
-                                            hideLoadingAnimation();
+                                            Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
                                         }
                                     }
                                 })
@@ -448,52 +466,8 @@ public class CameraActivity extends AppCompatActivity {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         Snackbar.make(rootView, "Face detection error", Snackbar.LENGTH_SHORT).show();
-                                        hideLoadingAnimation();
+                                        Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
                                     }
                                 });
-    }
-
-    // TODO: Move to utility class and receive progressbar instans as argument
-    private void showLoadingAnimation() {
-        ProgressBar progressBar_loadingAnimation = findViewById(R.id.progressBar_loadingAnimation);
-        if (progressBar_loadingAnimation.getVisibility() == View.INVISIBLE) {
-            progressBar_loadingAnimation.setVisibility(View.VISIBLE);
-        }
-
-        if (GlobalVariables.getCurrentAlgorithm() != GlobalVariables.Algorithms.MaxMinTemplate) {
-            ImageView headTemplate = findViewById(R.id.imageView_head);
-            if (headTemplate.getVisibility() == View.VISIBLE) {
-                headTemplate.setVisibility(View.INVISIBLE);
-            }
-        }
-
-        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
-            RelativeLayout eyeNoseTemplate = findViewById(R.id.relativeLayout_minMaxTemplate);
-            if (eyeNoseTemplate.getVisibility() == View.VISIBLE) {
-                eyeNoseTemplate.setVisibility(View.INVISIBLE);
-            }
-        }
-    }
-
-    // TODO: Move to utility class and receive progressbar instans as argument
-    private void hideLoadingAnimation() {
-        ProgressBar progressBar_loadingAnimation = findViewById(R.id.progressBar_loadingAnimation);
-        if (progressBar_loadingAnimation.getVisibility() == View.VISIBLE) {
-            progressBar_loadingAnimation.setVisibility(View.INVISIBLE);
-        }
-
-        if (GlobalVariables.getCurrentAlgorithm() != GlobalVariables.Algorithms.MaxMinTemplate) {
-            ImageView headTemplate = findViewById(R.id.imageView_head);
-            if (headTemplate.getVisibility() == View.INVISIBLE) {
-                headTemplate.setVisibility(View.VISIBLE);
-            }
-        }
-
-        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
-            RelativeLayout eyeNoseTemplate = findViewById(R.id.relativeLayout_minMaxTemplate);
-            if (eyeNoseTemplate.getVisibility() == View.INVISIBLE) {
-                eyeNoseTemplate.setVisibility(View.VISIBLE);
-            }
-        }
     }
 }

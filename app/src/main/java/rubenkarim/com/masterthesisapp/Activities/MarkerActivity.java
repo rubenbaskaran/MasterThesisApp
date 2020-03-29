@@ -74,6 +74,8 @@ public class MarkerActivity extends AppCompatActivity {
         }
     }
 
+
+
     private void setPicture() throws Exception {
         try {
             ImageProcessing.FixImageOrientation(filename);
