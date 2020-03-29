@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
@@ -20,11 +21,15 @@ import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 
-import java.io.IOException;
-
 import androidx.appcompat.app.AppCompatActivity;
+import rubenkarim.com.masterthesisapp.Algorithms.Cnn;
+import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
+import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithm;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
+import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.R;
+import rubenkarim.com.masterthesisapp.Utilities.Animation;
+import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
@@ -32,13 +37,14 @@ import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 public class MarkerActivity extends AppCompatActivity {
 
     //region Properties
-    private static final String TAG = MarkerActivity.class.getSimpleName();
-    private String filename;
+    private String thermalImagePath;
     private int imageViewVerticalOffset;
     private int imageHeight;
     private int imageWidth;
-    private ImageView imageView_markerImage;
+    private ImageView imageView_thermalImageContainer;
     private GradientModel gradientAndPositions;
+    private ThermalImageFile thermalImageFile;
+    private ProgressBar progressBar_markerViewLoadingAnimation;
     //endregion
 
     @Override
@@ -46,11 +52,15 @@ public class MarkerActivity extends AppCompatActivity {
         try {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_marker);
-            imageView_markerImage = findViewById(R.id.imageView_markerImage);
+            imageView_thermalImageContainer = findViewById(R.id.imageView_thermalImageContainer);
+            progressBar_markerViewLoadingAnimation = findViewById(R.id.progressBar_markerViewLoadingAnimation);
+
+            Animation.showLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
 
             Intent receivedIntent = getIntent();
-            if (receivedIntent.hasExtra("filename")) {
-                filename = receivedIntent.getStringExtra("filename");
+            if (receivedIntent.hasExtra("thermalImagePath")) {
+                thermalImagePath = receivedIntent.getStringExtra("thermalImagePath");
+                thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
             }
             if (receivedIntent.hasExtra("imageViewVerticalOffset")) {
                 imageViewVerticalOffset = receivedIntent.getIntExtra("imageViewVerticalOffset", 0);
@@ -62,38 +72,99 @@ public class MarkerActivity extends AppCompatActivity {
                 imageWidth = receivedIntent.getIntExtra("imageWidth", 0);
             }
 
-            Bundle bundle = receivedIntent.getExtras();
-            if (bundle != null) {
-                gradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
-            }
-
-            setPicture();
-        } catch (Exception e) {
+            ExecuteAlgorithm();
+        }
+        catch (Exception e) {
             Logging.error("onCreate", e);
-            //throw e; //TODO: Dont throw in onCreating the app will crash!
         }
     }
 
-    private void setPicture() throws Exception {
+    private void ExecuteAlgorithm() {
         try {
-            ImageProcessing.FixImageOrientation(filename);
+            GradientModel gradientAndPositions;
+
+            switch (GlobalVariables.getCurrentAlgorithm()) {
+                case CNN:
+                    String cnnModelFile = "RGB_yinguobingWideDens.tflite";
+                    Cnn cnn = new Cnn(this, cnnModelFile, thermalImageFile);
+                    gradientAndPositions = cnn.getGradientAndPositions();
+                    setPicture(gradientAndPositions);
+                    break;
+                case CNNWithTransferLearning:
+                    // Add execution for CNN with transfer learning
+                    break;
+                case RgbThermalMapping:
+                    RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(this);
+                    rgbThermalAlgorithm.getGradientAndPositions(thermalImagePath);
+                    break;
+                case MaxMinTemplate:
+                    ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
+                    ImageView imageView_rightEye = findViewById(R.id.imageView_RightEye);
+                    ImageView imageView_nose = findViewById(R.id.imageView_Nose);
+                    ImageView imageView_cameraPreviewContainer = findViewById(R.id.imageView_cameraPreviewContainer);
+                    int[] leftEyeLocation = new int[2];
+                    int[] rightEyeLocation = new int[2];
+                    int[] noseLocation = new int[2];
+                    int[] cameraPreviewContainerLocation = new int[2];
+                    imageView_leftEye.getLocationOnScreen(leftEyeLocation);
+                    imageView_rightEye.getLocationOnScreen(rightEyeLocation);
+                    imageView_nose.getLocationOnScreen(noseLocation);
+                    imageView_cameraPreviewContainer.getLocationOnScreen(cameraPreviewContainerLocation);
+
+                    MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
+                            thermalImagePath,
+                            new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_leftEye.getWidth()),
+                            new RoiModel(rightEyeLocation, imageView_rightEye.getHeight(), imageView_rightEye.getWidth()),
+                            new RoiModel(noseLocation, imageView_nose.getHeight(), imageView_nose.getWidth()),
+                            new RoiModel(cameraPreviewContainerLocation, imageView_cameraPreviewContainer.getWidth(), imageView_cameraPreviewContainer.getHeight())
+                    );
+                    setPicture(minMaxAlgorithm.getGradientAndPositions());
+                    break;
+            }
+        }
+        // TODO: Un-comment following four catch clauses when algorithms have been added and throws appropriate custom exceptions
+//        catch (CnnException e) {
+//            Logging.error("ExecuteAlgorithm", e);
+//        }
+//        catch (CnnWithTransferLearningException e) {
+//            Logging.error("ExecuteAlgorithm", e);
+//        }
+//        catch (RgbThermalMappingException e) {
+//            Logging.error("ExecuteAlgorithm", e);
+//        }
+//        catch (MaxMinTemplateException e) {
+//            Logging.error("ExecuteAlgorithm", e);
+//        }
+        catch (Exception e) {
+            Logging.error("ExecuteAlgorithm", e);
+        }
+    }
+
+    public void setPicture(GradientModel gradientAndPositions) {
+        try {
+            this.gradientAndPositions = gradientAndPositions;
+
+            ImageProcessing.FixImageOrientation(thermalImagePath);
             int[] imageOriginalDimensions = null;
 
-            if (ThermalImageFile.isThermalImage(filename)) {
-                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filename);
+            if (ThermalImageFile.isThermalImage(thermalImagePath)) {
+                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
                 thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY); //Is showing only Thermal picture wit resolution of 480x640
                 JavaImageBuffer javaBuffer = thermalImageFile.getImage();
                 Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
-                imageView_markerImage.setImageBitmap(originalThermalImageBitmap);
+                imageView_thermalImageContainer.setImageBitmap(originalThermalImageBitmap);
                 imageOriginalDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
-            } else {
+            }
+            else {
                 Log.e("SetPicture", "IS NOT A THERMAL PICTURE");
             }
 
             addMarkers(imageOriginalDimensions, new int[]{imageWidth, imageHeight}, imageViewVerticalOffset);
-        } catch (Exception e) {
+            Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
+        }
+        catch (Exception e) {
             Logging.error("setPicture", e);
-            throw e;
+            Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         }
     }
 
@@ -101,7 +172,7 @@ public class MarkerActivity extends AppCompatActivity {
         try {
             int markerWidthHeight = 200;
 
-            RelativeLayout relativeLayout_markers = findViewById(R.id.relativeLayout_markers);
+            RelativeLayout relativeLayout_markers = findViewById(R.id.relativeLayout_thermalImageContainer);
             ImageView imageView_eyeMarker = new ImageView(this);
             ImageView imageView_noseMarker = new ImageView(this);
 
@@ -127,47 +198,9 @@ public class MarkerActivity extends AppCompatActivity {
                     + ". nose x: " + noseParams.leftMargin + ", nose y: " + noseParams.topMargin
                     + ". imageView x: " + imageWidth + ", imageView y: " + imageHeight
                     + ". markerWidth: " + markerWidthHeight + ". horizontal offset: " + horizontalOffset);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Logging.error("addMarkers", e);
-            throw e;
-        }
-    }
-
-    private void getCoordinates(ImageView marker) {
-        try {
-            Bitmap markerBitmap = ((BitmapDrawable) marker.getDrawable()).getBitmap();
-            int markerVerticalOffset = markerBitmap.getHeight();
-            int markerHorizontalOffset = markerBitmap.getWidth();
-            int[] coordinates = new int[2];
-            marker.getLocationOnScreen(coordinates);
-
-            int x = coordinates[0] + markerHorizontalOffset / 2;
-            int y = coordinates[1] + markerVerticalOffset / 2 - imageViewVerticalOffset;
-            // TODO: Save new coordinate for eye/nose in gradientAndPositions object (remember to scale to original image dimensions before saving)
-            Log.e(String.valueOf(marker.getTag()), "x: " + x + ", y: " + y);
-            getPixelColor(x, y);
-        } catch (Exception e) {
-            Logging.error("getCoordinates", e);
-            throw e;
-        }
-    }
-
-    private void getPixelColor(int x, int y) {
-        try {
-            // TODO: Test marker precision on color_test.png
-            Bitmap rootElementBitmap = ImageProcessing.loadBitmapFromView(imageView_markerImage);
-
-            // Setting screen boundary programmatically
-            x = x < 0 ? 0 : Math.min(x, imageWidth - 1);
-            y = y < 0 ? 0 : Math.min(y, imageHeight - 1);
-
-            int targetPixel = rootElementBitmap.getPixel(x, y);
-            Log.e("Target pixel", "x: " + x + ", y: " + y);
-            // TODO: Calculate new gradient based on adjusted value for eye/nose and save in gradientAndPositions object
-            Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
-        } catch (Exception e) {
-            Logging.error("getPixelColor", e);
-            throw e;
         }
     }
 
@@ -199,9 +232,47 @@ public class MarkerActivity extends AppCompatActivity {
                     return true;
                 }
             });
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Logging.error("SetOnTouchListener", e);
-            throw e;
+        }
+    }
+
+    private void getCoordinates(ImageView marker) {
+        try {
+            Bitmap markerBitmap = ((BitmapDrawable) marker.getDrawable()).getBitmap();
+            int markerVerticalOffset = markerBitmap.getHeight();
+            int markerHorizontalOffset = markerBitmap.getWidth();
+            int[] coordinates = new int[2];
+            marker.getLocationOnScreen(coordinates);
+
+            int x = coordinates[0] + markerHorizontalOffset / 2;
+            int y = coordinates[1] + markerVerticalOffset / 2 - imageViewVerticalOffset;
+            // TODO: Save new coordinate for eye/nose in gradientAndPositions object (remember to scale to original image dimensions before saving)
+            Log.e(String.valueOf(marker.getTag()), "x: " + x + ", y: " + y);
+            getPixelColor(x, y);
+        }
+        catch (Exception e) {
+            Logging.error("getCoordinates", e);
+        }
+    }
+
+    private void getPixelColor(int x, int y) {
+        try {
+            // TODO: Test marker precision on color_test.png
+            Bitmap rootElementBitmap = ImageProcessing.loadBitmapFromView(imageView_thermalImageContainer);
+
+            // Setting screen boundary programmatically
+            x = x < 0 ? 0 : Math.min(x, imageWidth - 1);
+            y = y < 0 ? 0 : Math.min(y, imageHeight - 1);
+
+            int targetPixel = rootElementBitmap.getPixel(x, y);
+            Log.e("Target pixel", "x: " + x + ", y: " + y);
+            // TODO: Calculate new gradient based on adjusted value for eye/nose and save in gradientAndPositions object
+            Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
+        }
+        catch (Exception e) {
+            Logging.error("getPixelColor", e);
         }
     }
 
@@ -210,25 +281,25 @@ public class MarkerActivity extends AppCompatActivity {
         try {
             Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
             startActivity(intent);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Logging.error("backOnClick", e);
-            throw e;
         }
     }
 
     public void submitOnClick(View view) {
         try {
             Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
-            intent.putExtra("filename", filename);
+            intent.putExtra("thermalImagePath", thermalImagePath);
             intent.putExtra("imageHeight", imageHeight);
             intent.putExtra("imageWidth", imageWidth);
             Bundle bundle = new Bundle();
             bundle.putSerializable("gradientAndPositions", gradientAndPositions);
             intent.putExtras(bundle);
             startActivity(intent);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Logging.error("submitOnClick", e);
-            throw e;
         }
     }
     //endregion

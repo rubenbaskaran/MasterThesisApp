@@ -1,5 +1,7 @@
 package rubenkarim.com.masterthesisapp.Algorithms;
 
+import android.app.Activity;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
@@ -11,6 +13,7 @@ import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 
+import rubenkarim.com.masterthesisapp.Activities.MarkerActivity;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 
 import org.tensorflow.lite.DataType;
@@ -22,21 +25,21 @@ import org.tensorflow.lite.support.common.ops.NormalizeOp;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 
 public class Cnn extends AbstractAlgorithm {
 
     private final Interpreter mTflite;
     private ThermalImageFile mthermalImageFile;
 
-    public Cnn(File modelFile, ThermalImageFile mthermalImageFile) {
-        mTflite = new Interpreter(modelFile);
-        this.mthermalImageFile = mthermalImageFile;
-    }
 
-    public Cnn(ByteBuffer modelFile, ThermalImageFile mthermalImageFile) {
-        mTflite = new Interpreter(modelFile);
-        this.mthermalImageFile = mthermalImageFile;
+    public Cnn(MarkerActivity markerActivity, String cnnModelFilePath, ThermalImageFile mThermalImage) throws IOException {
+        mTflite = new Interpreter((ByteBuffer) loadModelFile(markerActivity, cnnModelFilePath));
+        this.mthermalImageFile = mThermalImage;
     }
 
     @Override
@@ -95,6 +98,15 @@ public class Cnn extends AbstractAlgorithm {
         paint.setColorFilter(f);
         c.drawBitmap(bmpOriginal, 0, 0, paint);
         return bmpGrayscale;
+    }
+
+    private MappedByteBuffer loadModelFile(Activity activity, String MODEL_FILE) throws IOException {
+        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(MODEL_FILE);
+        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+        FileChannel fileChannel = inputStream.getChannel();
+        long startOffset = fileDescriptor.getStartOffset();
+        long declaredLength = fileDescriptor.getDeclaredLength();
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
 
 }
