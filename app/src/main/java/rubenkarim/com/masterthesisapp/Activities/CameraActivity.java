@@ -55,7 +55,6 @@ public class CameraActivity extends AppCompatActivity {
     private ImageView imageView_faceTemplate;
     private RelativeLayout relativeLayout_eyeNoseTemplate;
     private ProgressBar progressBar_loadingAnimation;
-    private MinMaxDataTransferContainer minMaxDataTransferContainer;
     //endregion
 
     @Override
@@ -118,9 +117,9 @@ public class CameraActivity extends AppCompatActivity {
         else {
             //Setup of Flir Test Image
             try {
-                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open("Thermal_Test_Img.jpg"));
-                String fileName = "Thermal_Test_Img.jpg";
-                thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
+                String defaultImageName = "Thermal_Test_Img3.jpg";
+                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open(defaultImageName));
+                thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + defaultImageName;
                 thermalImageFile.saveAs(thermalImagePath);
                 JavaImageBuffer javaBuffer = thermalImageFile.getImage();
                 imageView_cameraPreviewContainer.setImageBitmap(BitmapAndroid.createBitmap(javaBuffer).getBitMap());
@@ -260,7 +259,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private void addMinMaxDataIfChosen(Intent intent) {
         if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
-            minMaxDataTransferContainer = new MinMaxDataTransferContainer(
+            MinMaxDataTransferContainer minMaxDataTransferContainer = new MinMaxDataTransferContainer(
                     findViewById(R.id.imageView_leftEye),
                     findViewById(R.id.imageView_RightEye),
                     findViewById(R.id.imageView_Nose),
