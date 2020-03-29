@@ -22,6 +22,7 @@ import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
+import com.flir.thermalsdk.image.ThermalImage;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.live.Identity;
 import com.flir.thermalsdk.live.connectivity.ConnectionStatus;
@@ -39,6 +40,7 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.sql.Timestamp;
@@ -70,9 +72,11 @@ public class CameraActivity extends AppCompatActivity {
     private boolean isThermalCameraOn = true;
     private MyCameraManager myCameraManager = null;
     private PermissionManager permissionManager;
-    private String filepath;
+    private String mfilepath;
     private boolean useDefaultPicture = false;
     ImageView imageView_thermalViewFinder;
+    private final boolean USE_TEST_IMAGE = true;
+    private ThermalImage mThermalImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,15 +154,20 @@ public class CameraActivity extends AppCompatActivity {
             case CNN:
                 // Add execution for CNN
                 try {
-                    String fileName = "14:28:27Thermal.jpg";
-                    ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() +  "/Masterthesisimages/" + fileName);
+                    ThermalImageFile thermalImageFile;
+                    if(USE_TEST_IMAGE){
+                        InputStream testImageStream = getAssets().open("ThermalTest.jpg");
+                        thermalImageFile = (ThermalImageFile) ImageFactory.createImage(testImageStream);
+                    } else {
+                        thermalImageFile = (ThermalImageFile) mThermalImage;
+                    }
                     JavaImageBuffer javaBuffer = thermalImageFile.getImage();
                     Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
 
                     String cnnModelFile = "RGB_yinguobingWideDens.tflite";
                     Cnn cnn = new Cnn(loadModelFile(this, cnnModelFile), thermalImageFile);
                     gradientAndPositions = cnn.getGradientAndPositions();
-                    goToMarkerActivity(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() +  "/Masterthesisimages/" + fileName, true, gradientAndPositions);
+                    goToMarkerActivity(mfilepath, true, gradientAndPositions);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -187,14 +196,14 @@ public class CameraActivity extends AppCompatActivity {
                 cameraPreviewElement.getLocationOnScreen(cameraPreviewLocation);
 
                 MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
-                        filepath,
+                        mfilepath,
                         new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_leftEye.getWidth()),
                         new RoiModel(rightEyeLocation, imageView_rightEye.getHeight(), imageView_rightEye.getWidth()),
                         new RoiModel(noseLocation, imageView_nose.getHeight(), imageView_nose.getWidth()),
                         new RoiModel(cameraPreviewLocation, cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight())
                 );
                 gradientAndPositions = minMaxAlgorithm.getGradientAndPositions();
-                goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
+                goToMarkerActivity(mfilepath, isThermalCameraOn, gradientAndPositions);
                 break;
         }
     }
@@ -350,9 +359,10 @@ public class CameraActivity extends AppCompatActivity {
             boolean isDirectoryCreated = ImageDir.exists() || ImageDir.mkdirs();
             try {
                 if (isDirectoryCreated) {
-                    String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
-                    filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
-                    thermalImage.saveAs(filepath);
+                    String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal.jpg";
+                    mfilepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
+                    thermalImage.saveAs(mfilepath);
+                    mThermalImage = thermalImage;
                     resetThermalCamera();
                     ExecuteAlgorithm();
                 }
@@ -378,12 +388,12 @@ public class CameraActivity extends AppCompatActivity {
 
             String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis()));
             File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/Masterthesisimages", fileName + ".jpg");
-            filepath = file.getPath();
+            mfilepath = file.getPath();
 
             cameraView_rgbViewFinder.takePicture(file, Runnable::run, new ImageCapture.OnImageSavedCallback() {
                 @Override
                 public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                    Log.i(TAG, "onImageSaved: Picture saved! path: " + filepath);
+                    Log.i(TAG, "onImageSaved: Picture saved! path: " + mfilepath);
                     ExecuteAlgorithm();
                 }
 
@@ -429,10 +439,10 @@ public class CameraActivity extends AppCompatActivity {
             imageBitmap = ImageProcessing.convertDrawableToBitmap(this, R.drawable.rgb_picture);
         }
         else {
-            if (ThermalImageFile.isThermalImage(filepath)) {
+            if (ThermalImageFile.isThermalImage(mfilepath)) {
                 try {
-                    ImageProcessing.FixImageOrientation(filepath);
-                    ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filepath);
+                    ImageProcessing.FixImageOrientation(mfilepath);
+                    ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(mfilepath);
                     JavaImageBuffer rgbImage = thermalImageFile.getFusion().getPhoto();
                     imageBitmap = BitmapAndroid.createBitmap(rgbImage).getBitMap();
                 }
@@ -480,7 +490,7 @@ public class CameraActivity extends AppCompatActivity {
                                                 gradientAndPositions.setNosePosition(new int[]{(int) ((float) nose.getPosition().getX()), (int) ((float) nose.getPosition().getY()) + horizontalOffset});
                                             }
 
-                                            goToMarkerActivity(filepath, isThermalCameraOn, gradientAndPositions);
+                                            goToMarkerActivity(mfilepath, isThermalCameraOn, gradientAndPositions);
                                         }
                                         else {
                                             // TODO: Add re-instantiation of myCameraManager
