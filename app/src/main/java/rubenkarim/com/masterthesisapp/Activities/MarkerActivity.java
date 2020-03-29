@@ -81,7 +81,7 @@ public class MarkerActivity extends AppCompatActivity {
 
             if (ThermalImageFile.isThermalImage(filename)) {
                 ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(filename);
-                thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+                thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY); //Is showing only Thermal picture wit resolution of 480x640
                 JavaImageBuffer javaBuffer = thermalImageFile.getImage();
                 Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
                 imageView_markerImage.setImageBitmap(originalThermalImageBitmap);
