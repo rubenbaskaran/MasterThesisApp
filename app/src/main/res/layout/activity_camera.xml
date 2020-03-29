@@ -22,12 +22,6 @@
             android:translationZ="2dp"
             android:visibility="invisible" />
 
-        <androidx.camera.view.CameraView
-            android:id="@+id/cameraView_rgbViewFinder"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
         <ImageView
             android:id="@+id/imageView_thermalViewFinder"
             android:layout_width="match_parent"
