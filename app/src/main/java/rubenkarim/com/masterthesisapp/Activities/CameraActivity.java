@@ -96,7 +96,11 @@ public class CameraActivity extends AppCompatActivity {
         UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
         HashMap<String, UsbDevice> deviceList = manager.getDeviceList();
 
-        //Check Permissions:
+        CheckPermissions(deviceList);
+        SetupCameraPreviewUi();
+    }
+
+    private void CheckPermissions(HashMap<String, UsbDevice> deviceList){
         if (PermissionManager.checkPermissions(this, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             startView(deviceList);
         }
@@ -117,12 +121,9 @@ public class CameraActivity extends AppCompatActivity {
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.READ_EXTERNAL_STORAGE);
         }
-
-        SetupAlgorithm();
     }
 
-    // TODO: Move to MarkerActivity
-    private void SetupAlgorithm() {
+    private void SetupCameraPreviewUi() {
         // Fix for Android Studio bug (returning to previous activity on "stop app")
         if (GlobalVariables.getCurrentAlgorithm() == null) {
             Snackbar.make(rootView, "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
