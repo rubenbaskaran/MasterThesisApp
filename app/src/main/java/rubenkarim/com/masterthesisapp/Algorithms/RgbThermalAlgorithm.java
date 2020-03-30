@@ -104,12 +104,15 @@ public class RgbThermalAlgorithm {
                                             FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
                                             if (leftEye != null) {
                                                 gradientAndPositions.setEyePosition(new int[]{(int) (leftEye.getPosition().getX() * widthScalingFactor + horizontalOffset), (int) (leftEye.getPosition().getY() * heightScalingFactor + verticalOffset)});
+                                                // TODO: Get eye temperature
                                             }
                                             FirebaseVisionFaceLandmark nose = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE);
                                             if (nose != null) {
                                                 gradientAndPositions.setNosePosition(new int[]{(int) (nose.getPosition().getX() * widthScalingFactor), (int) (nose.getPosition().getY() * heightScalingFactor + verticalOffset)});
+                                                // TODO: Get nose temperature
                                             }
 
+                                            // TODO: eye_temp-nose_temp = gradient
                                             ((MarkerActivity) markerActivityReference).setPicture(gradientAndPositions);
                                         }
                                         else {

@@ -109,6 +109,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
                 }
             }
 
+            // TODO convert value to temperature before returning
             return new InterestPointModel(category.equals("max") ? maxValue : minValue, position);
         }
         catch (Exception e) {
