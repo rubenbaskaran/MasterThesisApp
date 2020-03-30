@@ -121,21 +121,9 @@ public class Cnn extends AbstractAlgorithm {
         Bitmap bmpWithBorder;
         int bmpAddWidth = minImgSize - bmp.getWidth();
         int bmpAddHeight = minImgSize - bmp.getHeight();
-        int newImgWidth;
-        int newImgHeight;
 
-        newImgHeight = bmpAddWidth <= 0 ? bmp.getWidth() : minImgSize;
-
-        if (bmpAddWidth <= 0){
-            newImgWidth = bmp.getWidth();
-        } else {
-            newImgWidth = minImgSize;
-        }
-        if (bmpAddHeight <= 0){
-            newImgHeight = bmp.getHeight();
-        } else {
-            newImgHeight = minImgSize;
-        }
+        int newImgWidth = bmpAddWidth <= 0 ? bmp.getWidth() : minImgSize;
+        int newImgHeight = bmpAddHeight <= 0 ? bmp.getHeight(): minImgSize;
 
         bmpWithBorder = Bitmap.createBitmap(newImgWidth, newImgHeight, bmp.getConfig());
         Canvas canvas = new Canvas(bmpWithBorder);
