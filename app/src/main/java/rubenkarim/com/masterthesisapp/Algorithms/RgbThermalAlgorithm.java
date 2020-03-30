@@ -49,31 +49,31 @@ public class RgbThermalAlgorithm {
 
     public void getGradientAndPositions(String thermalImagePath) {
         GradientModel gradientAndPositions = new GradientModel(100, null, null);
-        Bitmap rgbImage = ImageProcessing.convertToBitmap(thermalImagePath);
-        double rgbImageWidth = rgbImage.getWidth();
-        double rgbImageHeight = rgbImage.getHeight();
-        double thermalImageWidth = 0;
-        double thermalImageHeight = 0;
+        Bitmap thermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
+        double thermalImageWidth = thermalImageBitmap.getWidth();
+        double thermalImageHeight = thermalImageBitmap.getHeight();
+        Bitmap rgbImageBitmap = null;
+        double rgbImageWidth = 0;
+        double rgbImageHeight = 0;
         int verticalOffset = 15;
         int horizontalOffset = 10;
 
         try {
             ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
-            thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+            thermalImageFile.getFusion().setFusionMode(FusionMode.VISUAL_ONLY);
             JavaImageBuffer javaImageBuffer = thermalImageFile.getImage();
-            Bitmap thermalImage = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
-            thermalImageWidth = thermalImage.getWidth();
-            thermalImageHeight = thermalImage.getHeight();
+            rgbImageBitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
+            rgbImageWidth = rgbImageBitmap.getWidth();
+            rgbImageHeight = rgbImageBitmap.getHeight();
         }
         catch (IOException e) {
             Logging.error("getGradientAndPositions", e);
         }
 
-        // TODO: Remember to remove
         double widthScalingFactor = thermalImageWidth / rgbImageWidth;
         double heightScalingFactor = thermalImageHeight / rgbImageHeight;
 
-        FirebaseVisionImage firebaseVisionImage = ImageProcessing.convertToFirebaseVisionImage(rgbImage);
+        FirebaseVisionImage firebaseVisionImage = ImageProcessing.convertToFirebaseVisionImage(rgbImageBitmap);
 
         FirebaseVisionFaceDetectorOptions options =
                 new FirebaseVisionFaceDetectorOptions.Builder()
