@@ -90,12 +90,15 @@ public class MarkerActivity extends AppCompatActivity {
             switch (GlobalVariables.getCurrentAlgorithm()) {
                 case CNN:
                     String cnnModelFile = "RGB_yinguobingWideDens.tflite";
-                    Cnn cnn = new Cnn(this, cnnModelFile, thermalImageFile);
+                    Cnn cnn = new Cnn(this, cnnModelFile, thermalImageFile, false);
                     gradientAndPositions = cnn.getGradientAndPositions();
                     setPicture(gradientAndPositions);
                     break;
                 case CNNWithTransferLearning:
-                    // Add execution for CNN with transfer learning
+                    String cnnTransferLearningModelFile = "RGB_InceptionV3.tflite";
+                    Cnn cnnTransferLearning = new Cnn(this, cnnTransferLearningModelFile, thermalImageFile, true);
+                    gradientAndPositions = cnnTransferLearning.getGradientAndPositions();
+                    setPicture(gradientAndPositions);
                     break;
                 case RgbThermalMapping:
                     RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(this);
