@@ -10,15 +10,20 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.R;
+import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
+import rubenkarim.com.masterthesisapp.Utilities.MinMaxDataTransferContainer;
 
 public class OverviewActivity extends AppCompatActivity {
+
+    //region Properties
     private ImageView imageView_thermalImageContainer;
     private TextView textView_cprNumber;
     private int imageHeight;
     private int imageWidth;
     private String thermalImagePath;
     private GradientModel gradientAndPositions;
-
+    private MinMaxDataTransferContainer minMaxData;
+    //endregion
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +47,8 @@ public class OverviewActivity extends AppCompatActivity {
         if (bundle != null) {
             gradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
             ((TextView) findViewById(R.id.textView_gradient)).setText(String.valueOf(gradientAndPositions.getGradient()));
+
+            minMaxData = (MinMaxDataTransferContainer) bundle.getSerializable("minMaxData");
         }
 
         setPicture();
@@ -58,8 +65,15 @@ public class OverviewActivity extends AppCompatActivity {
         intent.putExtra("imageWidth", imageWidth);
         Bundle bundle = new Bundle();
         bundle.putSerializable("gradientAndPositions", gradientAndPositions);
+        addMinMaxDataIfChosen(bundle);
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    private void addMinMaxDataIfChosen(Bundle bundle) {
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
+            bundle.putSerializable("minMaxData", minMaxData);
+        }
     }
 
     public void saveOnClick(View view) {

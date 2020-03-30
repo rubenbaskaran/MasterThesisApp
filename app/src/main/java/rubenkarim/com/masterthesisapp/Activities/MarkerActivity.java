@@ -19,7 +19,6 @@ import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
-import com.flir.thermalsdk.image.fusion.FusionMode;
 
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.Cnn;
@@ -32,6 +31,7 @@ import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
+import rubenkarim.com.masterthesisapp.Utilities.MinMaxDataTransferContainer;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
 public class MarkerActivity extends AppCompatActivity {
@@ -45,6 +45,7 @@ public class MarkerActivity extends AppCompatActivity {
     private GradientModel gradientAndPositions;
     private ThermalImageFile thermalImageFile;
     private ProgressBar progressBar_markerViewLoadingAnimation;
+    private MinMaxDataTransferContainer minMaxData;
     //endregion
 
     @Override
@@ -70,6 +71,11 @@ public class MarkerActivity extends AppCompatActivity {
             }
             if (receivedIntent.hasExtra("imageWidth")) {
                 imageWidth = receivedIntent.getIntExtra("imageWidth", 0);
+            }
+
+            Bundle bundle = receivedIntent.getExtras();
+            if (bundle != null) {
+                minMaxData = (MinMaxDataTransferContainer) bundle.getSerializable("minMaxData");
             }
 
             ExecuteAlgorithm();
@@ -98,26 +104,13 @@ public class MarkerActivity extends AppCompatActivity {
                     RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(this);
                     rgbThermalAlgorithm.getGradientAndPositions(thermalImagePath);
                     break;
-                case MaxMinTemplate:
-                    ImageView imageView_leftEye = findViewById(R.id.imageView_leftEye);
-                    ImageView imageView_rightEye = findViewById(R.id.imageView_RightEye);
-                    ImageView imageView_nose = findViewById(R.id.imageView_Nose);
-                    ImageView imageView_cameraPreviewContainer = findViewById(R.id.imageView_cameraPreviewContainer);
-                    int[] leftEyeLocation = new int[2];
-                    int[] rightEyeLocation = new int[2];
-                    int[] noseLocation = new int[2];
-                    int[] cameraPreviewContainerLocation = new int[2];
-                    imageView_leftEye.getLocationOnScreen(leftEyeLocation);
-                    imageView_rightEye.getLocationOnScreen(rightEyeLocation);
-                    imageView_nose.getLocationOnScreen(noseLocation);
-                    imageView_cameraPreviewContainer.getLocationOnScreen(cameraPreviewContainerLocation);
-
+                case MinMaxTemplate:
                     MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
                             thermalImagePath,
-                            new RoiModel(leftEyeLocation, imageView_leftEye.getHeight(), imageView_leftEye.getWidth()),
-                            new RoiModel(rightEyeLocation, imageView_rightEye.getHeight(), imageView_rightEye.getWidth()),
-                            new RoiModel(noseLocation, imageView_nose.getHeight(), imageView_nose.getWidth()),
-                            new RoiModel(cameraPreviewContainerLocation, imageView_cameraPreviewContainer.getWidth(), imageView_cameraPreviewContainer.getHeight())
+                            new RoiModel(minMaxData.getLeftEyeLocation(), minMaxData.getLeftEyeWidth(), minMaxData.getLeftEyeHeight()),
+                            new RoiModel(minMaxData.getRightEyeLocation(), minMaxData.getRightEyeWidth(), minMaxData.getRightEyeHeight()),
+                            new RoiModel(minMaxData.getNoseLocation(), minMaxData.getNoseWidth(), minMaxData.getNoseHeight()),
+                            new RoiModel(minMaxData.getCameraPreviewContainerLocation(), minMaxData.getCameraPreviewContainerWidth(), minMaxData.getCameraPreviewContainerHeight())
                     );
                     setPicture(minMaxAlgorithm.getGradientAndPositions());
                     break;
@@ -144,21 +137,11 @@ public class MarkerActivity extends AppCompatActivity {
     public void setPicture(GradientModel gradientAndPositions) {
         try {
             this.gradientAndPositions = gradientAndPositions;
-
             ImageProcessing.FixImageOrientation(thermalImagePath);
-            int[] imageOriginalDimensions = null;
 
-            if (ThermalImageFile.isThermalImage(thermalImagePath)) {
-                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
-                thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY); //Is showing only Thermal picture wit resolution of 480x640
-                JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-                Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaBuffer).getBitMap();
-                imageView_thermalImageContainer.setImageBitmap(originalThermalImageBitmap);
-                imageOriginalDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
-            }
-            else {
-                Log.e("SetPicture", "IS NOT A THERMAL PICTURE");
-            }
+            Bitmap originalThermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
+            imageView_thermalImageContainer.setImageBitmap(originalThermalImageBitmap);
+            int[] imageOriginalDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
 
             addMarkers(imageOriginalDimensions, new int[]{imageWidth, imageHeight}, imageViewVerticalOffset);
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
@@ -296,11 +279,18 @@ public class MarkerActivity extends AppCompatActivity {
             intent.putExtra("imageWidth", imageWidth);
             Bundle bundle = new Bundle();
             bundle.putSerializable("gradientAndPositions", gradientAndPositions);
+            addMinMaxDataIfChosen(bundle);
             intent.putExtras(bundle);
             startActivity(intent);
         }
         catch (Exception e) {
             Logging.error("submitOnClick", e);
+        }
+    }
+
+    private void addMinMaxDataIfChosen(Bundle bundle) {
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
+            bundle.putSerializable("minMaxData", minMaxData);
         }
     }
     //endregion

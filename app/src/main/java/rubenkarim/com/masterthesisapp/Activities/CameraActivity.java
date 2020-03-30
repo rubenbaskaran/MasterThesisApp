@@ -20,6 +20,7 @@ import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.flir.thermalsdk.live.Identity;
 import com.flir.thermalsdk.live.connectivity.ConnectionStatus;
 import com.google.android.material.snackbar.Snackbar;
@@ -39,13 +40,15 @@ import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionMana
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
+import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
+import rubenkarim.com.masterthesisapp.Utilities.MinMaxDataTransferContainer;
 
 public class CameraActivity extends AppCompatActivity {
 
     //region Properties
     private static final String TAG = CameraActivity.class.getSimpleName();
-    private boolean useDebugImage = false;
+    private boolean useDefaultImage = false;
     private View rootView;
     private MyCameraManager myCameraManager;
     private PermissionManager permissionManager;
@@ -66,12 +69,23 @@ public class CameraActivity extends AppCompatActivity {
         progressBar_loadingAnimation = findViewById(R.id.progressBar_cameraViewLoadingAnimation);
         imageView_cameraPreviewContainer = findViewById(R.id.imageView_cameraPreviewContainer);
 
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
+            relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
+            imageView_faceTemplate.setVisibility(View.INVISIBLE);
+        }
+
+        permissionManager = new PermissionManager();
+        myCameraManager = new MyCameraManager(getApplicationContext());
+
         checkPermissions(getListOfUsbDevices());
     }
 
-    private void checkPermissions(HashMap<String, UsbDevice> deviceList) {
-        permissionManager = new PermissionManager();
+    private HashMap<String, UsbDevice> getListOfUsbDevices() {
+        UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        return manager.getDeviceList();
+    }
 
+    private void checkPermissions(HashMap<String, UsbDevice> deviceList) {
         if (PermissionManager.checkPermissions(this, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             startCameraPreview(deviceList);
         }
@@ -94,11 +108,6 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    private HashMap<String, UsbDevice> getListOfUsbDevices() {
-        UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        return manager.getDeviceList();
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -106,36 +115,13 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void startCameraPreview(HashMap<String, UsbDevice> deviceList) {
-        setupCameraPreviewUi();
-        myCameraManager = new MyCameraManager(getApplicationContext());
-
         if (!deviceList.isEmpty()) {
-            Snackbar.make(rootView, "USB device is detected trying to connect", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(rootView, "FLIR camera detected. Trying to connect", Snackbar.LENGTH_SHORT).show();
             setupFlirCamera();
         }
         else {
-            //Setup of Flir Test Image
-            try {
-                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open("Thermal_Test_Img.jpg"));
-                String fileName = "Thermal_Test_Img.jpg";
-                thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
-                thermalImageFile.saveAs(thermalImagePath);
-                JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-                imageView_cameraPreviewContainer.setImageBitmap(BitmapAndroid.createBitmap(javaBuffer).getBitMap());
-                useDebugImage = true;
-                Snackbar.make(rootView, "Cant find USB device opening phones camera using default img", Snackbar.LENGTH_SHORT).show();
-            }
-            catch (IOException e) {
-                Snackbar.make(rootView, "an error accrued when open default img", Snackbar.LENGTH_SHORT).show();
-                Logging.error("startCameraPreview", e);
-            }
-        }
-    }
-
-    private void setupCameraPreviewUi() {
-        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
-            relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
-            imageView_faceTemplate.setVisibility(View.INVISIBLE);
+            Snackbar.make(rootView, "Can't find FLIR camera. Using default image", Snackbar.LENGTH_SHORT).show();
+            setupDefaultImage();
         }
     }
 
@@ -199,6 +185,22 @@ public class CameraActivity extends AppCompatActivity {
         });
     }
 
+    private void setupDefaultImage() {
+        try {
+            String defaultImageName = "Thermal_Test_Img3.jpg";
+            ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open(defaultImageName));
+            thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+            thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + defaultImageName;
+            thermalImageFile.saveAs(thermalImagePath);
+            imageView_cameraPreviewContainer.setImageBitmap(ImageProcessing.convertToBitmap(thermalImagePath));
+            useDefaultImage = true;
+        }
+        catch (IOException e) {
+            Snackbar.make(rootView, "an error accrued when open default image", Snackbar.LENGTH_SHORT).show();
+            Logging.error("startCameraPreview", e);
+        }
+    }
+
     public void takePictureOnClick(View view) {
         // Fix for Android Studio bug (returning to previous activity on "stop app")
         if (GlobalVariables.getCurrentAlgorithm() == null) {
@@ -211,7 +213,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void saveThermalImage() {
-        if (useDebugImage) {
+        if (useDefaultImage) {
             goToMarkerActivity();
         }
         else {
@@ -226,13 +228,13 @@ public class CameraActivity extends AppCompatActivity {
                         goToMarkerActivity();
                     }
                     else {
-                        Log.i(TAG, "takeAndSaveThermalImage: ERROR! IMAGE DIR NOT CREATED");
+                        Log.i(TAG, "saveThermalImage: ERROR! IMAGE DIR NOT CREATED");
                         Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
                         throw new IOException("Image Directory not created");
                     }
                 }
                 catch (IOException e) {
-                    Log.d(TAG, "takeAndSaveThermalImage: ERROR: " + e);
+                    Log.d(TAG, "saveThermalImage: ERROR: " + e);
                     Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
                 }
             });
@@ -251,8 +253,23 @@ public class CameraActivity extends AppCompatActivity {
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
+        addMinMaxDataIfChosen(intent);
 
         startActivity(intent);
+    }
+
+    private void addMinMaxDataIfChosen(Intent intent) {
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
+            MinMaxDataTransferContainer minMaxDataTransferContainer = new MinMaxDataTransferContainer(
+                    findViewById(R.id.imageView_leftEye),
+                    findViewById(R.id.imageView_RightEye),
+                    findViewById(R.id.imageView_Nose),
+                    findViewById(R.id.imageView_cameraPreviewContainer));
+
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("minMaxData", minMaxDataTransferContainer);
+            intent.putExtras(bundle);
+        }
     }
 
     public void backOnClick(View view) {
