@@ -55,8 +55,9 @@ public class Cnn extends AbstractAlgorithm {
         Bitmap thermalImage = getBitmap(mthermalImageFile);
 
         //somePretrained networks only inputs rects.
+        int cnnImgInputSize = 320;
         if(imgShouldBeRect){
-            addBlackBorder(thermalImage, 320);
+            addBlackBorder(thermalImage, cnnImgInputSize);
         }
 
         inputImageBuffer.load(thermalImage);
