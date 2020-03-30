@@ -99,7 +99,7 @@ public class MarkerActivity extends AppCompatActivity {
                     break;
                 case RgbThermalMapping:
                     RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(this);
-                    rgbThermalAlgorithm.getGradientAndPositions(thermalImagePath);
+                    rgbThermalAlgorithm.getGradientAndPositionsAsync(thermalImagePath);
                     break;
                 case MinMaxTemplate:
                     MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
