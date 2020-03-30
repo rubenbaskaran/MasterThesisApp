@@ -153,6 +153,7 @@ public class MarkerActivity extends AppCompatActivity {
                     originalThermalImageBitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
                 }
                 catch (IOException e) {
+                    //TODO: handle exception
                     Logging.error("getGradientAndPositions", e);
                 }
             }
@@ -204,6 +205,7 @@ public class MarkerActivity extends AppCompatActivity {
                     + ". markerWidth: " + markerWidthHeight + ". horizontal offset: " + horizontalOffset);
         }
         catch (Exception e) {
+            //TODO: Handle exception
             Logging.error("addMarkers", e);
         }
     }

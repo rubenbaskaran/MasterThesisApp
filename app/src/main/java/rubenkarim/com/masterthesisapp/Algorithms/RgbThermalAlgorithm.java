@@ -38,6 +38,7 @@ import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 // Checkout DetectionBasedTracker.java and FdActivity.java
 
+//FIXME: implement ApstractAlgorithm?
 public class RgbThermalAlgorithm {
 
     private Context markerActivityReference;
