@@ -20,6 +20,7 @@ import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.flir.thermalsdk.live.Identity;
 import com.flir.thermalsdk.live.connectivity.ConnectionStatus;
 import com.google.android.material.snackbar.Snackbar;
@@ -40,6 +41,7 @@ import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
+import rubenkarim.com.masterthesisapp.Utilities.MinMaxDataTransferContainer;
 
 public class CameraActivity extends AppCompatActivity {
 
@@ -106,7 +108,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void startCameraPreview(HashMap<String, UsbDevice> deviceList) {
-        setupCameraPreviewUi();
+        setupMinMaxAlgorithmIfChosen();
         myCameraManager = new MyCameraManager(getApplicationContext());
 
         if (!deviceList.isEmpty()) {
@@ -116,9 +118,10 @@ public class CameraActivity extends AppCompatActivity {
         else {
             //Setup of Flir Test Image
             try {
-                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open("Thermal_Test_Img.jpg"));
-                String fileName = "Thermal_Test_Img.jpg";
-                thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
+                String defaultImageName = "Thermal_Test_Img3.jpg";
+                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open(defaultImageName));
+                thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+                thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + defaultImageName;
                 thermalImageFile.saveAs(thermalImagePath);
                 JavaImageBuffer javaBuffer = thermalImageFile.getImage();
                 imageView_cameraPreviewContainer.setImageBitmap(BitmapAndroid.createBitmap(javaBuffer).getBitMap());
@@ -132,8 +135,8 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    private void setupCameraPreviewUi() {
-        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MaxMinTemplate) {
+    private void setupMinMaxAlgorithmIfChosen() {
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
             relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
             imageView_faceTemplate.setVisibility(View.INVISIBLE);
         }
@@ -251,8 +254,23 @@ public class CameraActivity extends AppCompatActivity {
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
+        addMinMaxDataIfChosen(intent);
 
         startActivity(intent);
+    }
+
+    private void addMinMaxDataIfChosen(Intent intent) {
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
+            MinMaxDataTransferContainer minMaxDataTransferContainer = new MinMaxDataTransferContainer(
+                    findViewById(R.id.imageView_leftEye),
+                    findViewById(R.id.imageView_RightEye),
+                    findViewById(R.id.imageView_Nose),
+                    findViewById(R.id.imageView_cameraPreviewContainer));
+
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("minMaxData", minMaxDataTransferContainer);
+            intent.putExtras(bundle);
+        }
     }
 
     public void backOnClick(View view) {
