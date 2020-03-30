@@ -99,7 +99,6 @@ public class MarkerActivity extends AppCompatActivity {
                 case CNNWithTransferLearning:
                     // Add execution for CNN with transfer learning
                     break;
-                // TODO: Debug this one today
                 case RgbThermalMapping:
                     RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(this);
                     rgbThermalAlgorithm.getGradientAndPositions(thermalImagePath);
