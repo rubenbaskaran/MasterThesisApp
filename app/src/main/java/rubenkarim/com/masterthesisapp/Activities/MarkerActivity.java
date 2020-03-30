@@ -169,7 +169,6 @@ public class MarkerActivity extends AppCompatActivity {
         }
     }
 
-    // TODO: Make it work on the RGB pictures
     private void addMarkers(int[] imageOriginalDimensions, int[] imageViewDimensions, int horizontalOffset) {
         try {
             int markerWidthHeight = 200;
