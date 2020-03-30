@@ -38,7 +38,7 @@ import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 // Checkout DetectionBasedTracker.java and FdActivity.java
 
-public class RgbThermalAlgorithm {
+public class RgbThermalAlgorithm extends AbstractAlgorithm {
 
     private Context markerActivityReference;
 
@@ -47,7 +47,12 @@ public class RgbThermalAlgorithm {
         this.markerActivityReference = markerActivityReference;
     }
 
-    public void getGradientAndPositions(String thermalImagePath) {
+    @Override
+    public GradientModel getGradientAndPositions() {
+        return null;
+    }
+
+    public void getGradientAndPositionsAsync(String thermalImagePath) {
         GradientModel gradientAndPositions = new GradientModel(100, null, null);
         Bitmap thermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
         double thermalImageWidth = thermalImageBitmap.getWidth();
