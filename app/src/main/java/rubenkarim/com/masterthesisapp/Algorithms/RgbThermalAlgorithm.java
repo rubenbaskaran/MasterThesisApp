@@ -9,6 +9,7 @@ import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -28,6 +29,7 @@ import rubenkarim.com.masterthesisapp.Activities.MarkerActivity;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
+import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 // Sample – face-detection – is the simplest implementation of the face detection functionality on Android.
 // It supports 2 modes of execution: available by default Java wrapper for the cascade classifier,
@@ -45,25 +47,33 @@ public class RgbThermalAlgorithm {
         this.markerActivityReference = markerActivityReference;
     }
 
-    public void getGradientAndPositions(String mThermalImgPath) {
-        Bitmap imageBitmap = null;
-        int horizontalOffset = 50;
-        int verticalOffset = 50;
+    public void getGradientAndPositions(String thermalImagePath) {
+        GradientModel gradientAndPositions = new GradientModel(100, null, null);
+        Bitmap thermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
+        double thermalImageWidth = thermalImageBitmap.getWidth();
+        double thermalImageHeight = thermalImageBitmap.getHeight();
+        Bitmap rgbImageBitmap = null;
+        double rgbImageWidth = 0;
+        double rgbImageHeight = 0;
+        int verticalOffset = 15;
+        int horizontalOffset = 10;
 
-        if (ThermalImageFile.isThermalImage(mThermalImgPath)) {
-            try {
-                ImageProcessing.FixImageOrientation(mThermalImgPath);
-                ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(mThermalImgPath);
-                JavaImageBuffer rgbImage = thermalImageFile.getFusion().getPhoto();
-                imageBitmap = BitmapAndroid.createBitmap(rgbImage).getBitMap();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
+            thermalImageFile.getFusion().setFusionMode(FusionMode.VISUAL_ONLY);
+            JavaImageBuffer javaImageBuffer = thermalImageFile.getImage();
+            rgbImageBitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
+            rgbImageWidth = rgbImageBitmap.getWidth();
+            rgbImageHeight = rgbImageBitmap.getHeight();
+        }
+        catch (IOException e) {
+            Logging.error("getGradientAndPositions", e);
         }
 
-        FirebaseVisionImage image = ImageProcessing.convertToFirebaseVisionImage(imageBitmap);
-        GradientModel gradientAndPositions = new GradientModel(100, null, null);
+        double widthScalingFactor = thermalImageWidth / rgbImageWidth;
+        double heightScalingFactor = thermalImageHeight / rgbImageHeight;
+
+        FirebaseVisionImage firebaseVisionImage = ImageProcessing.convertToFirebaseVisionImage(rgbImageBitmap);
 
         FirebaseVisionFaceDetectorOptions options =
                 new FirebaseVisionFaceDetectorOptions.Builder()
@@ -78,7 +88,7 @@ public class RgbThermalAlgorithm {
                 .getVisionFaceDetector(options);
 
         Task<List<FirebaseVisionFace>> result =
-                detector.detectInImage(image)
+                detector.detectInImage(firebaseVisionImage)
                         .addOnSuccessListener(
                                 new OnSuccessListener<List<FirebaseVisionFace>>() {
                                     @Override
@@ -93,11 +103,11 @@ public class RgbThermalAlgorithm {
 
                                             FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
                                             if (leftEye != null) {
-                                                gradientAndPositions.setEyePosition(new int[]{(int) ((float) leftEye.getPosition().getX()) + verticalOffset, (int) ((float) leftEye.getPosition().getY()) + horizontalOffset});
+                                                gradientAndPositions.setEyePosition(new int[]{(int) (leftEye.getPosition().getX() * widthScalingFactor + horizontalOffset), (int) (leftEye.getPosition().getY() * heightScalingFactor + verticalOffset)});
                                             }
                                             FirebaseVisionFaceLandmark nose = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE);
                                             if (nose != null) {
-                                                gradientAndPositions.setNosePosition(new int[]{(int) ((float) nose.getPosition().getX()), (int) ((float) nose.getPosition().getY()) + horizontalOffset});
+                                                gradientAndPositions.setNosePosition(new int[]{(int) (nose.getPosition().getX() * widthScalingFactor), (int) (nose.getPosition().getY() * heightScalingFactor + verticalOffset)});
                                             }
 
                                             ((MarkerActivity) markerActivityReference).setPicture(gradientAndPositions);

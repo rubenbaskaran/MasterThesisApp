@@ -15,8 +15,13 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.ImageFactory;
+import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.fusion.FusionMode;
+
+import java.io.IOException;
 
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.Cnn;
@@ -137,9 +142,24 @@ public class MarkerActivity extends AppCompatActivity {
     public void setPicture(GradientModel gradientAndPositions) {
         try {
             this.gradientAndPositions = gradientAndPositions;
+            Bitmap originalThermalImageBitmap = null;
             ImageProcessing.FixImageOrientation(thermalImagePath);
 
-            Bitmap originalThermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
+            if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.RgbThermalMapping) {
+                try {
+                    ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
+                    thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+                    JavaImageBuffer javaImageBuffer = thermalImageFile.getImage();
+                    originalThermalImageBitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
+                }
+                catch (IOException e) {
+                    Logging.error("getGradientAndPositions", e);
+                }
+            }
+            else {
+                originalThermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
+            }
+
             imageView_thermalImageContainer.setImageBitmap(originalThermalImageBitmap);
             int[] imageOriginalDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
 
