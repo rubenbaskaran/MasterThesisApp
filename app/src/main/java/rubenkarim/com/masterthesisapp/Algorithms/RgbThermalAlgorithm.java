@@ -3,7 +3,6 @@ package rubenkarim.com.masterthesisapp.Algorithms;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.ImageFactory;
@@ -53,7 +52,6 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
     }
 
     public void getGradientAndPositionsAsync(String thermalImagePath) {
-        GradientModel gradientAndPositions = new GradientModel(100, null, null);
         Bitmap thermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
         double thermalImageWidth = thermalImageBitmap.getWidth();
         double thermalImageHeight = thermalImageBitmap.getHeight();
@@ -62,9 +60,10 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
         double rgbImageHeight = 0;
         int verticalOffset = 15;
         int horizontalOffset = 10;
+        ThermalImageFile thermalImageFile = null;
 
         try {
-            ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
+            thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
             thermalImageFile.getFusion().setFusionMode(FusionMode.VISUAL_ONLY);
             JavaImageBuffer javaImageBuffer = thermalImageFile.getImage();
             rgbImageBitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
@@ -89,8 +88,8 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
                         .setMinFaceSize(0.15f)
                         .build();
 
-        FirebaseVisionFaceDetector detector = FirebaseVision.getInstance()
-                .getVisionFaceDetector(options);
+        FirebaseVisionFaceDetector detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
+        ThermalImageFile finalThermalImageFile = thermalImageFile;
 
         Task<List<FirebaseVisionFace>> result =
                 detector.detectInImage(firebaseVisionImage)
@@ -102,23 +101,32 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
                                         // [START_EXCLUDE]
                                         // [START get_face_info]
                                         if (!faces.isEmpty()) {
-                                            Rect bounds = faces.get(0).getBoundingBox();
-                                            float rotY = faces.get(0).getHeadEulerAngleY();  // Head is rotated to the right rotY degrees
-                                            float rotZ = faces.get(0).getHeadEulerAngleZ();  // Head is tilted sideways rotZ degrees
+                                            int[] rightEyeCoordinates = null;
+                                            int[] leftEyeCoordinates = null;
+                                            int[] noseCoordinates = null;
 
+                                            FirebaseVisionFaceLandmark rightEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
+                                            if (rightEye != null) {
+                                                rightEyeCoordinates = new int[]{(int) (rightEye.getPosition().getX() * widthScalingFactor - horizontalOffset), (int) (rightEye.getPosition().getY() * heightScalingFactor + verticalOffset)};
+                                            }
                                             FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
                                             if (leftEye != null) {
-                                                gradientAndPositions.setEyePosition(new int[]{(int) (leftEye.getPosition().getX() * widthScalingFactor + horizontalOffset), (int) (leftEye.getPosition().getY() * heightScalingFactor + verticalOffset)});
-                                                // TODO: Get eye temperature
+                                                leftEyeCoordinates = new int[]{(int) (leftEye.getPosition().getX() * widthScalingFactor + horizontalOffset), (int) (leftEye.getPosition().getY() * heightScalingFactor + verticalOffset)};
                                             }
                                             FirebaseVisionFaceLandmark nose = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE);
                                             if (nose != null) {
-                                                gradientAndPositions.setNosePosition(new int[]{(int) (nose.getPosition().getX() * widthScalingFactor), (int) (nose.getPosition().getY() * heightScalingFactor + verticalOffset)});
-                                                // TODO: Get nose temperature
+                                                noseCoordinates = new int[]{(int) (nose.getPosition().getX() * widthScalingFactor), (int) (nose.getPosition().getY() * heightScalingFactor + verticalOffset)};
                                             }
 
-                                            // TODO: eye_temp-nose_temp = gradient
-                                            ((MarkerActivity) markerActivityReference).setPicture(gradientAndPositions);
+                                            ((MarkerActivity) markerActivityReference).setPicture(RgbThermalAlgorithm.super.calculateGradient(
+                                                    rightEyeCoordinates[0],
+                                                    rightEyeCoordinates[1],
+                                                    leftEyeCoordinates[0],
+                                                    leftEyeCoordinates[1],
+                                                    noseCoordinates[0],
+                                                    noseCoordinates[1],
+                                                    finalThermalImageFile
+                                            ));
                                         }
                                         else {
                                             Snackbar.make(((Activity) markerActivityReference).findViewById(R.id.linearLayout_MarkerActivity), "No faces found", Snackbar.LENGTH_SHORT).show();
