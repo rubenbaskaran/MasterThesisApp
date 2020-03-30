@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
@@ -24,7 +25,6 @@ import org.tensorflow.lite.support.image.ops.ResizeOp;
 import org.tensorflow.lite.support.common.ops.NormalizeOp;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -35,9 +35,11 @@ public class Cnn extends AbstractAlgorithm {
 
     private final Interpreter mTflite;
     private ThermalImageFile mthermalImageFile;
+    private boolean imgShouldBeRect;
 
 
-    public Cnn(MarkerActivity markerActivity, String cnnModelFilePath, ThermalImageFile mThermalImage) throws IOException {
+    public Cnn(MarkerActivity markerActivity, String cnnModelFilePath, ThermalImageFile mThermalImage, boolean imgShouldBeRect) throws IOException {
+        this.imgShouldBeRect = imgShouldBeRect;
         mTflite = new Interpreter((ByteBuffer) loadModelFile(markerActivity, cnnModelFilePath));
         this.mthermalImageFile = mThermalImage;
     }
@@ -51,6 +53,12 @@ public class Cnn extends AbstractAlgorithm {
         mthermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
         //Bitmap grayBitmap = toGrayscale(mImageBitmap);
         Bitmap thermalImage = getBitmap(mthermalImageFile);
+
+        //somePretrained networks only inputs rects.
+        if(imgShouldBeRect){
+            addBlackBorder(thermalImage, 320);
+        }
+
         inputImageBuffer.load(thermalImage);
         float heightProportion = (float) thermalImage.getHeight() / imgShapeInput[1];
         float widthProportion = (float) thermalImage.getWidth() / imgShapeInput[2];
@@ -107,6 +115,35 @@ public class Cnn extends AbstractAlgorithm {
         long startOffset = fileDescriptor.getStartOffset();
         long declaredLength = fileDescriptor.getDeclaredLength();
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+    }
+
+    private Bitmap addBlackBorder(Bitmap bmp, int minImgSize) {
+        Bitmap bmpWithBorder;
+        int bmpAddWidth = minImgSize - bmp.getWidth();
+        int bmpAddHeight = minImgSize - bmp.getHeight();
+        int newImgWidth;
+        int newImgHeight;
+
+        newImgHeight = bmpAddWidth <= 0 ? bmp.getWidth() : minImgSize;
+
+        if (bmpAddWidth <= 0){
+            newImgWidth = bmp.getWidth();
+        } else {
+            newImgWidth = minImgSize;
+        }
+        if (bmpAddHeight <= 0){
+            newImgHeight = bmp.getHeight();
+        } else {
+            newImgHeight = minImgSize;
+        }
+
+        bmpWithBorder = Bitmap.createBitmap(newImgWidth, newImgHeight, bmp.getConfig());
+        Canvas canvas = new Canvas(bmpWithBorder);
+        canvas.drawColor(Color.BLACK);
+        float imfHeightOffset = bmpAddHeight >= 0? (float) (bmpAddHeight / 2.0) : 0;
+        float imfWidthOffset = bmpAddWidth >= 0? (float) (bmpAddWidth / 2.0) : 0;
+        canvas.drawBitmap(bmp, imfWidthOffset, imfHeightOffset, null);
+        return bmpWithBorder;
     }
 
 }
