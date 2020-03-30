@@ -9,6 +9,7 @@ import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -48,30 +49,31 @@ public class RgbThermalAlgorithm {
 
     public void getGradientAndPositions(String thermalImagePath) {
         GradientModel gradientAndPositions = new GradientModel(100, null, null);
-        Bitmap thermalImage = ImageProcessing.convertToBitmap(thermalImagePath);
-        Bitmap imageConvertedToRgb = null;
-        double thermalImageWidth = thermalImage.getWidth();
-        double thermalImageHeight = thermalImage.getHeight();
+        Bitmap thermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
+        double thermalImageWidth = thermalImageBitmap.getWidth();
+        double thermalImageHeight = thermalImageBitmap.getHeight();
+        Bitmap rgbImageBitmap = null;
         double rgbImageWidth = 0;
         double rgbImageHeight = 0;
-        double widthScalingFactor;
-        double heightScalingFactor;
+        int verticalOffset = 15;
+        int horizontalOffset = 10;
 
         try {
             ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
-            JavaImageBuffer rgbImage = thermalImageFile.getFusion().getPhoto();
-            imageConvertedToRgb = BitmapAndroid.createBitmap(rgbImage).getBitMap();
-            rgbImageWidth = imageConvertedToRgb.getWidth();
-            rgbImageHeight = imageConvertedToRgb.getHeight();
+            thermalImageFile.getFusion().setFusionMode(FusionMode.VISUAL_ONLY);
+            JavaImageBuffer javaImageBuffer = thermalImageFile.getImage();
+            rgbImageBitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
+            rgbImageWidth = rgbImageBitmap.getWidth();
+            rgbImageHeight = rgbImageBitmap.getHeight();
         }
         catch (IOException e) {
-            Logging.error("getGradientAndPosition", e);
+            Logging.error("getGradientAndPositions", e);
         }
 
-        widthScalingFactor = thermalImageWidth / rgbImageWidth;
-        heightScalingFactor = thermalImageHeight / rgbImageHeight;
+        double widthScalingFactor = thermalImageWidth / rgbImageWidth;
+        double heightScalingFactor = thermalImageHeight / rgbImageHeight;
 
-        FirebaseVisionImage firebaseVisionImage = ImageProcessing.convertToFirebaseVisionImage(imageConvertedToRgb);
+        FirebaseVisionImage firebaseVisionImage = ImageProcessing.convertToFirebaseVisionImage(rgbImageBitmap);
 
         FirebaseVisionFaceDetectorOptions options =
                 new FirebaseVisionFaceDetectorOptions.Builder()
@@ -101,11 +103,11 @@ public class RgbThermalAlgorithm {
 
                                             FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
                                             if (leftEye != null) {
-                                                gradientAndPositions.setEyePosition(new int[]{(int) (leftEye.getPosition().getX() * widthScalingFactor), (int) (leftEye.getPosition().getY() * heightScalingFactor)});
+                                                gradientAndPositions.setEyePosition(new int[]{(int) (leftEye.getPosition().getX() * widthScalingFactor + horizontalOffset), (int) (leftEye.getPosition().getY() * heightScalingFactor + verticalOffset)});
                                             }
                                             FirebaseVisionFaceLandmark nose = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE);
                                             if (nose != null) {
-                                                gradientAndPositions.setNosePosition(new int[]{(int) (nose.getPosition().getX() * widthScalingFactor), (int) (nose.getPosition().getY() * heightScalingFactor)});
+                                                gradientAndPositions.setNosePosition(new int[]{(int) (nose.getPosition().getX() * widthScalingFactor), (int) (nose.getPosition().getY() * heightScalingFactor + verticalOffset)});
                                             }
 
                                             ((MarkerActivity) markerActivityReference).setPicture(gradientAndPositions);
