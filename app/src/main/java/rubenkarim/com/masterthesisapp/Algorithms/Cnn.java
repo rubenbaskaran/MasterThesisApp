@@ -44,29 +44,50 @@ public class Cnn extends AbstractAlgorithm {
         this.mthermalImageFile = mThermalImage;
     }
 
+    private class BitmapWithBordersInfo {
+        private Bitmap thermalImg;
+        private float offsetX;
+        private float offsetY;
+
+        public BitmapWithBordersInfo(Bitmap thermalImg, float offsetX, float offsetY) {
+            this.thermalImg = thermalImg;
+            this.offsetX = offsetX;
+            this.offsetY = offsetY;
+        }
+
+        public Bitmap getThermalImg() {
+            return thermalImg;
+        }
+
+        public float getOffsetX() {
+            return offsetX;
+        }
+
+        public float getOffsetY() {
+            return offsetY;
+        }
+    }
+
     @Override
     public GradientModel getGradientAndPositions() {
         //Input
         int[] imgShapeInput = mTflite.getInputTensor(0).shape(); // {1, 240, 320, 1}
-        DataType dataTypeInput = mTflite.getInputTensor(0).dataType(); //FLOAT32
-        TensorImage inputImageBuffer = new TensorImage(dataTypeInput);
         mthermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
         //Bitmap grayBitmap = toGrayscale(mImageBitmap);
         Bitmap thermalImage = getBitmap(mthermalImageFile);
 
-        //somePretrained networks only inputs rects.
-        int cnnImgInputSize = 320;
-        if(imgShouldBeRect){
-            addBlackBorder(thermalImage, cnnImgInputSize);
-        }
-
-        inputImageBuffer.load(thermalImage);
         float heightProportion = (float) thermalImage.getHeight() / imgShapeInput[1];
         float widthProportion = (float) thermalImage.getWidth() / imgShapeInput[2];
-        ImageProcessor imageProcessor = new ImageProcessor.Builder()
-                .add(new ResizeOp(imgShapeInput[1], imgShapeInput[2], ResizeOp.ResizeMethod.NEAREST_NEIGHBOR))
-                .add(new NormalizeOp(0, 255)).build();
-        TensorImage tensorImage = imageProcessor.process(inputImageBuffer);
+
+        TensorImage tensorImage;
+        int cnnImgInputSize = 640;
+        if(imgShouldBeRect){ //somePretrained networks only inputs rects.
+            BitmapWithBordersInfo bitmapWithBordersInfo = addBlackBorder(thermalImage, cnnImgInputSize);
+            tensorImage = getTensorImage(imgShapeInput, bitmapWithBordersInfo.getThermalImg());
+
+        } else {
+            tensorImage = getTensorImage(imgShapeInput, thermalImage);
+        }
 
         //Output
         int[] probabilityShapeOutput = mTflite.getOutputTensor(0).shape();//{1,6}
@@ -86,6 +107,16 @@ public class Cnn extends AbstractAlgorithm {
             }
         }
         return super.calculateGradient(results, mthermalImageFile);
+    }
+
+    private TensorImage getTensorImage(int[] imgShapeInput, Bitmap thermalImage) {
+        DataType dataTypeInput = mTflite.getInputTensor(0).dataType(); //FLOAT32
+        TensorImage inputImageBuffer = new TensorImage(dataTypeInput);
+        ImageProcessor imageProcessor = new ImageProcessor.Builder()
+                .add(new ResizeOp(imgShapeInput[1], imgShapeInput[2], ResizeOp.ResizeMethod.NEAREST_NEIGHBOR))
+                .add(new NormalizeOp(0, 255)).build();
+        inputImageBuffer.load(thermalImage);
+        return imageProcessor.process(inputImageBuffer);
     }
 
     private Bitmap getBitmap(ThermalImageFile thermalImageFile) {
@@ -118,7 +149,7 @@ public class Cnn extends AbstractAlgorithm {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
 
-    private Bitmap addBlackBorder(Bitmap bmp, int minImgSize) {
+    private BitmapWithBordersInfo addBlackBorder(Bitmap bmp, int minImgSize) {
         Bitmap bmpWithBorder;
         int bmpAddWidth = minImgSize - bmp.getWidth();
         int bmpAddHeight = minImgSize - bmp.getHeight();
@@ -129,10 +160,10 @@ public class Cnn extends AbstractAlgorithm {
         bmpWithBorder = Bitmap.createBitmap(newImgWidth, newImgHeight, bmp.getConfig());
         Canvas canvas = new Canvas(bmpWithBorder);
         canvas.drawColor(Color.BLACK);
-        float imfHeightOffset = bmpAddHeight >= 0? (float) (bmpAddHeight / 2.0) : 0;
-        float imfWidthOffset = bmpAddWidth >= 0? (float) (bmpAddWidth / 2.0) : 0;
-        canvas.drawBitmap(bmp, imfWidthOffset, imfHeightOffset, null);
-        return bmpWithBorder;
+        float imgHeightOffset = bmpAddHeight >= 0? (float) (bmpAddHeight / 2.0) : 0;
+        float imgWidthOffset = bmpAddWidth >= 0? (float) (bmpAddWidth / 2.0) : 0;
+        canvas.drawBitmap(bmp, imgWidthOffset, imgHeightOffset, null);
+        return new BitmapWithBordersInfo(bmpWithBorder, imgWidthOffset, imgHeightOffset);
     }
 
 }
