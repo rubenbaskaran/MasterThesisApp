@@ -19,10 +19,10 @@ public class Scaling {
         int imageContainerHeight = imageContainerDimensions[1];
 
         // Check whether coordinates are inside image boundaries
-        positionInCapturedImage[0] = Math.max(positionInCapturedImage[0], 0);
-        positionInCapturedImage[1] = Math.max(positionInCapturedImage[1], 0);
-        positionInCapturedImage[0] = Math.min(positionInCapturedImage[0], capturedImageWidth-1);
-        positionInCapturedImage[1] = Math.min(positionInCapturedImage[1], capturedImageHeight-1);
+        positionInCapturedImage[0] = Math.max(positionInCapturedImage[0], 10);
+        positionInCapturedImage[1] = Math.max(positionInCapturedImage[1], 10);
+        positionInCapturedImage[0] = Math.min(positionInCapturedImage[0], capturedImageWidth-10);
+        positionInCapturedImage[1] = Math.min(positionInCapturedImage[1], capturedImageHeight-10);
 
         double scalingFactorX = (double)imageContainerWidth / (double)capturedImageWidth;
         double scalingFactorY = (double)imageContainerHeight / (double)capturedImageHeight;
@@ -30,10 +30,10 @@ public class Scaling {
         double positionInImageContainerY = (double)positionInCapturedImage[1] * scalingFactorY;
 
         // Check whether coordinates are inside screen boundaries
-        positionInImageContainerX = Math.max(positionInImageContainerX, 0);
-        positionInImageContainerY = Math.max(positionInImageContainerY, 0);
-        positionInImageContainerX = Math.min(positionInImageContainerX, imageContainerWidth-1);
-        positionInImageContainerY = Math.min(positionInImageContainerY, imageContainerHeight-1);
+        positionInImageContainerX = Math.max(positionInImageContainerX, 10);
+        positionInImageContainerY = Math.max(positionInImageContainerY, 10);
+        positionInImageContainerX = Math.min(positionInImageContainerX, imageContainerWidth-10);
+        positionInImageContainerY = Math.min(positionInImageContainerY, imageContainerHeight-10);
 
         return new int[]{(int)positionInImageContainerX, (int)positionInImageContainerY};
     }
@@ -45,10 +45,10 @@ public class Scaling {
         int imageContainerHeight = imageContainerDimensions[1];
 
         // Check whether coordinates are inside screen boundaries
-        positionInImageContainer[0] = Math.max(positionInImageContainer[0], 0);
-        positionInImageContainer[1] = Math.max(positionInImageContainer[1], 0);
-        positionInImageContainer[0] = Math.min(positionInImageContainer[0], imageContainerWidth-1);
-        positionInImageContainer[1] = Math.min(positionInImageContainer[1], imageContainerHeight-1);
+        positionInImageContainer[0] = Math.max(positionInImageContainer[0], 10);
+        positionInImageContainer[1] = Math.max(positionInImageContainer[1], 10);
+        positionInImageContainer[0] = Math.min(positionInImageContainer[0], imageContainerWidth-10);
+        positionInImageContainer[1] = Math.min(positionInImageContainer[1], imageContainerHeight-10);
 
         double scalingFactorX = (double) imageContainerWidth / (double) capturedImageWidth;
         double scalingFactorY = (double) imageContainerHeight / (double) capturedImageHeight;
@@ -56,10 +56,10 @@ public class Scaling {
         double positionInCapturedImageY = (double)positionInImageContainer[1] / scalingFactorY;
 
         // Check whether coordinates are inside image boundaries
-        positionInCapturedImageX = Math.max(positionInCapturedImageX, 0);
-        positionInCapturedImageY = Math.max(positionInCapturedImageY, 0);
-        positionInCapturedImageX = Math.min(positionInCapturedImageX, capturedImageWidth-1);
-        positionInCapturedImageY = Math.min(positionInCapturedImageY, capturedImageHeight-1);
+        positionInCapturedImageX = Math.max(positionInCapturedImageX, 10);
+        positionInCapturedImageY = Math.max(positionInCapturedImageY, 10);
+        positionInCapturedImageX = Math.min(positionInCapturedImageX, capturedImageWidth-10);
+        positionInCapturedImageY = Math.min(positionInCapturedImageY, capturedImageHeight-10);
 
         return new int[]{(int)positionInCapturedImageX, (int)positionInCapturedImageY};
     }

@@ -18,6 +18,8 @@ import android.widget.RelativeLayout;
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.ThermalImageFile;
 
+import java.io.ByteArrayOutputStream;
+
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.Cnn;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
@@ -294,16 +296,15 @@ public class MarkerActivity extends AppCompatActivity {
                 recalculateGradient();
             }
 
-            // TODO: Save bitmap copy of image with red dots on eye and nose positions
-            Bitmap thermalImageBitmapWithDots = ImageProcessing.convertThermalImageFileToBitmap(thermalImageFile);
-            drawCircles(thermalImageBitmapWithDots, gradientAndPositions.getEyePosition(), gradientAndPositions.getNosePosition());
+            Bitmap thermalImageBitmapWithMarkers = ImageProcessing.convertThermalImageFileToBitmap(thermalImageFile);
+            drawCircles(thermalImageBitmapWithMarkers, gradientAndPositions.getEyePosition(), gradientAndPositions.getNosePosition());
 
             Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
             intent.putExtra("thermalImagePath", thermalImagePath);
             intent.putExtra("imageHeight", imageHeight);
             intent.putExtra("imageWidth", imageWidth);
             intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
-            // TODO: Pass thermalImageBitmapWithDots to OverviewActivity
+            intent.putExtra("thermalImageByteArrayWithMarkers", convertBitmapToByteArray(thermalImageBitmapWithMarkers));
             Bundle bundle = new Bundle();
             bundle.putSerializable("gradientAndPositions", gradientAndPositions);
             addMinMaxDataIfChosen(bundle);
@@ -315,10 +316,23 @@ public class MarkerActivity extends AppCompatActivity {
         }
     }
 
-    private void drawCircles(Bitmap bitmap, int[] eye, int[] nose){
-        // TODO: Draw additional dots next to location
-        bitmap.setPixel(eye[0], eye[1], Color.RED);
-        bitmap.setPixel(nose[0], nose[1], Color.RED);
+    private void drawCircles(Bitmap bitmap, int[] eye, int[] nose) {
+        for (int i = 0; i < 10; i++) {
+            bitmap.setPixel(eye[0]+i, eye[1], Color.RED);
+            bitmap.setPixel(eye[0]-i, eye[1], Color.RED);
+            bitmap.setPixel(eye[0], eye[1]+i, Color.RED);
+            bitmap.setPixel(eye[0], eye[1]-i, Color.RED);
+            bitmap.setPixel(nose[0]+i, nose[1], Color.RED);
+            bitmap.setPixel(nose[0]-i, nose[1], Color.RED);
+            bitmap.setPixel(nose[0], nose[1]+i, Color.RED);
+            bitmap.setPixel(nose[0], nose[1]-i, Color.RED);
+        }
+    }
+
+    private byte[] convertBitmapToByteArray(Bitmap thermalImageBitmapWithDots){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        thermalImageBitmapWithDots.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
     }
 
     private void recalculateGradient() {
