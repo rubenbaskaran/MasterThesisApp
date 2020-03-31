@@ -52,8 +52,8 @@ public class Scaling {
 
         double scalingFactorX = (double) imageContainerWidth / (double) capturedImageWidth;
         double scalingFactorY = (double) imageContainerHeight / (double) capturedImageHeight;
-        double positionInCapturedImageX = (double)positionInImageContainer[0] * scalingFactorX;
-        double positionInCapturedImageY = (double)positionInImageContainer[1] * scalingFactorY;
+        double positionInCapturedImageX = (double)positionInImageContainer[0] / scalingFactorX;
+        double positionInCapturedImageY = (double)positionInImageContainer[1] / scalingFactorY;
 
         // Check whether coordinates are inside image boundaries
         positionInCapturedImageX = Math.max(positionInCapturedImageX, 0);
