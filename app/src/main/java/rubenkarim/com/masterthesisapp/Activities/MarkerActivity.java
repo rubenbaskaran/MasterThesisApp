@@ -40,6 +40,7 @@ public class MarkerActivity extends AppCompatActivity {
     private int imageHeight;
     private int imageWidth;
     private ImageView imageView_thermalImageContainer;
+    private RelativeLayout relativeLayout_markers;
     private GradientModel gradientAndPositions = null;
     private ThermalImageFile thermalImageFile;
     private ProgressBar progressBar_markerViewLoadingAnimation;
@@ -60,6 +61,7 @@ public class MarkerActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_marker);
             imageView_thermalImageContainer = findViewById(R.id.imageView_thermalImageContainer);
+            relativeLayout_markers = findViewById(R.id.relativeLayout_thermalImageContainer);
             progressBar_markerViewLoadingAnimation = findViewById(R.id.progressBar_markerViewLoadingAnimation);
 
             Animation.showLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
@@ -152,9 +154,6 @@ public class MarkerActivity extends AppCompatActivity {
 
     private void addMarkers(int[] capturedImageDimensions, int[] imageContainerDimensions, int horizontalOffset) {
         try {
-            int markerWidthHeight = 200;
-
-            RelativeLayout relativeLayout_markers = findViewById(R.id.relativeLayout_thermalImageContainer);
             ImageView imageView_eyeMarker = new ImageView(this);
             ImageView imageView_noseMarker = new ImageView(this);
 
@@ -166,6 +165,7 @@ public class MarkerActivity extends AppCompatActivity {
 
             SetOnTouchListener(imageView_noseMarker);
             SetOnTouchListener(imageView_eyeMarker);
+            int markerWidthHeight = ((BitmapDrawable) imageView_eyeMarker.getDrawable()).getBitmap().getWidth();
 
             RelativeLayout.LayoutParams eyeParams = new RelativeLayout.LayoutParams(markerWidthHeight, markerWidthHeight);
             int[] scaledEyeMarkerPosition = Scaling.upscaleCoordinatesFromImageToScreen(gradientAndPositions.getEyePosition(), capturedImageDimensions, imageContainerDimensions);
@@ -301,6 +301,7 @@ public class MarkerActivity extends AppCompatActivity {
             intent.putExtra("thermalImagePath", thermalImagePath);
             intent.putExtra("imageHeight", imageHeight);
             intent.putExtra("imageWidth", imageWidth);
+            intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
             Bundle bundle = new Bundle();
             bundle.putSerializable("gradientAndPositions", gradientAndPositions);
             addMinMaxDataIfChosen(bundle);
