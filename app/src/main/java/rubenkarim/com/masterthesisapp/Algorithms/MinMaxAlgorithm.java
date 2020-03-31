@@ -2,10 +2,13 @@ package rubenkarim.com.masterthesisapp.Algorithms;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.util.Log;
+
+import com.flir.thermalsdk.image.ImageFactory;
+import com.flir.thermalsdk.image.ThermalImageFile;
+
+import java.io.IOException;
 
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
-import rubenkarim.com.masterthesisapp.Models.InterestPointModel;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
@@ -22,10 +25,12 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     private int[] center;
     private int radius;
     private Bitmap capturedImageBitmap;
+    private String thermalImagePath;
     //endregion
 
     public MinMaxAlgorithm(String imagePath, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) {
         try {
+            thermalImagePath = imagePath;
             ImageProcessing.FixImageOrientation(imagePath);
             capturedImageBitmap = ImageProcessing.convertToBitmap(imagePath);
 
@@ -54,30 +59,26 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     @Override
     public GradientModel getGradientAndPositions() {
         try {
-            InterestPointModel leftEyeMax = getMaxMinSpotInRoi(leftEye, "max");
-            InterestPointModel rightEyeMax = getMaxMinSpotInRoi(rightEye, "max");
-            InterestPointModel noseMin = getMaxMinSpotInRoi(nose, "min");
+            int[] rightEyeMax = getMaxMinSpotInRoi(rightEye, "max");
+            int[] leftEyeMax = getMaxMinSpotInRoi(leftEye, "max");
+            int[] noseMin = getMaxMinSpotInRoi(nose, "min");
 
-            if (leftEyeMax.getValue() > rightEyeMax.getValue()) {
-                Log.e("MinMaxAlgorithm - getGradientAndPositions - returned", "left eye x: " + leftEyeMax.getPosition()[0] + ", left eye y: " + leftEyeMax.getPosition()[1]
-                        + ". nose x: " + noseMin.getPosition()[0] + ", nose y: " + noseMin.getPosition()[1]
-                        + ". original image x: " + capturedImageBitmap.getWidth() + ", original image y: " + capturedImageBitmap.getHeight());
-                return new GradientModel(leftEyeMax.getValue() - noseMin.getValue(), leftEyeMax.getPosition(), noseMin.getPosition());
-            }
-            else {
-                Log.e("MinMaxAlgorithm - getGradientAndPositions - returned", "right eye x: " + rightEyeMax.getPosition()[0] + ", right eye y: " + rightEyeMax.getPosition()[1]
-                        + ". nose x: " + noseMin.getPosition()[0] + ", nose y: " + noseMin.getPosition()[1]
-                        + ". original image x: " + capturedImageBitmap.getWidth() + ", original image y: " + capturedImageBitmap.getHeight());
-                return new GradientModel(rightEyeMax.getValue() - noseMin.getValue(), rightEyeMax.getPosition(), noseMin.getPosition());
-            }
+            return super.calculateGradient(
+                    rightEyeMax[0],
+                    rightEyeMax[1],
+                    leftEyeMax[0],
+                    leftEyeMax[1],
+                    noseMin[0],
+                    noseMin[1],
+                    (ThermalImageFile) ImageFactory.createImage(thermalImagePath));
         }
-        catch (Exception e) {
+        catch (IOException e) {
             Logging.error("getGradientAndPositions", e);
-            throw e;
+            return null;
         }
     }
 
-    private InterestPointModel getMaxMinSpotInRoi(RoiModel roiCircle, String category) {
+    private int[] getMaxMinSpotInRoi(RoiModel roiCircle, String category) {
         try {
             int[] leftUpperCornerLocation = roiCircle.getUpperLeftCornerLocation();
             center = new int[]{leftUpperCornerLocation[0] + radius, leftUpperCornerLocation[1] + radius};
@@ -109,11 +110,11 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
                 }
             }
 
-            return new InterestPointModel(category.equals("max") ? maxValue : minValue, position);
+            return position;
         }
         catch (Exception e) {
             Logging.error("getMaxMinSpotInRoi", e);
-            throw e;
+            return null;
         }
     }
 

@@ -15,13 +15,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.ImageFactory;
-import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
-import com.flir.thermalsdk.image.fusion.FusionMode;
 
-import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.Cnn;
@@ -46,10 +43,19 @@ public class MarkerActivity extends AppCompatActivity {
     private int imageHeight;
     private int imageWidth;
     private ImageView imageView_thermalImageContainer;
-    private GradientModel gradientAndPositions;
+    private RelativeLayout relativeLayout_markers;
+    private GradientModel gradientAndPositions = null;
     private ThermalImageFile thermalImageFile;
     private ProgressBar progressBar_markerViewLoadingAnimation;
     private MinMaxDataTransferContainer minMaxData;
+    private int[] capturedImageDimensions;
+    private int[] imageContainerDimensions;
+    private int adjustedNosePositionX;
+    private int adjustedNosePositionY;
+    private int adjustedEyePositionX;
+    private int adjustedEyePositionY;
+    private boolean eyeAdjusted = false;
+    private boolean noseAdjusted = false;
     //endregion
 
     @Override
@@ -58,6 +64,7 @@ public class MarkerActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_marker);
             imageView_thermalImageContainer = findViewById(R.id.imageView_thermalImageContainer);
+            relativeLayout_markers = findViewById(R.id.relativeLayout_thermalImageContainer);
             progressBar_markerViewLoadingAnimation = findViewById(R.id.progressBar_markerViewLoadingAnimation);
 
             Animation.showLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
@@ -80,18 +87,23 @@ public class MarkerActivity extends AppCompatActivity {
             Bundle bundle = receivedIntent.getExtras();
             if (bundle != null) {
                 minMaxData = (MinMaxDataTransferContainer) bundle.getSerializable("minMaxData");
+                gradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
             }
 
-            ExecuteAlgorithm();
-        } catch (Exception e) {
+            if (gradientAndPositions == null) {
+                ExecuteAlgorithm();
+            }
+            else {
+                setPicture(gradientAndPositions);
+            }
+        }
+        catch (Exception e) {
             Logging.error("onCreate", e);
         }
     }
 
     private void ExecuteAlgorithm() {
         try {
-            GradientModel gradientAndPositions;
-
             switch (GlobalVariables.getCurrentAlgorithm()) {
                 case CNN:
                     String cnnModelFile = "RGB_yinguobingWideDens.tflite";
@@ -107,7 +119,7 @@ public class MarkerActivity extends AppCompatActivity {
                     break;
                 case RgbThermalMapping:
                     RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(this);
-                    rgbThermalAlgorithm.getGradientAndPositions(thermalImagePath);
+                    rgbThermalAlgorithm.getGradientAndPositionsAsync(thermalImagePath);
                     break;
                 case MinMaxTemplate:
                     MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
@@ -121,19 +133,6 @@ public class MarkerActivity extends AppCompatActivity {
                     break;
             }
         }
-        // TODO: Un-comment following four catch clauses when algorithms have been added and throws appropriate custom exceptions
-//        catch (CnnException e) {
-//            Logging.error("ExecuteAlgorithm", e);
-//        }
-//        catch (CnnWithTransferLearningException e) {
-//            Logging.error("ExecuteAlgorithm", e);
-//        }
-//        catch (RgbThermalMappingException e) {
-//            Logging.error("ExecuteAlgorithm", e);
-//        }
-//        catch (MaxMinTemplateException e) {
-//            Logging.error("ExecuteAlgorithm", e);
-//        }
         catch (Exception e) {
             Logging.error("ExecuteAlgorithm", e);
         }
@@ -142,17 +141,15 @@ public class MarkerActivity extends AppCompatActivity {
     public void setPicture(GradientModel gradientAndPositions) {
         try {
             this.gradientAndPositions = gradientAndPositions;
-
-            ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
-            thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
-            JavaImageBuffer javaImageBuffer = thermalImageFile.getImage();
-            Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
-
+            ImageProcessing.FixImageOrientation(thermalImagePath);
+            Bitmap originalThermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
 
             imageView_thermalImageContainer.setImageBitmap(originalThermalImageBitmap);
-            int[] imageOriginalDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
 
-            addMarkers(imageOriginalDimensions, new int[]{imageWidth, imageHeight}, imageViewVerticalOffset);
+            capturedImageDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
+            imageContainerDimensions = new int[]{imageWidth, imageHeight};
+
+            addMarkers(capturedImageDimensions, imageContainerDimensions, imageViewVerticalOffset);
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         } catch (Exception e) {
             Logging.error("setPicture", e);
@@ -160,28 +157,29 @@ public class MarkerActivity extends AppCompatActivity {
         }
     }
 
-    private void addMarkers(int[] imageOriginalDimensions, int[] imageViewDimensions, int horizontalOffset) {
+    private void addMarkers(int[] capturedImageDimensions, int[] imageContainerDimensions, int horizontalOffset) {
         try {
-            int markerWidthHeight = 200;
-
-            RelativeLayout relativeLayout_markers = findViewById(R.id.relativeLayout_thermalImageContainer);
             ImageView imageView_eyeMarker = new ImageView(this);
             ImageView imageView_noseMarker = new ImageView(this);
+
+            imageView_eyeMarker.setTag("eye");
+            imageView_noseMarker.setTag("nose");
 
             imageView_eyeMarker.setImageURI(Uri.parse("android.resource://" + this.getPackageName() + "/drawable/eye_marker"));
             imageView_noseMarker.setImageURI(Uri.parse("android.resource://" + this.getPackageName() + "/drawable/nose_marker"));
 
             SetOnTouchListener(imageView_noseMarker);
             SetOnTouchListener(imageView_eyeMarker);
+            int markerWidthHeight = ((BitmapDrawable) imageView_eyeMarker.getDrawable()).getBitmap().getWidth();
 
             RelativeLayout.LayoutParams eyeParams = new RelativeLayout.LayoutParams(markerWidthHeight, markerWidthHeight);
-            int[] scaledEyeMarkerPosition = Scaling.getScaledMarkerPosition(gradientAndPositions.getEyePosition(), imageOriginalDimensions, imageViewDimensions, horizontalOffset);
+            int[] scaledEyeMarkerPosition = Scaling.upscaleCoordinatesFromImageToScreen(gradientAndPositions.getEyePosition(), capturedImageDimensions, imageContainerDimensions);
             eyeParams.leftMargin = scaledEyeMarkerPosition[0] - markerWidthHeight / 2;
             eyeParams.topMargin = scaledEyeMarkerPosition[1] - markerWidthHeight / 2;
             relativeLayout_markers.addView(imageView_eyeMarker, eyeParams);
 
             RelativeLayout.LayoutParams noseParams = new RelativeLayout.LayoutParams(markerWidthHeight, markerWidthHeight);
-            int[] scaledNoseMarkerPosition = Scaling.getScaledMarkerPosition(gradientAndPositions.getNosePosition(), imageOriginalDimensions, imageViewDimensions, horizontalOffset);
+            int[] scaledNoseMarkerPosition = Scaling.upscaleCoordinatesFromImageToScreen(gradientAndPositions.getNosePosition(), capturedImageDimensions, imageContainerDimensions);
             noseParams.leftMargin = scaledNoseMarkerPosition[0] - markerWidthHeight / 2;
             noseParams.topMargin = scaledNoseMarkerPosition[1] - markerWidthHeight / 2;
             relativeLayout_markers.addView(imageView_noseMarker, noseParams);
@@ -189,9 +187,9 @@ public class MarkerActivity extends AppCompatActivity {
             Log.e("addMarkers", "eye x: " + eyeParams.leftMargin + ", eye y: " + eyeParams.topMargin
                     + ". nose x: " + noseParams.leftMargin + ", nose y: " + noseParams.topMargin
                     + ". imageView x: " + imageWidth + ", imageView y: " + imageHeight
-                    + ". markerWidth: " + markerWidthHeight + ". horizontal offset: " + horizontalOffset);
-        } catch (Exception e) {
-            //TODO: Handle exception
+                    + ". markerWidth: " + markerWidthHeight);
+        }
+        catch (Exception e) {
             Logging.error("addMarkers", e);
         }
     }
@@ -207,6 +205,12 @@ public class MarkerActivity extends AppCompatActivity {
                 public boolean onTouch(View v, MotionEvent event) {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_MOVE:
+                            if((StartPT.x + event.getX() - DownPT.x) < 0 || (StartPT.y + event.getY() - DownPT.y) < 0){
+                                break;
+                            }
+                            if((StartPT.x + event.getX() - DownPT.x) > imageWidth - imageView.getWidth() || (StartPT.y + event.getY() - DownPT.y) > imageHeight - imageView.getHeight()){
+                                break;
+                            }
                             imageView.setX((int) (StartPT.x + event.getX() - DownPT.x));
                             imageView.setY((int) (StartPT.y + event.getY() - DownPT.y));
                             StartPT.set(imageView.getX(), imageView.getY());
@@ -239,17 +243,28 @@ public class MarkerActivity extends AppCompatActivity {
 
             int x = coordinates[0] + markerHorizontalOffset / 2;
             int y = coordinates[1] + markerVerticalOffset / 2 - imageViewVerticalOffset;
-            // TODO: Save new coordinate for eye/nose in gradientAndPositions object (remember to scale to original image dimensions before saving)
+
+            if (marker.getTag() == "eye") {
+                adjustedEyePositionX = x;
+                adjustedEyePositionY = y;
+                eyeAdjusted = true;
+            }
+            else if (marker.getTag() == "nose") {
+                adjustedNosePositionX = x;
+                adjustedNosePositionY = y;
+                noseAdjusted = true;
+            }
             Log.e(String.valueOf(marker.getTag()), "x: " + x + ", y: " + y);
-            getPixelColor(x, y);
-        } catch (Exception e) {
+
+            //getPixelColor(x, y);
+        }
+        catch (Exception e) {
             Logging.error("getCoordinates", e);
         }
     }
 
     private void getPixelColor(int x, int y) {
         try {
-            // TODO: Test marker precision on color_test.png
             Bitmap rootElementBitmap = ImageProcessing.loadBitmapFromView(imageView_thermalImageContainer);
 
             // Setting screen boundary programmatically
@@ -258,7 +273,6 @@ public class MarkerActivity extends AppCompatActivity {
 
             int targetPixel = rootElementBitmap.getPixel(x, y);
             Log.e("Target pixel", "x: " + x + ", y: " + y);
-            // TODO: Calculate new gradient based on adjusted value for eye/nose and save in gradientAndPositions object
             Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
         } catch (Exception e) {
             Logging.error("getPixelColor", e);
@@ -277,10 +291,26 @@ public class MarkerActivity extends AppCompatActivity {
 
     public void submitOnClick(View view) {
         try {
+            if (eyeAdjusted) {
+                gradientAndPositions.setEyePosition(Scaling.downscaleCoordinatesFromScreenToImage(new int[]{adjustedEyePositionX, adjustedEyePositionY}, capturedImageDimensions, imageContainerDimensions));
+            }
+            if (noseAdjusted) {
+                gradientAndPositions.setNosePosition(Scaling.downscaleCoordinatesFromScreenToImage(new int[]{adjustedNosePositionX, adjustedNosePositionY}, capturedImageDimensions, imageContainerDimensions));
+            }
+
+            if (eyeAdjusted || noseAdjusted) {
+                recalculateGradient();
+            }
+
+            Bitmap thermalImageBitmapWithMarkers = ImageProcessing.convertThermalImageFileToBitmap(thermalImageFile);
+            drawCircles(thermalImageBitmapWithMarkers, gradientAndPositions.getEyePosition(), gradientAndPositions.getNosePosition());
+
             Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
             intent.putExtra("thermalImagePath", thermalImagePath);
             intent.putExtra("imageHeight", imageHeight);
             intent.putExtra("imageWidth", imageWidth);
+            intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
+            intent.putExtra("thermalImageByteArrayWithMarkers", convertBitmapToByteArray(thermalImageBitmapWithMarkers));
             Bundle bundle = new Bundle();
             bundle.putSerializable("gradientAndPositions", gradientAndPositions);
             addMinMaxDataIfChosen(bundle);
@@ -289,6 +319,33 @@ public class MarkerActivity extends AppCompatActivity {
         } catch (Exception e) {
             Logging.error("submitOnClick", e);
         }
+    }
+
+    private void drawCircles(Bitmap bitmap, int[] eye, int[] nose) {
+        for (int i = 0; i < 10; i++) {
+            bitmap.setPixel(eye[0]+i, eye[1], Color.RED);
+            bitmap.setPixel(eye[0]-i, eye[1], Color.RED);
+            bitmap.setPixel(eye[0], eye[1]+i, Color.RED);
+            bitmap.setPixel(eye[0], eye[1]-i, Color.RED);
+            bitmap.setPixel(nose[0]+i, nose[1], Color.RED);
+            bitmap.setPixel(nose[0]-i, nose[1], Color.RED);
+            bitmap.setPixel(nose[0], nose[1]+i, Color.RED);
+            bitmap.setPixel(nose[0], nose[1]-i, Color.RED);
+        }
+    }
+
+    private byte[] convertBitmapToByteArray(Bitmap thermalImageBitmapWithDots){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        thermalImageBitmapWithDots.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
+    }
+
+    private void recalculateGradient() {
+        thermalImageFile.getMeasurements().addSpot(gradientAndPositions.getEyePosition()[0], gradientAndPositions.getEyePosition()[1]);
+        thermalImageFile.getMeasurements().addSpot(gradientAndPositions.getNosePosition()[0], gradientAndPositions.getNosePosition()[1]);
+        double eye = thermalImageFile.getMeasurements().getSpots().get(0).getValue().value;
+        double nose = thermalImageFile.getMeasurements().getSpots().get(1).getValue().value;
+        gradientAndPositions.setGradient(eye - nose);
     }
 
     private void addMinMaxDataIfChosen(Bundle bundle) {
