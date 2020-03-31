@@ -23,6 +23,7 @@ public class OverviewActivity extends AppCompatActivity {
     private String thermalImagePath;
     private GradientModel gradientAndPositions;
     private MinMaxDataTransferContainer minMaxData;
+    private int imageViewVerticalOffset;
     //endregion
 
     @Override
@@ -41,6 +42,9 @@ public class OverviewActivity extends AppCompatActivity {
         }
         if (receivedIntent.hasExtra("imageWidth")) {
             imageWidth = receivedIntent.getIntExtra("imageWidth", 0);
+        }
+        if (receivedIntent.hasExtra("imageViewVerticalOffset")) {
+            imageViewVerticalOffset = receivedIntent.getIntExtra("imageViewVerticalOffset", 0);
         }
 
         Bundle bundle = receivedIntent.getExtras();
@@ -63,6 +67,7 @@ public class OverviewActivity extends AppCompatActivity {
         intent.putExtra("thermalImagePath", thermalImagePath);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
+        intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         Bundle bundle = new Bundle();
         bundle.putSerializable("gradientAndPositions", gradientAndPositions);
         addMinMaxDataIfChosen(bundle);
