@@ -71,17 +71,17 @@ public class Cnn extends AbstractAlgorithm {
     @Override
     public GradientModel getGradientAndPositions() {
         //Input
-        int[] imgShapeInput = mTflite.getInputTensor(0).shape(); // cnn: {1, 240, 320, 1} cnnTransferlearning: {1, 320, 320, 1}
+        int[] imgShapeInput = mTflite.getInputTensor(0).shape(); // cnn: {1, width: 240, Height: 320, 1} cnnTransferlearning: {1, 320, 320, 1}
         mthermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
         //Bitmap grayBitmap = toGrayscale(mImageBitmap);
         Bitmap thermalImage = getBitmap(mthermalImageFile);
 
-        float heightProportion = (float) thermalImage.getHeight() / imgShapeInput[2];
-        float widthProportion = (float) thermalImage.getWidth() / imgShapeInput[1];
+        float heightProportion = (float) thermalImage.getHeight() / imgShapeInput[1];
+        float widthProportion = (float) thermalImage.getWidth() / imgShapeInput[2];
 
         TensorImage tensorImage;
         int cnnImgInputSize = 640;
-        if(imgShouldBeRect){ //somePretrained networks only inputs rects.
+        if(false){ //somePretrained networks only inputs rects.
             BitmapWithBordersInfo bitmapWithBordersInfo = addBlackBorder(thermalImage, cnnImgInputSize);
             tensorImage = getTensorImage(imgShapeInput, bitmapWithBordersInfo.getThermalImg());
 
@@ -113,7 +113,7 @@ public class Cnn extends AbstractAlgorithm {
         DataType dataTypeInput = mTflite.getInputTensor(0).dataType(); //FLOAT32
         TensorImage inputImageBuffer = new TensorImage(dataTypeInput);
         ImageProcessor imageProcessor = new ImageProcessor.Builder()
-                .add(new ResizeOp(imgShapeInput[2], imgShapeInput[1], ResizeOp.ResizeMethod.NEAREST_NEIGHBOR))
+                .add(new ResizeOp(imgShapeInput[1], imgShapeInput[2], ResizeOp.ResizeMethod.BILINEAR))
                 .add(new NormalizeOp(0, 255)).build();
         inputImageBuffer.load(thermalImage);
         return imageProcessor.process(inputImageBuffer);

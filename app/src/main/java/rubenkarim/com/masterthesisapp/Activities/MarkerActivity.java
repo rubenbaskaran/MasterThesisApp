@@ -82,8 +82,7 @@ public class MarkerActivity extends AppCompatActivity {
             }
 
             ExecuteAlgorithm();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("onCreate", e);
         }
     }
@@ -142,32 +141,19 @@ public class MarkerActivity extends AppCompatActivity {
     public void setPicture(GradientModel gradientAndPositions) {
         try {
             this.gradientAndPositions = gradientAndPositions;
-            Bitmap originalThermalImageBitmap = null;
-            ImageProcessing.FixImageOrientation(thermalImagePath);
 
-            if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.RgbThermalMapping) {
-                try {
-                    ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
-                    thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
-                    JavaImageBuffer javaImageBuffer = thermalImageFile.getImage();
-                    originalThermalImageBitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
-                }
-                catch (IOException e) {
-                    //TODO: handle exception
-                    Logging.error("getGradientAndPositions", e);
-                }
-            }
-            else {
-                originalThermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
-            }
+            ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
+            thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+            JavaImageBuffer javaImageBuffer = thermalImageFile.getImage();
+            Bitmap originalThermalImageBitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
+
 
             imageView_thermalImageContainer.setImageBitmap(originalThermalImageBitmap);
             int[] imageOriginalDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
 
             addMarkers(imageOriginalDimensions, new int[]{imageWidth, imageHeight}, imageViewVerticalOffset);
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("setPicture", e);
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         }
@@ -203,8 +189,7 @@ public class MarkerActivity extends AppCompatActivity {
                     + ". nose x: " + noseParams.leftMargin + ", nose y: " + noseParams.topMargin
                     + ". imageView x: " + imageWidth + ", imageView y: " + imageHeight
                     + ". markerWidth: " + markerWidthHeight + ". horizontal offset: " + horizontalOffset);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             //TODO: Handle exception
             Logging.error("addMarkers", e);
         }
@@ -238,8 +223,7 @@ public class MarkerActivity extends AppCompatActivity {
                     return true;
                 }
             });
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("SetOnTouchListener", e);
         }
     }
@@ -257,8 +241,7 @@ public class MarkerActivity extends AppCompatActivity {
             // TODO: Save new coordinate for eye/nose in gradientAndPositions object (remember to scale to original image dimensions before saving)
             Log.e(String.valueOf(marker.getTag()), "x: " + x + ", y: " + y);
             getPixelColor(x, y);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("getCoordinates", e);
         }
     }
@@ -276,8 +259,7 @@ public class MarkerActivity extends AppCompatActivity {
             Log.e("Target pixel", "x: " + x + ", y: " + y);
             // TODO: Calculate new gradient based on adjusted value for eye/nose and save in gradientAndPositions object
             Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("getPixelColor", e);
         }
     }
@@ -287,8 +269,7 @@ public class MarkerActivity extends AppCompatActivity {
         try {
             Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
             startActivity(intent);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("backOnClick", e);
         }
     }
@@ -304,8 +285,7 @@ public class MarkerActivity extends AppCompatActivity {
             addMinMaxDataIfChosen(bundle);
             intent.putExtras(bundle);
             startActivity(intent);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Logging.error("submitOnClick", e);
         }
     }
