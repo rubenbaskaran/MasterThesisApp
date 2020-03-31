@@ -40,7 +40,8 @@
             android:layout_weight="0.5"
             android:background="@color/colorAccent"
             android:gravity="center"
-            android:text="Gradient" />
+            android:text="Gradient"
+            android:maxLength="7"/>
 
         <TextView
             android:layout_width="0dp"
