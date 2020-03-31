@@ -121,19 +121,6 @@ public class MarkerActivity extends AppCompatActivity {
                     break;
             }
         }
-        // TODO: Un-comment following four catch clauses when algorithms have been added and throws appropriate custom exceptions
-//        catch (CnnException e) {
-//            Logging.error("ExecuteAlgorithm", e);
-//        }
-//        catch (CnnWithTransferLearningException e) {
-//            Logging.error("ExecuteAlgorithm", e);
-//        }
-//        catch (RgbThermalMappingException e) {
-//            Logging.error("ExecuteAlgorithm", e);
-//        }
-//        catch (MaxMinTemplateException e) {
-//            Logging.error("ExecuteAlgorithm", e);
-//        }
         catch (Exception e) {
             Logging.error("ExecuteAlgorithm", e);
         }
@@ -264,7 +251,6 @@ public class MarkerActivity extends AppCompatActivity {
 
     private void getPixelColor(int x, int y) {
         try {
-            // TODO: Test marker precision on color_test.png
             Bitmap rootElementBitmap = ImageProcessing.loadBitmapFromView(imageView_thermalImageContainer);
 
             // Setting screen boundary programmatically
@@ -300,7 +286,7 @@ public class MarkerActivity extends AppCompatActivity {
                 gradientAndPositions.setNosePosition(Scaling.downscaleCoordinatesFromScreenToImage(new int[]{adjustedNosePositionX, adjustedNosePositionY}, capturedImageDimensions, imageContainerDimensions));
             }
 
-            // TODO: Calculate new gradient based on adjusted value for eye/nose and save in gradientAndPositions object
+            // TODO: Calculate new temperature gradient based on adjusted value for eye/nose and save in gradientAndPositions object
 
             Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
             intent.putExtra("thermalImagePath", thermalImagePath);
