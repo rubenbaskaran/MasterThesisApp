@@ -12,12 +12,21 @@ public class Scaling {
         return new RoiModel(new int[]{(int) positionX, (int) positionY}, (int) width, (int) height);
     }
 
-    public static int[] getScaledMarkerPosition(int[] markerPosition, int[] imageOriginalDimensions, int[] imageViewDimensions, int horizontalOffset) {
-        double scalingFactorX = (double)imageOriginalDimensions[0] / (double)imageViewDimensions[0];
-        double scalingFactorY = (double)imageOriginalDimensions[1] / (double)imageViewDimensions[1];
-        double positionX = (double)markerPosition[0] / scalingFactorX;
-        double positionY = (double)markerPosition[1] / scalingFactorY;
+    public static int[] upscaleCoordinatesFromImageToScreen(int[] positionInCapturedImage, int[] capturedImageDimensions, int[] imageContainerDimensions) {
+        double scalingFactorX = (double)imageContainerDimensions[0] / (double)capturedImageDimensions[0];
+        double scalingFactorY = (double)imageContainerDimensions[1] / (double)capturedImageDimensions[1];
+        double positionInImageContainerX = (double)positionInCapturedImage[0] * scalingFactorX;
+        double positionInImageContainerY = (double)positionInCapturedImage[1] * scalingFactorY;
 
-        return new int[]{(int)positionX, (int)positionY};
+        return new int[]{(int)positionInImageContainerX, (int)positionInImageContainerY};
+    }
+
+    public static int[] downscaleCoordinatesFromScreenToImage(int[] positionInImageContainer, int[] capturedImageDimensions, int[] imageContainerDimensions) {
+        double scalingFactorX = (double)capturedImageDimensions[0] / (double)imageContainerDimensions[0];
+        double scalingFactorY = (double)capturedImageDimensions[1] / (double)imageContainerDimensions[1];
+        double positionInCapturedImageX = (double)positionInImageContainer[0] * scalingFactorX;
+        double positionInCapturedImageY = (double)positionInImageContainer[1] * scalingFactorY;
+
+        return new int[]{(int)positionInCapturedImageX, (int)positionInCapturedImageY};
     }
 }
