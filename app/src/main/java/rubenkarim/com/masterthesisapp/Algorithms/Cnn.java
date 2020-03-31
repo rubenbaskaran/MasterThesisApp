@@ -59,11 +59,11 @@ public class Cnn extends AbstractAlgorithm {
             return thermalImg;
         }
 
-        public float getOffsetX() {
+        public float getOffsetWidth() {
             return offsetX;
         }
 
-        public float getOffsetY() {
+        public float getOffsetHeight() {
             return offsetY;
         }
     }
@@ -79,10 +79,12 @@ public class Cnn extends AbstractAlgorithm {
         float heightProportion = (float) thermalImage.getHeight() / imgShapeInput[1];
         float widthProportion = (float) thermalImage.getWidth() / imgShapeInput[2];
 
+        BitmapWithBordersInfo bitmapWithBordersInfo = null;
         TensorImage tensorImage;
         int cnnImgInputSize = 640;
-        if(false){ //somePretrained networks only inputs rects.
-            BitmapWithBordersInfo bitmapWithBordersInfo = addBlackBorder(thermalImage, cnnImgInputSize);
+        if(imgShouldBeRect){ //somePretrained networks only inputs rects.
+
+            bitmapWithBordersInfo = addBlackBorder(thermalImage, cnnImgInputSize);
             tensorImage = getTensorImage(imgShapeInput, bitmapWithBordersInfo.getThermalImg());
 
         } else {
@@ -106,6 +108,17 @@ public class Cnn extends AbstractAlgorithm {
                 results[i] = scaledResults[i] * heightProportion;
             }
         }
+
+        if(imgShouldBeRect){
+            for (int i = 0; i < results.length; i++) {
+                if (i % 2 == 0) {
+                    results[i] = results[i]; //- bitmapWithBordersInfo.getOffsetWidth();
+                } else {
+                    results[i] = results[i] +80;
+                }
+            }
+        }
+
         return super.calculateGradient(results, mthermalImageFile);
     }
 
