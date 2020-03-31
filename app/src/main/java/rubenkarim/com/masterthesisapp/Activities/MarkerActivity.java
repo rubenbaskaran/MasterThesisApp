@@ -18,6 +18,8 @@ import android.widget.RelativeLayout;
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.ThermalImageFile;
 
+import java.io.ByteArrayOutputStream;
+
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.Cnn;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
@@ -95,7 +97,6 @@ public class MarkerActivity extends AppCompatActivity {
             }
         }
         catch (Exception e) {
-            //FIXME: Catch the expected exception and handle it properly!
             Logging.error("onCreate", e);
         }
     }
@@ -129,7 +130,6 @@ public class MarkerActivity extends AppCompatActivity {
             }
         }
         catch (Exception e) {
-            //FIXME: Catch the expected exception and handle it properly!
             Logging.error("ExecuteAlgorithm", e);
         }
     }
@@ -149,7 +149,6 @@ public class MarkerActivity extends AppCompatActivity {
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         }
         catch (Exception e) {
-            //FIXME: Catch the expected exception and handle it properly!
             Logging.error("setPicture", e);
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         }
@@ -188,7 +187,6 @@ public class MarkerActivity extends AppCompatActivity {
                     + ". markerWidth: " + markerWidthHeight);
         }
         catch (Exception e) {
-            //FIXME: Catch the expected exception and handle it properly!
             Logging.error("addMarkers", e);
         }
     }
@@ -204,6 +202,12 @@ public class MarkerActivity extends AppCompatActivity {
                 public boolean onTouch(View v, MotionEvent event) {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_MOVE:
+                            if((StartPT.x + event.getX() - DownPT.x) < 0 || (StartPT.y + event.getY() - DownPT.y) < 0){
+                                break;
+                            }
+                            if((StartPT.x + event.getX() - DownPT.x) > imageWidth - imageView.getWidth() || (StartPT.y + event.getY() - DownPT.y) > imageHeight - imageView.getHeight()){
+                                break;
+                            }
                             imageView.setX((int) (StartPT.x + event.getX() - DownPT.x));
                             imageView.setY((int) (StartPT.y + event.getY() - DownPT.y));
                             StartPT.set(imageView.getX(), imageView.getY());
@@ -298,14 +302,15 @@ public class MarkerActivity extends AppCompatActivity {
                 recalculateGradient();
             }
 
-            // TODO: Save copy of image with red dots on eye and nose positions
-            Bitmap markerImage = ImageProcessing.convertThermalImageFileToBitmap(thermalImageFile);
+            Bitmap thermalImageBitmapWithMarkers = ImageProcessing.convertThermalImageFileToBitmap(thermalImageFile);
+            drawCircles(thermalImageBitmapWithMarkers, gradientAndPositions.getEyePosition(), gradientAndPositions.getNosePosition());
 
             Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
             intent.putExtra("thermalImagePath", thermalImagePath);
             intent.putExtra("imageHeight", imageHeight);
             intent.putExtra("imageWidth", imageWidth);
             intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
+            intent.putExtra("thermalImageByteArrayWithMarkers", convertBitmapToByteArray(thermalImageBitmapWithMarkers));
             Bundle bundle = new Bundle();
             bundle.putSerializable("gradientAndPositions", gradientAndPositions);
             addMinMaxDataIfChosen(bundle);
@@ -315,6 +320,25 @@ public class MarkerActivity extends AppCompatActivity {
         catch (Exception e) {
             Logging.error("submitOnClick", e);
         }
+    }
+
+    private void drawCircles(Bitmap bitmap, int[] eye, int[] nose) {
+        for (int i = 0; i < 10; i++) {
+            bitmap.setPixel(eye[0]+i, eye[1], Color.RED);
+            bitmap.setPixel(eye[0]-i, eye[1], Color.RED);
+            bitmap.setPixel(eye[0], eye[1]+i, Color.RED);
+            bitmap.setPixel(eye[0], eye[1]-i, Color.RED);
+            bitmap.setPixel(nose[0]+i, nose[1], Color.RED);
+            bitmap.setPixel(nose[0]-i, nose[1], Color.RED);
+            bitmap.setPixel(nose[0], nose[1]+i, Color.RED);
+            bitmap.setPixel(nose[0], nose[1]-i, Color.RED);
+        }
+    }
+
+    private byte[] convertBitmapToByteArray(Bitmap thermalImageBitmapWithDots){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        thermalImageBitmapWithDots.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
     }
 
     private void recalculateGradient() {

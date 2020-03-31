@@ -1,6 +1,8 @@
 package rubenkarim.com.masterthesisapp.Activities;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -24,6 +26,7 @@ public class OverviewActivity extends AppCompatActivity {
     private GradientModel gradientAndPositions;
     private MinMaxDataTransferContainer minMaxData;
     private int imageViewVerticalOffset;
+    private Bitmap thermalImageBitmapWithMarkers;
     //endregion
 
     @Override
@@ -46,6 +49,11 @@ public class OverviewActivity extends AppCompatActivity {
         if (receivedIntent.hasExtra("imageViewVerticalOffset")) {
             imageViewVerticalOffset = receivedIntent.getIntExtra("imageViewVerticalOffset", 0);
         }
+        if (receivedIntent.hasExtra("thermalImageByteArrayWithMarkers")) {
+            byte[] byteArray = getIntent().getByteArrayExtra("thermalImageByteArrayWithMarkers");
+            thermalImageBitmapWithMarkers = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+        }
+
 
         Bundle bundle = receivedIntent.getExtras();
         if (bundle != null) {
@@ -59,7 +67,7 @@ public class OverviewActivity extends AppCompatActivity {
     }
 
     private void setPicture() {
-        imageView_thermalImageContainer.setImageURI(Uri.parse(thermalImagePath));
+        imageView_thermalImageContainer.setImageBitmap(thermalImageBitmapWithMarkers);
     }
 
     public void backOnClick(View view) {
