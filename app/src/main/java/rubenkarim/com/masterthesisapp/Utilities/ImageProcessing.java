@@ -8,6 +8,9 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.view.View;
 
+import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
+import com.flir.thermalsdk.image.JavaImageBuffer;
+import com.flir.thermalsdk.image.ThermalImageFile;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 
 import java.io.FileOutputStream;
@@ -104,5 +107,10 @@ public class ImageProcessing {
 
     public static FirebaseVisionImage convertToFirebaseVisionImage(Bitmap bitmap) {
         return FirebaseVisionImage.fromBitmap(bitmap);
+    }
+
+    public static Bitmap convertThermalImageFileToBitmap(ThermalImageFile thermalImageFile) {
+        JavaImageBuffer javaBuffer = thermalImageFile.getImage();
+        return BitmapAndroid.createBitmap(javaBuffer).getBitMap();
     }
 }

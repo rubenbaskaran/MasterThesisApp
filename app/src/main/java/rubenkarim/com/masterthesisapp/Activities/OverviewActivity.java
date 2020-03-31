@@ -79,8 +79,6 @@ public class OverviewActivity extends AppCompatActivity {
     public void saveOnClick(View view) {
         String cpr = textView_cprNumber.getText().toString();
 
-        // TODO: Save copy of image with red dots on eye and nose positions
-
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
     }

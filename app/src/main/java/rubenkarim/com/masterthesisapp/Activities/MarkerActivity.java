@@ -40,7 +40,7 @@ public class MarkerActivity extends AppCompatActivity {
     private int imageHeight;
     private int imageWidth;
     private ImageView imageView_thermalImageContainer;
-    private GradientModel gradientAndPositions;
+    private GradientModel gradientAndPositions = null;
     private ThermalImageFile thermalImageFile;
     private ProgressBar progressBar_markerViewLoadingAnimation;
     private MinMaxDataTransferContainer minMaxData;
@@ -50,8 +50,8 @@ public class MarkerActivity extends AppCompatActivity {
     private int adjustedNosePositionY;
     private int adjustedEyePositionX;
     private int adjustedEyePositionY;
-    private boolean eyeAdjusted;
-    private boolean noseAdjusted;
+    private boolean eyeAdjusted = false;
+    private boolean noseAdjusted = false;
     //endregion
 
     @Override
@@ -82,9 +82,15 @@ public class MarkerActivity extends AppCompatActivity {
             Bundle bundle = receivedIntent.getExtras();
             if (bundle != null) {
                 minMaxData = (MinMaxDataTransferContainer) bundle.getSerializable("minMaxData");
+                gradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
             }
 
-            ExecuteAlgorithm();
+            if (gradientAndPositions == null) {
+                ExecuteAlgorithm();
+            }
+            else {
+                setPicture(gradientAndPositions);
+            }
         }
         catch (Exception e) {
             Logging.error("onCreate", e);
@@ -93,8 +99,6 @@ public class MarkerActivity extends AppCompatActivity {
 
     private void ExecuteAlgorithm() {
         try {
-            GradientModel gradientAndPositions;
-
             switch (GlobalVariables.getCurrentAlgorithm()) {
                 case CNN:
                     String cnnModelFile = "RGB_yinguobingWideDens.tflite";
@@ -286,7 +290,12 @@ public class MarkerActivity extends AppCompatActivity {
                 gradientAndPositions.setNosePosition(Scaling.downscaleCoordinatesFromScreenToImage(new int[]{adjustedNosePositionX, adjustedNosePositionY}, capturedImageDimensions, imageContainerDimensions));
             }
 
-            // TODO: Calculate new temperature gradient based on adjusted value for eye/nose and save in gradientAndPositions object
+            if (eyeAdjusted || noseAdjusted) {
+                recalculateGradient();
+            }
+
+            // TODO: Save copy of image with red dots on eye and nose positions
+            Bitmap markerImage = ImageProcessing.convertThermalImageFileToBitmap(thermalImageFile);
 
             Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
             intent.putExtra("thermalImagePath", thermalImagePath);
@@ -301,6 +310,14 @@ public class MarkerActivity extends AppCompatActivity {
         catch (Exception e) {
             Logging.error("submitOnClick", e);
         }
+    }
+
+    private void recalculateGradient() {
+        thermalImageFile.getMeasurements().addSpot(gradientAndPositions.getEyePosition()[0], gradientAndPositions.getEyePosition()[1]);
+        thermalImageFile.getMeasurements().addSpot(gradientAndPositions.getNosePosition()[0], gradientAndPositions.getNosePosition()[1]);
+        double eye = thermalImageFile.getMeasurements().getSpots().get(0).getValue().value;
+        double nose = thermalImageFile.getMeasurements().getSpots().get(1).getValue().value;
+        gradientAndPositions.setGradient(eye - nose);
     }
 
     private void addMinMaxDataIfChosen(Bundle bundle) {

@@ -8,13 +8,12 @@ import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 
-import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
-import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 
 import rubenkarim.com.masterthesisapp.Activities.MarkerActivity;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
+import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.Interpreter;
@@ -24,7 +23,6 @@ import org.tensorflow.lite.support.image.ops.ResizeOp;
 import org.tensorflow.lite.support.common.ops.NormalizeOp;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -50,7 +48,7 @@ public class Cnn extends AbstractAlgorithm {
         TensorImage inputImageBuffer = new TensorImage(dataTypeInput);
         mthermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
         //Bitmap grayBitmap = toGrayscale(mImageBitmap);
-        Bitmap thermalImage = getBitmap(mthermalImageFile);
+        Bitmap thermalImage = ImageProcessing.convertThermalImageFileToBitmap(mthermalImageFile);
         inputImageBuffer.load(thermalImage);
         float heightProportion = (float) thermalImage.getHeight() / imgShapeInput[1];
         float widthProportion = (float) thermalImage.getWidth() / imgShapeInput[2];
@@ -77,11 +75,6 @@ public class Cnn extends AbstractAlgorithm {
             }
         }
         return super.calculateGradient(results, mthermalImageFile);
-    }
-
-    private Bitmap getBitmap(ThermalImageFile thermalImageFile) {
-        JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-        return BitmapAndroid.createBitmap(javaBuffer).getBitMap();
     }
 
     public Bitmap toGrayscale(Bitmap bmpOriginal) {
