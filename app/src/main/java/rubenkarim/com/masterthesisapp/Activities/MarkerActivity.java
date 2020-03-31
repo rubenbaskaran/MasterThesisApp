@@ -95,7 +95,6 @@ public class MarkerActivity extends AppCompatActivity {
             }
         }
         catch (Exception e) {
-            //FIXME: Catch the expected exception and handle it properly!
             Logging.error("onCreate", e);
         }
     }
@@ -129,7 +128,6 @@ public class MarkerActivity extends AppCompatActivity {
             }
         }
         catch (Exception e) {
-            //FIXME: Catch the expected exception and handle it properly!
             Logging.error("ExecuteAlgorithm", e);
         }
     }
@@ -149,7 +147,6 @@ public class MarkerActivity extends AppCompatActivity {
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         }
         catch (Exception e) {
-            //FIXME: Catch the expected exception and handle it properly!
             Logging.error("setPicture", e);
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         }
@@ -188,7 +185,6 @@ public class MarkerActivity extends AppCompatActivity {
                     + ". markerWidth: " + markerWidthHeight);
         }
         catch (Exception e) {
-            //FIXME: Catch the expected exception and handle it properly!
             Logging.error("addMarkers", e);
         }
     }
@@ -298,14 +294,16 @@ public class MarkerActivity extends AppCompatActivity {
                 recalculateGradient();
             }
 
-            // TODO: Save copy of image with red dots on eye and nose positions
-            Bitmap markerImage = ImageProcessing.convertThermalImageFileToBitmap(thermalImageFile);
+            // TODO: Save bitmap copy of image with red dots on eye and nose positions
+            Bitmap thermalImageBitmapWithDots = ImageProcessing.convertThermalImageFileToBitmap(thermalImageFile);
+            drawCircles(thermalImageBitmapWithDots, gradientAndPositions.getEyePosition(), gradientAndPositions.getNosePosition());
 
             Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
             intent.putExtra("thermalImagePath", thermalImagePath);
             intent.putExtra("imageHeight", imageHeight);
             intent.putExtra("imageWidth", imageWidth);
             intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
+            // TODO: Pass thermalImageBitmapWithDots to OverviewActivity
             Bundle bundle = new Bundle();
             bundle.putSerializable("gradientAndPositions", gradientAndPositions);
             addMinMaxDataIfChosen(bundle);
@@ -315,6 +313,12 @@ public class MarkerActivity extends AppCompatActivity {
         catch (Exception e) {
             Logging.error("submitOnClick", e);
         }
+    }
+
+    private void drawCircles(Bitmap bitmap, int[] eye, int[] nose){
+        // TODO: Draw additional dots next to location
+        bitmap.setPixel(eye[0], eye[1], Color.RED);
+        bitmap.setPixel(nose[0], nose[1], Color.RED);
     }
 
     private void recalculateGradient() {
