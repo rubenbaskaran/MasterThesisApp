@@ -13,19 +13,53 @@ public class Scaling {
     }
 
     public static int[] upscaleCoordinatesFromImageToScreen(int[] positionInCapturedImage, int[] capturedImageDimensions, int[] imageContainerDimensions) {
-        double scalingFactorX = (double)imageContainerDimensions[0] / (double)capturedImageDimensions[0];
-        double scalingFactorY = (double)imageContainerDimensions[1] / (double)capturedImageDimensions[1];
+        int capturedImageWidth = capturedImageDimensions[0];
+        int capturedImageHeight = capturedImageDimensions[1];
+        int imageContainerWidth = imageContainerDimensions[0];
+        int imageContainerHeight = imageContainerDimensions[1];
+
+        // Check whether coordinates are inside image boundaries
+        positionInCapturedImage[0] = Math.max(positionInCapturedImage[0], 0);
+        positionInCapturedImage[1] = Math.max(positionInCapturedImage[1], 0);
+        positionInCapturedImage[0] = Math.min(positionInCapturedImage[0], capturedImageWidth);
+        positionInCapturedImage[1] = Math.min(positionInCapturedImage[1], capturedImageHeight);
+
+        double scalingFactorX = (double)imageContainerWidth / (double)capturedImageWidth;
+        double scalingFactorY = (double)imageContainerHeight / (double)capturedImageHeight;
         double positionInImageContainerX = (double)positionInCapturedImage[0] * scalingFactorX;
         double positionInImageContainerY = (double)positionInCapturedImage[1] * scalingFactorY;
+
+        // Check whether coordinates are inside screen boundaries
+        positionInImageContainerX = Math.max(positionInImageContainerX, 0);
+        positionInImageContainerY = Math.max(positionInImageContainerY, 0);
+        positionInImageContainerX = Math.min(positionInImageContainerX, imageContainerWidth);
+        positionInImageContainerY = Math.min(positionInImageContainerY, imageContainerHeight);
 
         return new int[]{(int)positionInImageContainerX, (int)positionInImageContainerY};
     }
 
     public static int[] downscaleCoordinatesFromScreenToImage(int[] positionInImageContainer, int[] capturedImageDimensions, int[] imageContainerDimensions) {
+        int capturedImageWidth = capturedImageDimensions[0];
+        int capturedImageHeight = capturedImageDimensions[1];
+        int imageContainerWidth = imageContainerDimensions[0];
+        int imageContainerHeight = imageContainerDimensions[1];
+
+        // Check whether coordinates are inside image boundaries
+        positionInImageContainer[0] = Math.max(positionInImageContainer[0], 0);
+        positionInImageContainer[1] = Math.max(positionInImageContainer[1], 0);
+        positionInImageContainer[0] = Math.min(positionInImageContainer[0], imageContainerWidth);
+        positionInImageContainer[1] = Math.min(positionInImageContainer[1], imageContainerHeight);
+
         double scalingFactorX = (double)capturedImageDimensions[0] / (double)imageContainerDimensions[0];
         double scalingFactorY = (double)capturedImageDimensions[1] / (double)imageContainerDimensions[1];
         double positionInCapturedImageX = (double)positionInImageContainer[0] * scalingFactorX;
         double positionInCapturedImageY = (double)positionInImageContainer[1] * scalingFactorY;
+
+        // Check whether coordinates are inside screen boundaries
+        positionInCapturedImageX = Math.max(positionInCapturedImageX, 0);
+        positionInCapturedImageY = Math.max(positionInCapturedImageY, 0);
+        positionInCapturedImageX = Math.min(positionInCapturedImageX, capturedImageWidth);
+        positionInCapturedImageY = Math.min(positionInCapturedImageY, capturedImageHeight);
 
         return new int[]{(int)positionInCapturedImageX, (int)positionInCapturedImageY};
     }
