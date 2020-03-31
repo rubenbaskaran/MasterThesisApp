@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.Cnn;
+import rubenkarim.com.masterthesisapp.Algorithms.CnnRectImg;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
 import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithm;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
@@ -94,13 +95,13 @@ public class MarkerActivity extends AppCompatActivity {
             switch (GlobalVariables.getCurrentAlgorithm()) {
                 case CNN:
                     String cnnModelFile = "RGB_yinguobingWideDens.tflite";
-                    Cnn cnn = new Cnn(this, cnnModelFile, thermalImageFile, false);
+                    CnnRectImg cnn = new CnnRectImg(this, cnnModelFile, thermalImageFile);
                     gradientAndPositions = cnn.getGradientAndPositions();
                     setPicture(gradientAndPositions);
                     break;
                 case CNNWithTransferLearning:
                     String cnnTransferLearningModelFile = "RGB_InceptionV3.tflite";
-                    Cnn cnnTransferLearning = new Cnn(this, cnnTransferLearningModelFile, thermalImageFile, true);
+                    CnnRectImg cnnTransferLearning = new CnnRectImg(this, cnnTransferLearningModelFile, thermalImageFile);
                     gradientAndPositions = cnnTransferLearning.getGradientAndPositions();
                     setPicture(gradientAndPositions);
                     break;

@@ -187,7 +187,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private void setupDefaultImage() {
         try {
-            String defaultImageName = "Thermal_Test_Img.jpg";
+            String defaultImageName = "Thermal_Test_Img4.jpg";
             ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open(defaultImageName));
             thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
             thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + defaultImageName;
