@@ -202,6 +202,12 @@ public class MarkerActivity extends AppCompatActivity {
                 public boolean onTouch(View v, MotionEvent event) {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_MOVE:
+                            if((StartPT.x + event.getX() - DownPT.x) < 0 || (StartPT.y + event.getY() - DownPT.y) < 0){
+                                break;
+                            }
+                            if((StartPT.x + event.getX() - DownPT.x) > imageWidth - imageView.getWidth() || (StartPT.y + event.getY() - DownPT.y) > imageHeight - imageView.getHeight()){
+                                break;
+                            }
                             imageView.setX((int) (StartPT.x + event.getX() - DownPT.x));
                             imageView.setY((int) (StartPT.y + event.getY() - DownPT.y));
                             StartPT.set(imageView.getX(), imageView.getY());
