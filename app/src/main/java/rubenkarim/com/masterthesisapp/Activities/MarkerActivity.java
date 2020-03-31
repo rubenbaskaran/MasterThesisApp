@@ -79,6 +79,7 @@ public class MarkerActivity extends AppCompatActivity {
             ExecuteAlgorithm();
         }
         catch (Exception e) {
+            //FIXME: Catch the expected exception and handle it properly!
             Logging.error("onCreate", e);
         }
     }
@@ -127,6 +128,7 @@ public class MarkerActivity extends AppCompatActivity {
 //            Logging.error("ExecuteAlgorithm", e);
 //        }
         catch (Exception e) {
+            //FIXME: Catch the expected exception and handle it properly!
             Logging.error("ExecuteAlgorithm", e);
         }
     }
@@ -144,6 +146,7 @@ public class MarkerActivity extends AppCompatActivity {
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         }
         catch (Exception e) {
+            //FIXME: Catch the expected exception and handle it properly!
             Logging.error("setPicture", e);
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         }
@@ -181,6 +184,7 @@ public class MarkerActivity extends AppCompatActivity {
                     + ". markerWidth: " + markerWidthHeight + ". horizontal offset: " + horizontalOffset);
         }
         catch (Exception e) {
+            //FIXME: Catch the expected exception and handle it properly!
             Logging.error("addMarkers", e);
         }
     }
