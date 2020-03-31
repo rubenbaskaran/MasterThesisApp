@@ -44,18 +44,18 @@ public class Scaling {
         int imageContainerWidth = imageContainerDimensions[0];
         int imageContainerHeight = imageContainerDimensions[1];
 
-        // Check whether coordinates are inside image boundaries
+        // Check whether coordinates are inside screen boundaries
         positionInImageContainer[0] = Math.max(positionInImageContainer[0], 0);
         positionInImageContainer[1] = Math.max(positionInImageContainer[1], 0);
         positionInImageContainer[0] = Math.min(positionInImageContainer[0], imageContainerWidth);
         positionInImageContainer[1] = Math.min(positionInImageContainer[1], imageContainerHeight);
 
-        double scalingFactorX = (double)capturedImageDimensions[0] / (double)imageContainerDimensions[0];
-        double scalingFactorY = (double)capturedImageDimensions[1] / (double)imageContainerDimensions[1];
+        double scalingFactorX = (double) imageContainerWidth / (double) capturedImageWidth;
+        double scalingFactorY = (double) imageContainerHeight / (double) capturedImageHeight;
         double positionInCapturedImageX = (double)positionInImageContainer[0] * scalingFactorX;
         double positionInCapturedImageY = (double)positionInImageContainer[1] * scalingFactorY;
 
-        // Check whether coordinates are inside screen boundaries
+        // Check whether coordinates are inside image boundaries
         positionInCapturedImageX = Math.max(positionInCapturedImageX, 0);
         positionInCapturedImageY = Math.max(positionInCapturedImageY, 0);
         positionInCapturedImageX = Math.min(positionInCapturedImageX, capturedImageWidth);
