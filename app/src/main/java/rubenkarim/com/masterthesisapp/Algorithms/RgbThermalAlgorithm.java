@@ -58,7 +58,7 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
         Bitmap rgbImageBitmap = null;
         double rgbImageWidth = 0;
         double rgbImageHeight = 0;
-        int verticalOffset = 15;
+        int verticalOffset = 25;
         int horizontalOffset = 10;
         ThermalImageFile thermalImageFile = null;
 
@@ -107,15 +107,15 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
 
                                             FirebaseVisionFaceLandmark rightEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
                                             if (rightEye != null) {
-                                                rightEyeCoordinates = new int[]{(int) (rightEye.getPosition().getX() * widthScalingFactor - horizontalOffset), (int) (rightEye.getPosition().getY() * heightScalingFactor + verticalOffset)};
+                                                rightEyeCoordinates = new int[]{(int) (rightEye.getPosition().getX() * widthScalingFactor - horizontalOffset), (int) (rightEye.getPosition().getY() * heightScalingFactor - verticalOffset)};
                                             }
                                             FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
                                             if (leftEye != null) {
-                                                leftEyeCoordinates = new int[]{(int) (leftEye.getPosition().getX() * widthScalingFactor + horizontalOffset), (int) (leftEye.getPosition().getY() * heightScalingFactor + verticalOffset)};
+                                                leftEyeCoordinates = new int[]{(int) (leftEye.getPosition().getX() * widthScalingFactor + horizontalOffset), (int) (leftEye.getPosition().getY() * heightScalingFactor - verticalOffset)};
                                             }
                                             FirebaseVisionFaceLandmark nose = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE);
                                             if (nose != null) {
-                                                noseCoordinates = new int[]{(int) (nose.getPosition().getX() * widthScalingFactor), (int) (nose.getPosition().getY() * heightScalingFactor + verticalOffset)};
+                                                noseCoordinates = new int[]{(int) (nose.getPosition().getX() * widthScalingFactor), (int) (nose.getPosition().getY() * heightScalingFactor - verticalOffset)};
                                             }
 
                                             ((MarkerActivity) markerActivityReference).setPicture(RgbThermalAlgorithm.super.calculateGradient(
