@@ -45,9 +45,6 @@ public class CnnRectImg extends AbstractAlgorithm {
         //Bitmap grayBitmap = toGrayscale(mImageBitmap);
         Bitmap thermalImage = getBitmap(mthermalImageFile);
 
-        float heightProportion = (float) thermalImage.getHeight() / imgShapeInput[1];
-        float widthProportion = (float) thermalImage.getWidth() / imgShapeInput[2];
-
         //Change Img
         int cnnImgInputSize = 640; //image has not been downsized yet
         BitmapWithBordersInfo bitmapWithBordersInfo = addBlackBorder(thermalImage, cnnImgInputSize);
@@ -61,17 +58,20 @@ public class CnnRectImg extends AbstractAlgorithm {
         //Get predictions
         mTflite.run(tensorImage.getBuffer(), tensorBufferOutput.getBuffer().rewind());
 
-        float[] scaledResults = tensorBufferOutput.getFloatArray();
-        float[] results = new float[6];
-        for (int i = 0; i < results.length; i++) {
+        float heightProportion = (float) thermalImage.getHeight() / imgShapeInput[2];
+        float widthProportion = (float) thermalImage.getWidth() / imgShapeInput[1];
+
+        float[] results = tensorBufferOutput.getFloatArray();
+        float[] scaledResults = new float[6];
+        for (int i = 0; i < scaledResults.length; i++) {
             if (i % 2 == 0) {
-                results[i] = (scaledResults[i]) * widthProportion;
+                scaledResults[i] = results[i] * widthProportion;
             } else {
-                results[i] = (scaledResults[i]) * heightProportion;
+                scaledResults[i] = results[i] * heightProportion;
             }
         }
 
-        return super.calculateGradient(results, mthermalImageFile);
+        return super.calculateGradient(scaledResults, mthermalImageFile);
     }
 
     private TensorImage getTensorImage(int[] imgShapeInput, Bitmap thermalImage) {

@@ -106,7 +106,7 @@ public class MarkerActivity extends AppCompatActivity {
         try {
             switch (GlobalVariables.getCurrentAlgorithm()) {
                 case CNN:
-                    String cnnModelFile = "RGB_yinguobingWideDens.tflite";
+                    String cnnModelFile = "RGB_yinguobingCNNV1.tflite";
                     CnnRectImg cnn = new CnnRectImg(this, cnnModelFile, thermalImageFile);
                     gradientAndPositions = cnn.getGradientAndPositions();
                     setPicture(gradientAndPositions);
