@@ -3,30 +3,42 @@ package rubenkarim.com.masterthesisapp.Activities;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.flir.thermalsdk.image.ImageFactory;
+import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.fusion.FusionMode;
+import com.google.android.material.snackbar.Snackbar;
+
+import org.tensorflow.lite.support.image.ImageProcessor;
+
+import java.io.IOException;
+
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
+import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
+import rubenkarim.com.masterthesisapp.Utilities.Logging;
 import rubenkarim.com.masterthesisapp.Utilities.MinMaxDataTransferContainer;
 
 public class OverviewActivity extends AppCompatActivity {
 
     //region Properties
+    private static final String TAG = OverviewActivity.class.getSimpleName();
     private ImageView imageView_thermalImageContainer;
     private TextView textView_cprNumber;
     private int imageHeight;
     private int imageWidth;
-    private String thermalImagePath;
-    private GradientModel gradientAndPositions;
+    private String mThermalImagePath;
+    private GradientModel mGradientAndPositions;
     private MinMaxDataTransferContainer minMaxData;
     private int imageViewVerticalOffset;
-    private Bitmap thermalImageBitmapWithMarkers;
+    private View mRootView;
     //endregion
 
     @Override
@@ -35,10 +47,11 @@ public class OverviewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_overview);
         imageView_thermalImageContainer = findViewById(R.id.imageView_patientImage);
         textView_cprNumber = findViewById(R.id.textView_cprNumber);
+        mRootView = findViewById(R.id.LinearLayout_rootView);
 
         Intent receivedIntent = getIntent();
         if (receivedIntent.hasExtra("thermalImagePath")) {
-            thermalImagePath = receivedIntent.getStringExtra("thermalImagePath");
+            mThermalImagePath = receivedIntent.getStringExtra("thermalImagePath");
         }
         if (receivedIntent.hasExtra("imageHeight")) {
             imageHeight = receivedIntent.getIntExtra("imageHeight", 0);
@@ -49,35 +62,52 @@ public class OverviewActivity extends AppCompatActivity {
         if (receivedIntent.hasExtra("imageViewVerticalOffset")) {
             imageViewVerticalOffset = receivedIntent.getIntExtra("imageViewVerticalOffset", 0);
         }
-        if (receivedIntent.hasExtra("thermalImageByteArrayWithMarkers")) {
-            byte[] byteArray = getIntent().getByteArrayExtra("thermalImageByteArrayWithMarkers");
-            thermalImageBitmapWithMarkers = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-        }
 
 
         Bundle bundle = receivedIntent.getExtras();
         if (bundle != null) {
-            gradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
-            ((TextView) findViewById(R.id.textView_gradient)).setText(String.valueOf(gradientAndPositions.getGradient()));
-
+            mGradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
+            ((TextView) findViewById(R.id.textView_gradient)).setText(String.valueOf(mGradientAndPositions.getGradient()));
             minMaxData = (MinMaxDataTransferContainer) bundle.getSerializable("minMaxData");
         }
 
-        setPicture();
+        try {
+            ThermalImageFile thermalImage = (ThermalImageFile) ImageFactory.createImage(mThermalImagePath);
+            setPicture(thermalImage, mGradientAndPositions);
+        } catch (IOException e) {
+            Logging.error(TAG + " onCreate: ", e);
+            Snackbar.make(mRootView, "There was an error with the thermal image file", Snackbar.LENGTH_INDEFINITE).show();
+        }
     }
 
-    private void setPicture() {
-        imageView_thermalImageContainer.setImageBitmap(thermalImageBitmapWithMarkers);
+    private void drawCirclesOnBitmap(Bitmap bitmap, int[] eye, int[] nose) {
+        for (int i = 0; i < 10; i++) {
+            bitmap.setPixel(eye[0] + i, eye[1], Color.RED);
+            bitmap.setPixel(eye[0] - i, eye[1], Color.RED);
+            bitmap.setPixel(eye[0], eye[1] + i, Color.RED);
+            bitmap.setPixel(eye[0], eye[1] - i, Color.RED);
+            bitmap.setPixel(nose[0] + i, nose[1], Color.RED);
+            bitmap.setPixel(nose[0] - i, nose[1], Color.RED);
+            bitmap.setPixel(nose[0], nose[1] + i, Color.RED);
+            bitmap.setPixel(nose[0], nose[1] - i, Color.RED);
+        }
+    }
+
+    private void setPicture(ThermalImageFile thermalImageFile, GradientModel gradientModel) {
+        thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+        Bitmap bmp = ImageProcessing.getBitmap(thermalImageFile);
+        drawCirclesOnBitmap(bmp, gradientModel.getEyePosition(), gradientModel.getNosePosition());
+        imageView_thermalImageContainer.setImageBitmap(bmp);
     }
 
     public void backOnClick(View view) {
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
-        intent.putExtra("thermalImagePath", thermalImagePath);
+        intent.putExtra("thermalImagePath", mThermalImagePath);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("gradientAndPositions", gradientAndPositions);
+        bundle.putSerializable("gradientAndPositions", mGradientAndPositions);
         addMinMaxDataIfChosen(bundle);
         intent.putExtras(bundle);
         startActivity(intent);

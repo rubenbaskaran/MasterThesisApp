@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="7"
-    tools:context=".Activities.OverviewActivity">
+    tools:context=".Activities.OverviewActivity"
+    android:id="@+id/LinearLayout_rootView">
 
     <ImageView
         android:id="@+id/imageView_patientImage"
