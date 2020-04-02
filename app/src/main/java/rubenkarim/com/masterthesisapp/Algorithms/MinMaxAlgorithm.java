@@ -74,11 +74,11 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
         double minValue = 765;
         double colorSum;
         int targetPixel;
-
+        Bitmap bitmap = super.getBitmap(capturedImageBitmap);
         for (int x = leftUpperCornerLocation[0]; x <= leftUpperCornerLocation[0] + width; x++) {
             for (int y = leftUpperCornerLocation[1]; y <= leftUpperCornerLocation[1] + height; y++) {
                 if (isPixelInsideRoi(x, y)) {
-                    targetPixel = super.getBitmap(capturedImageBitmap).getPixel(x, y);
+                    targetPixel = bitmap.getPixel(x, y);
                     colorSum = Color.red(targetPixel) + Color.green(targetPixel) + Color.blue(targetPixel);
 
                     if (category.equals("max")) {
