@@ -165,7 +165,6 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     @Override
     public void onResult(GradientModel gradientModel) {
         runOnUiThread(() -> {
-            Logging.info(TAG, "Getting result");
             this.setPicture(gradientModel);
         });
     }
@@ -179,6 +178,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
 
     public void setPicture(GradientModel gradientAndPositions) {
             this.mGradientAndPositions = gradientAndPositions;
+            mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
             Bitmap thermalImgBitmap = ImageProcessing.getBitmap(mThermalImage);
             imageView_thermalImageContainer.setImageBitmap(thermalImgBitmap);
 
