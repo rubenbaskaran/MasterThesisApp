@@ -49,7 +49,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     private ImageView imageView_thermalImageContainer;
     private RelativeLayout relativeLayout_markers;
     private GradientModel gradientAndPositions = null;
-    private ThermalImageFile mThermalImageFile;
+    private ThermalImageFile mThermalImage;
     private ProgressBar progressBar_markerViewLoadingAnimation;
     private MinMaxDataTransferContainer minMaxData;
     private int[] capturedImageDimensions;
@@ -81,8 +81,8 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             thermalImagePath = receivedIntent.getStringExtra("thermalImagePath");
             try {
                 ImageProcessing.FixImageOrientation(thermalImagePath);
-                mThermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
-                mThermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+                mThermalImage = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
+                mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
             } catch (IOException e) {
                 Logging.error(TAG + " onCreate: ", e);
                 Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_INDEFINITE).show();
@@ -122,7 +122,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNN:
                 try {
                     String cnnModelFile = "RGB_yinguobingCNNV1.tflite";
-                    CnnRectImg cnn = new CnnRectImg(this, cnnModelFile, mThermalImageFile);
+                    CnnRectImg cnn = new CnnRectImg(this, cnnModelFile, mThermalImage);
                     cnn.getGradientAndPositions(this);
                 } catch (IOException e) {
                     Logging.error("ExecuteAlgorithm(), CNN", e);
@@ -132,7 +132,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNNWithTransferLearning:
                 try {
                     String cnnTransferLearningModelFile = "RGB_InceptionV3.tflite";
-                    CnnRectImg cnnTransferLearning = new CnnRectImg(this, cnnTransferLearningModelFile, mThermalImageFile);
+                    CnnRectImg cnnTransferLearning = new CnnRectImg(this, cnnTransferLearningModelFile, mThermalImage);
                     cnnTransferLearning.getGradientAndPositions(this);
                 } catch (IOException e) {
                     Logging.error("ExecuteAlgorithm(), CNNWithTransferLearning", e);
@@ -141,13 +141,13 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                 break;
             case RgbThermalMapping:
                 Logging.info(TAG, "starting RGB");
-                RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(mThermalImageFile);
+                RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(mThermalImage);
                 rgbThermalAlgorithm.getGradientAndPositions(this, screenWidth, screenHeight);
                 break;
             case MinMaxTemplate:
                 try {
                     MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
-                            mThermalImageFile,
+                            mThermalImage,
                             new RoiModel(minMaxData.getLeftEyeLocation(), minMaxData.getLeftEyeWidth(), minMaxData.getLeftEyeHeight()),
                             new RoiModel(minMaxData.getRightEyeLocation(), minMaxData.getRightEyeWidth(), minMaxData.getRightEyeHeight()),
                             new RoiModel(minMaxData.getNoseLocation(), minMaxData.getNoseWidth(), minMaxData.getNoseHeight()),
@@ -315,13 +315,11 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             gradientAndPositions.setNosePosition(Scaling.downscaleCoordinatesFromScreenToImage(new int[]{adjustedNosePositionX, adjustedNosePositionY}, capturedImageDimensions, imageContainerDimensions));
         }
 
-        Bitmap thermalImageBitmapWithMarkers = null;
-
         if (eyeAdjusted || noseAdjusted) {
-            recalculateGradient(mThermalImageFile);
+            recalculateGradient(mThermalImage);
         }
 
-        thermalImageBitmapWithMarkers = ImageProcessing.convertThermalImageFileToBitmap(mThermalImageFile);
+        Bitmap thermalImageBitmapWithMarkers = ImageProcessing.convertThermalImageFileToBitmap(mThermalImage);
         drawCircles(thermalImageBitmapWithMarkers, gradientAndPositions.getEyePosition(), gradientAndPositions.getNosePosition());
 
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
