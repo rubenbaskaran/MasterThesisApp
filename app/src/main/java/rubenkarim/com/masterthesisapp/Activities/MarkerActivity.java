@@ -48,6 +48,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     private ImageView imageView_thermalImageContainer;
     private RelativeLayout relativeLayout_markers;
     private GradientModel gradientAndPositions = null;
+    private ThermalImageFile thermalImageFile;
     private ProgressBar progressBar_markerViewLoadingAnimation;
     private MinMaxDataTransferContainer minMaxData;
     private int[] capturedImageDimensions;
@@ -145,7 +146,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                     minMaxAlgorithm.getGradientAndPositions(this);
                 } catch (IOException e) {
                     Logging.error("ExecuteAlgorithm(), MinMaxTemplate", e);
-                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_INDEFINITE).show();
+                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
                 }
                 break;
         }
@@ -181,7 +182,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         } catch (IOException e) {
             Logging.error("setPicture: ", e);
-            Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG);
+            Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_INDEFINITE).show();
 
         }
     }
@@ -303,17 +304,20 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             gradientAndPositions.setNosePosition(Scaling.downscaleCoordinatesFromScreenToImage(new int[]{adjustedNosePositionX, adjustedNosePositionY}, capturedImageDimensions, imageContainerDimensions));
         }
 
-        if (eyeAdjusted || noseAdjusted) {
-            try {
-                recalculateGradient((ThermalImageFile) ImageFactory.createImage(thermalImagePath));
-            } catch (IOException e) {
-                Logging.error(TAG+ " submitOnClick", e);
-                Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_INDEFINITE).show();
-            }
-        }
+        Bitmap thermalImageBitmapWithMarkers = null;
+        try {
+            ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
 
-        Bitmap thermalImageBitmapWithMarkers = ImageProcessing.convertToBitmap(thermalImagePath);
-        drawCircles(thermalImageBitmapWithMarkers, gradientAndPositions.getEyePosition(), gradientAndPositions.getNosePosition());
+            if (eyeAdjusted || noseAdjusted) {
+                recalculateGradient(thermalImageFile);
+            }
+
+            thermalImageBitmapWithMarkers = ImageProcessing.convertThermalImageFileToBitmap(thermalImageFile);
+            drawCircles(thermalImageBitmapWithMarkers, gradientAndPositions.getEyePosition(), gradientAndPositions.getNosePosition());
+        } catch (IOException e) {
+            Logging.error(TAG +" submitOnClick: ", e);
+            Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_INDEFINITE).show();
+        }
 
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
         intent.putExtra("thermalImagePath", thermalImagePath);
