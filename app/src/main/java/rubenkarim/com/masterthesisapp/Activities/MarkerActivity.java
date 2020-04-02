@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -39,6 +40,7 @@ import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 public class MarkerActivity extends AppCompatActivity implements AlgorithmResult {
 
     //region Properties
+    private static final String TAG = MarkerActivity.class.getSimpleName();
     private String thermalImagePath;
     private int imageViewVerticalOffset;
     private int imageHeight;
@@ -46,7 +48,6 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     private ImageView imageView_thermalImageContainer;
     private RelativeLayout relativeLayout_markers;
     private GradientModel gradientAndPositions = null;
-    private ThermalImageFile thermalImageFile;
     private ProgressBar progressBar_markerViewLoadingAnimation;
     private MinMaxDataTransferContainer minMaxData;
     private int[] capturedImageDimensions;
@@ -144,7 +145,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                     minMaxAlgorithm.getGradientAndPositions(this);
                 } catch (IOException e) {
                     Logging.error("ExecuteAlgorithm(), MinMaxTemplate", e);
-                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_INDEFINITE).show();
                 }
                 break;
         }
@@ -303,10 +304,15 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         }
 
         if (eyeAdjusted || noseAdjusted) {
-            recalculateGradient();
+            try {
+                recalculateGradient((ThermalImageFile) ImageFactory.createImage(thermalImagePath));
+            } catch (IOException e) {
+                Logging.error(TAG+ " submitOnClick", e);
+                Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_INDEFINITE).show();
+            }
         }
 
-        Bitmap thermalImageBitmapWithMarkers = ImageProcessing.convertThermalImageFileToBitmap(thermalImageFile);
+        Bitmap thermalImageBitmapWithMarkers = ImageProcessing.convertToBitmap(thermalImagePath);
         drawCircles(thermalImageBitmapWithMarkers, gradientAndPositions.getEyePosition(), gradientAndPositions.getNosePosition());
 
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
@@ -341,7 +347,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         return stream.toByteArray();
     }
 
-    private void recalculateGradient() {
+    private void recalculateGradient(ThermalImageFile thermalImageFile) {
         thermalImageFile.getMeasurements().addSpot(gradientAndPositions.getEyePosition()[0], gradientAndPositions.getEyePosition()[1]);
         thermalImageFile.getMeasurements().addSpot(gradientAndPositions.getNosePosition()[0], gradientAndPositions.getNosePosition()[1]);
         double eye = thermalImageFile.getMeasurements().getSpots().get(0).getValue().value;
