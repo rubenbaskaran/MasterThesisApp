@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.ByteArrayOutputStream;
@@ -48,7 +49,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     private ImageView imageView_thermalImageContainer;
     private RelativeLayout relativeLayout_markers;
     private GradientModel gradientAndPositions = null;
-    private ThermalImageFile thermalImageFile;
+    private ThermalImageFile mThermalImageFile;
     private ProgressBar progressBar_markerViewLoadingAnimation;
     private MinMaxDataTransferContainer minMaxData;
     private int[] capturedImageDimensions;
@@ -78,6 +79,14 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         Intent receivedIntent = getIntent();
         if (receivedIntent.hasExtra("thermalImagePath")) {
             thermalImagePath = receivedIntent.getStringExtra("thermalImagePath");
+            try {
+                ImageProcessing.FixImageOrientation(thermalImagePath);
+                mThermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
+                mThermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+            } catch (IOException e) {
+                Logging.error(TAG + " onCreate: ", e);
+                Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_INDEFINITE).show();
+            }
         }
         if (receivedIntent.hasExtra("imageViewVerticalOffset")) {
             imageViewVerticalOffset = receivedIntent.getIntExtra("imageViewVerticalOffset", 0);
@@ -113,7 +122,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNN:
                 try {
                     String cnnModelFile = "RGB_yinguobingCNNV1.tflite";
-                    CnnRectImg cnn = new CnnRectImg(this, cnnModelFile, thermalImagePath);
+                    CnnRectImg cnn = new CnnRectImg(this, cnnModelFile, mThermalImageFile);
                     cnn.getGradientAndPositions(this);
                 } catch (IOException e) {
                     Logging.error("ExecuteAlgorithm(), CNN", e);
@@ -123,7 +132,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNNWithTransferLearning:
                 try {
                     String cnnTransferLearningModelFile = "RGB_InceptionV3.tflite";
-                    CnnRectImg cnnTransferLearning = new CnnRectImg(this, cnnTransferLearningModelFile, thermalImagePath);
+                    CnnRectImg cnnTransferLearning = new CnnRectImg(this, cnnTransferLearningModelFile, mThermalImageFile);
                     cnnTransferLearning.getGradientAndPositions(this);
                 } catch (IOException e) {
                     Logging.error("ExecuteAlgorithm(), CNNWithTransferLearning", e);
@@ -131,13 +140,14 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                 }
                 break;
             case RgbThermalMapping:
-                RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm();
-                rgbThermalAlgorithm.getGradientAndPositions(this,thermalImagePath, screenWidth, screenHeight);
+                Logging.info(TAG, "starting RGB");
+                RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(mThermalImageFile);
+                rgbThermalAlgorithm.getGradientAndPositions(this, screenWidth, screenHeight);
                 break;
             case MinMaxTemplate:
                 try {
                     MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
-                            thermalImagePath,
+                            mThermalImageFile,
                             new RoiModel(minMaxData.getLeftEyeLocation(), minMaxData.getLeftEyeWidth(), minMaxData.getLeftEyeHeight()),
                             new RoiModel(minMaxData.getRightEyeLocation(), minMaxData.getRightEyeWidth(), minMaxData.getRightEyeHeight()),
                             new RoiModel(minMaxData.getNoseLocation(), minMaxData.getNoseWidth(), minMaxData.getNoseHeight()),
@@ -155,14 +165,15 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
 
     @Override
     public void onResult(GradientModel gradientModel) {
-        runOnUiThread(()->{
+        runOnUiThread(() -> {
+            Logging.info(TAG, "Getting result");
             this.setPicture(gradientModel);
         });
     }
 
     @Override
     public void onError(String errorMessage) {
-        runOnUiThread(()->{
+        runOnUiThread(() -> {
             Snackbar.make(mRootView, errorMessage, Snackbar.LENGTH_LONG).show();
         });
     }
@@ -305,19 +316,13 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         }
 
         Bitmap thermalImageBitmapWithMarkers = null;
-        try {
-            ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
 
-            if (eyeAdjusted || noseAdjusted) {
-                recalculateGradient(thermalImageFile);
-            }
-
-            thermalImageBitmapWithMarkers = ImageProcessing.convertThermalImageFileToBitmap(thermalImageFile);
-            drawCircles(thermalImageBitmapWithMarkers, gradientAndPositions.getEyePosition(), gradientAndPositions.getNosePosition());
-        } catch (IOException e) {
-            Logging.error(TAG +" submitOnClick: ", e);
-            Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_INDEFINITE).show();
+        if (eyeAdjusted || noseAdjusted) {
+            recalculateGradient(mThermalImageFile);
         }
+
+        thermalImageBitmapWithMarkers = ImageProcessing.convertThermalImageFileToBitmap(mThermalImageFile);
+        drawCircles(thermalImageBitmapWithMarkers, gradientAndPositions.getEyePosition(), gradientAndPositions.getNosePosition());
 
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
         intent.putExtra("thermalImagePath", thermalImagePath);
