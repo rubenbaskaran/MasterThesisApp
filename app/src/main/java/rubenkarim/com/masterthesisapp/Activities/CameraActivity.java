@@ -129,6 +129,7 @@ public class CameraActivity extends AppCompatActivity {
         myCameraManager.InitCameraSearchAndSub((thermalImage) -> {
             //The image must not be processed on the UI Thread
             JavaImageBuffer javaImageBuffer = thermalImage.getImage();
+            thermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
             final Bitmap bitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
 
             runOnUiThread(() -> {
