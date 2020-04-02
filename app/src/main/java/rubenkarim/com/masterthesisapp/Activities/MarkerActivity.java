@@ -115,7 +115,7 @@ public class MarkerActivity extends AppCompatActivity {
                     gradientAndPositions = cnn.getGradientAndPositions();
                     setPicture(gradientAndPositions);
                 } catch (IOException e) {
-                    Logging.error("ExecuteAlgorithm, CNN", e);
+                    Logging.error("ExecuteAlgorithm(), CNN", e);
                     Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG);
                 }
                 break;
@@ -126,7 +126,7 @@ public class MarkerActivity extends AppCompatActivity {
                     gradientAndPositions = cnnTransferLearning.getGradientAndPositions();
                     setPicture(gradientAndPositions);
                 } catch (IOException e) {
-                    Logging.error("ExecuteAlgorithm, CNNWithTransferLearning", e);
+                    Logging.error("ExecuteAlgorithm(), CNNWithTransferLearning", e);
                     Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG);
                 }
                 break;
@@ -135,14 +135,19 @@ public class MarkerActivity extends AppCompatActivity {
                 rgbThermalAlgorithm.getGradientAndPositionsAsync(thermalImagePath, screenWidth, screenHeight);
                 break;
             case MinMaxTemplate:
-                MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
-                        thermalImagePath,
-                        new RoiModel(minMaxData.getLeftEyeLocation(), minMaxData.getLeftEyeWidth(), minMaxData.getLeftEyeHeight()),
-                        new RoiModel(minMaxData.getRightEyeLocation(), minMaxData.getRightEyeWidth(), minMaxData.getRightEyeHeight()),
-                        new RoiModel(minMaxData.getNoseLocation(), minMaxData.getNoseWidth(), minMaxData.getNoseHeight()),
-                        new RoiModel(minMaxData.getCameraPreviewContainerLocation(), minMaxData.getCameraPreviewContainerWidth(), minMaxData.getCameraPreviewContainerHeight())
-                );
-                setPicture(minMaxAlgorithm.getGradientAndPositions());
+                try {
+                    MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
+                            thermalImagePath,
+                            new RoiModel(minMaxData.getLeftEyeLocation(), minMaxData.getLeftEyeWidth(), minMaxData.getLeftEyeHeight()),
+                            new RoiModel(minMaxData.getRightEyeLocation(), minMaxData.getRightEyeWidth(), minMaxData.getRightEyeHeight()),
+                            new RoiModel(minMaxData.getNoseLocation(), minMaxData.getNoseWidth(), minMaxData.getNoseHeight()),
+                            new RoiModel(minMaxData.getCameraPreviewContainerLocation(), minMaxData.getCameraPreviewContainerWidth(), minMaxData.getCameraPreviewContainerHeight())
+                    );
+                    setPicture(minMaxAlgorithm.getGradientAndPositions());
+                } catch (IOException e) {
+                    Logging.error("ExecuteAlgorithm(), MinMaxTemplate", e);
+                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG);
+                }
                 break;
         }
 

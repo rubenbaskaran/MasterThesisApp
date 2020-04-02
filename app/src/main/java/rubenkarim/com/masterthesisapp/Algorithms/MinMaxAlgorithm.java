@@ -50,7 +50,6 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
         radius = this.leftEye.getWidth() / 2;
     }
 
-
     @Override
     public GradientModel getGradientAndPositions() {
         int[] rightEyeMax = getMaxMinSpotInRoi(rightEye, "max");
