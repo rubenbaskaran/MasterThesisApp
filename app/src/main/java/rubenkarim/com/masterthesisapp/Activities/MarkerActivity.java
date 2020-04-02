@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.ByteArrayOutputStream;
@@ -81,6 +82,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             try {
                 ImageProcessing.FixImageOrientation(thermalImagePath);
                 mThermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
+                mThermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
             } catch (IOException e) {
                 Logging.error(TAG + " onCreate: ", e);
                 Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_INDEFINITE).show();
