@@ -1,5 +1,9 @@
 package rubenkarim.com.masterthesisapp.Algorithms;
 
+import android.graphics.Bitmap;
+
+import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
+import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.ThermalValue;
 import com.flir.thermalsdk.image.measurements.MeasurementSpot;
@@ -40,5 +44,10 @@ public abstract class AbstractAlgorithm {
                     new int[]{nose.getPosition().x, nose.getPosition().y});
         }
 
+    }
+
+    protected Bitmap getBitmap(ThermalImageFile thermalImageFile) {
+        JavaImageBuffer javaBuffer = thermalImageFile.getImage();
+        return BitmapAndroid.createBitmap(javaBuffer).getBitMap();
     }
 }

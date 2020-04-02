@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
+import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
@@ -33,9 +34,10 @@ public class CnnRectImg extends AbstractAlgorithm {
     private final Interpreter mTflite;
     private ThermalImageFile mthermalImageFile;
 
-    public CnnRectImg(MarkerActivity markerActivity, String cnnModelFilePath, ThermalImageFile mThermalImage) throws IOException {
+    public CnnRectImg(MarkerActivity markerActivity, String cnnModelFilePath, String thermalImagePath) throws IOException {
         mTflite = new Interpreter((ByteBuffer) loadModelFile(markerActivity, cnnModelFilePath));
-        this.mthermalImageFile = mThermalImage;
+        ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
+        this.mthermalImageFile = thermalImageFile;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class CnnRectImg extends AbstractAlgorithm {
         int[] imgShapeInput = mTflite.getInputTensor(0).shape(); // cnn: {1, width: 240, Height: 320, 3} cnnTransferlearning: {1, 320, 320, 3}
         mthermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
         //Bitmap grayBitmap = toGrayscale(mImageBitmap);
-        Bitmap thermalImage = getBitmap(mthermalImageFile);
+        Bitmap thermalImage = super.getBitmap(mthermalImageFile);
 
         //Change Img
         int cnnImgInputSize = 640; //image has not been downsized yet
@@ -92,11 +94,6 @@ public class CnnRectImg extends AbstractAlgorithm {
         long startOffset = fileDescriptor.getStartOffset();
         long declaredLength = fileDescriptor.getDeclaredLength();
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
-    }
-
-    private Bitmap getBitmap(ThermalImageFile thermalImageFile) {
-        JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-        return BitmapAndroid.createBitmap(javaBuffer).getBitMap();
     }
 
     private BitmapWithBordersInfo addBlackBorder(Bitmap bmp, int minImgSize) {

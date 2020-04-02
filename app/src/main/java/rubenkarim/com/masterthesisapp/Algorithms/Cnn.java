@@ -132,11 +132,6 @@ public class Cnn extends AbstractAlgorithm {
         return imageProcessor.process(inputImageBuffer);
     }
 
-    private Bitmap getBitmap(ThermalImageFile thermalImageFile) {
-        JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-        return BitmapAndroid.createBitmap(javaBuffer).getBitMap();
-    }
-
     public Bitmap toGrayscale(Bitmap bmpOriginal) {
         int width, height;
         height = bmpOriginal.getHeight();
