@@ -57,8 +57,8 @@ public class MarkerActivity extends AppCompatActivity {
     private int adjustedEyePositionY;
     private boolean eyeAdjusted = false;
     private boolean noseAdjusted = false;
-    int screenWidth;
-    int screenHeight;
+    private int screenWidth;
+    private int screenHeight;
     private View mRootView;
     //endregion
 
