@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -23,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import androidx.appcompat.app.AppCompatActivity;
+import rubenkarim.com.masterthesisapp.Algorithms.AlgorithmResult;
 import rubenkarim.com.masterthesisapp.Algorithms.CnnRectImg;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
 import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithm;
@@ -36,7 +36,7 @@ import rubenkarim.com.masterthesisapp.Utilities.Logging;
 import rubenkarim.com.masterthesisapp.Utilities.MinMaxDataTransferContainer;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
-public class MarkerActivity extends AppCompatActivity {
+public class MarkerActivity extends AppCompatActivity implements AlgorithmResult {
 
     //region Properties
     private String thermalImagePath;
@@ -112,27 +112,25 @@ public class MarkerActivity extends AppCompatActivity {
                 try {
                     String cnnModelFile = "RGB_yinguobingCNNV1.tflite";
                     CnnRectImg cnn = new CnnRectImg(this, cnnModelFile, thermalImagePath);
-                    gradientAndPositions = cnn.getGradientAndPositions();
-                    setPicture(gradientAndPositions);
+                    cnn.getGradientAndPositions(this);
                 } catch (IOException e) {
                     Logging.error("ExecuteAlgorithm(), CNN", e);
-                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG);
+                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
                 }
                 break;
             case CNNWithTransferLearning:
                 try {
                     String cnnTransferLearningModelFile = "RGB_InceptionV3.tflite";
                     CnnRectImg cnnTransferLearning = new CnnRectImg(this, cnnTransferLearningModelFile, thermalImagePath);
-                    gradientAndPositions = cnnTransferLearning.getGradientAndPositions();
-                    setPicture(gradientAndPositions);
+                    cnnTransferLearning.getGradientAndPositions(this);
                 } catch (IOException e) {
                     Logging.error("ExecuteAlgorithm(), CNNWithTransferLearning", e);
-                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG);
+                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
                 }
                 break;
             case RgbThermalMapping:
-                RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(this);
-                rgbThermalAlgorithm.getGradientAndPositionsAsync(thermalImagePath, screenWidth, screenHeight);
+                RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm();
+                rgbThermalAlgorithm.getGradientAndPositions(this,thermalImagePath, screenWidth, screenHeight);
                 break;
             case MinMaxTemplate:
                 try {
@@ -143,14 +141,28 @@ public class MarkerActivity extends AppCompatActivity {
                             new RoiModel(minMaxData.getNoseLocation(), minMaxData.getNoseWidth(), minMaxData.getNoseHeight()),
                             new RoiModel(minMaxData.getCameraPreviewContainerLocation(), minMaxData.getCameraPreviewContainerWidth(), minMaxData.getCameraPreviewContainerHeight())
                     );
-                    setPicture(minMaxAlgorithm.getGradientAndPositions());
+                    minMaxAlgorithm.getGradientAndPositions(this);
                 } catch (IOException e) {
                     Logging.error("ExecuteAlgorithm(), MinMaxTemplate", e);
-                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG);
+                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
                 }
                 break;
         }
 
+    }
+
+    @Override
+    public void onResult(GradientModel gradientModel) {
+        runOnUiThread(()->{
+            this.setPicture(gradientModel);
+        });
+    }
+
+    @Override
+    public void onError(String errorMessage) {
+        runOnUiThread(()->{
+            Snackbar.make(mRootView, errorMessage, Snackbar.LENGTH_LONG).show();
+        });
     }
 
     public void setPicture(GradientModel gradientAndPositions) {

@@ -12,8 +12,7 @@ import rubenkarim.com.masterthesisapp.Models.GradientModel;
 
 public abstract class AbstractAlgorithm {
 
-
-    public abstract GradientModel getGradientAndPositions();
+    public abstract void getGradientAndPositions(AlgorithmResult algorithmResult);
 
     protected GradientModel calculateGradient(float[] coordinates, ThermalImageFile thermalImageFile){
         return calculateGradient((int) coordinates[0], (int) coordinates[1], (int) coordinates[2],

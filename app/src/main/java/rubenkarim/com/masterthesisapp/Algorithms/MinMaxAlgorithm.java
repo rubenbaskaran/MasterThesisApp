@@ -8,10 +8,8 @@ import com.flir.thermalsdk.image.ThermalImageFile;
 
 import java.io.IOException;
 
-import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
-import rubenkarim.com.masterthesisapp.Utilities.Logging;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
 public class MinMaxAlgorithm extends AbstractAlgorithm {
@@ -51,19 +49,19 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     }
 
     @Override
-    public GradientModel getGradientAndPositions() {
+    public void getGradientAndPositions(AlgorithmResult algorithmResult) {
         int[] rightEyeMax = getMaxMinSpotInRoi(rightEye, "max");
         int[] leftEyeMax = getMaxMinSpotInRoi(leftEye, "max");
         int[] noseMin = getMaxMinSpotInRoi(nose, "min");
 
-        return super.calculateGradient(
+        algorithmResult.onResult(super.calculateGradient(
                 rightEyeMax[0],
                 rightEyeMax[1],
                 leftEyeMax[0],
                 leftEyeMax[1],
                 noseMin[0],
                 noseMin[1],
-                capturedImageBitmap);
+                capturedImageBitmap));
     }
 
     private int[] getMaxMinSpotInRoi(RoiModel roiCircle, String category) {
