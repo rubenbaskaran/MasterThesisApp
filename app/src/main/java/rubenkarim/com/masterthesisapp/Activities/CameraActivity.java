@@ -234,6 +234,7 @@ public class CameraActivity extends AppCompatActivity {
                     }
                 }
                 catch (IOException e) {
+                    //FIXME: Handle exception
                     Log.d(TAG, "saveThermalImage: ERROR: " + e);
                     Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
                 }

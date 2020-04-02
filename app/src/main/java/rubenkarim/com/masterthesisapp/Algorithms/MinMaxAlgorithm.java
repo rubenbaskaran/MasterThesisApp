@@ -51,6 +51,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
             radius = this.leftEye.getWidth() / 2;
         }
         catch (Exception e) {
+            //FIXME: Handle exception or pass it up
             Logging.error("MinMaxAlgorithm", e);
             throw e;
         }
@@ -73,6 +74,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
                     (ThermalImageFile) ImageFactory.createImage(thermalImagePath));
         }
         catch (IOException e) {
+            //FIXME: Handle exception or pass it up
             Logging.error("getGradientAndPositions", e);
             return null;
         }
@@ -113,6 +115,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
             return position;
         }
         catch (Exception e) {
+            //FIXME: Handle exception or pass it up
             Logging.error("getMaxMinSpotInRoi", e);
             return null;
         }
@@ -123,6 +126,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
             return (Math.sqrt(Math.pow(center[0] - pixelX, 2) + Math.pow(center[1] - pixelY, 2))) < radius;
         }
         catch (Exception e) {
+            //FIXME: Handle exception or pass it up
             Logging.error("isPixelInsideRoi", e);
             throw e;
         }

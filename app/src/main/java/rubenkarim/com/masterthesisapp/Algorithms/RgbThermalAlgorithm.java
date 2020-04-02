@@ -81,6 +81,7 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
             rgbImageHeight = rgbImageBitmap.getHeight();
         }
         catch (IOException e) {
+            //FIXME: Handle exception or pass it up
             Logging.error("getGradientAndPositions", e);
         }
 
