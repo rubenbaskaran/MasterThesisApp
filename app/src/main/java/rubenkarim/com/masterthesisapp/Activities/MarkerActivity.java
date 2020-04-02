@@ -105,6 +105,7 @@ public class MarkerActivity extends AppCompatActivity {
             }
         }
         catch (Exception e) {
+            //FIXME: Handle exception
             Logging.error("onCreate", e);
         }
     }
@@ -141,6 +142,7 @@ public class MarkerActivity extends AppCompatActivity {
             }
         }
         catch (Exception e) {
+            //FIXME: Handle exception
             Logging.error("ExecuteAlgorithm", e);
         }
     }
@@ -160,6 +162,7 @@ public class MarkerActivity extends AppCompatActivity {
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         }
         catch (Exception e) {
+            //FIXME: Handle exception
             Logging.error("setPicture", e);
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         }
@@ -198,6 +201,7 @@ public class MarkerActivity extends AppCompatActivity {
                     + ". markerWidth: " + markerWidthHeight);
         }
         catch (Exception e) {
+            //FIXME: Handle exception
             Logging.error("addMarkers", e);
         }
     }
@@ -238,6 +242,7 @@ public class MarkerActivity extends AppCompatActivity {
             });
         }
         catch (Exception e) {
+            //FIXME: Handle exception
             Logging.error("SetOnTouchListener", e);
         }
     }
@@ -268,6 +273,7 @@ public class MarkerActivity extends AppCompatActivity {
             //getPixelColor(x, y);
         }
         catch (Exception e) {
+            //FIXME: Handle exception
             Logging.error("getCoordinates", e);
         }
     }
@@ -285,6 +291,7 @@ public class MarkerActivity extends AppCompatActivity {
             Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
         }
         catch (Exception e) {
+            //FIXME: Handle exception
             Logging.error("getPixelColor", e);
         }
     }
@@ -296,6 +303,7 @@ public class MarkerActivity extends AppCompatActivity {
             startActivity(intent);
         }
         catch (Exception e) {
+            //FIXME: Handle exception
             Logging.error("backOnClick", e);
         }
     }
@@ -329,6 +337,7 @@ public class MarkerActivity extends AppCompatActivity {
             startActivity(intent);
         }
         catch (Exception e) {
+            //FIXME: Handle exception
             Logging.error("submitOnClick", e);
         }
     }
