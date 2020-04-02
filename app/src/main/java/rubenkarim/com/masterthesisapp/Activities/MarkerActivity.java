@@ -21,7 +21,6 @@ import com.flir.thermalsdk.image.ThermalImageFile;
 import java.io.ByteArrayOutputStream;
 
 import androidx.appcompat.app.AppCompatActivity;
-import rubenkarim.com.masterthesisapp.Algorithms.Cnn;
 import rubenkarim.com.masterthesisapp.Algorithms.CnnRectImg;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
 import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithm;
@@ -56,6 +55,8 @@ public class MarkerActivity extends AppCompatActivity {
     private int adjustedEyePositionY;
     private boolean eyeAdjusted = false;
     private boolean noseAdjusted = false;
+    int screenWidth;
+    int screenHeight;
     //endregion
 
     @Override
@@ -82,6 +83,12 @@ public class MarkerActivity extends AppCompatActivity {
             }
             if (receivedIntent.hasExtra("imageWidth")) {
                 imageWidth = receivedIntent.getIntExtra("imageWidth", 0);
+            }
+            if (receivedIntent.hasExtra("screenWidth")) {
+                screenWidth = receivedIntent.getIntExtra("screenWidth", 0);
+            }
+            if (receivedIntent.hasExtra("screenHeight")) {
+                screenHeight = receivedIntent.getIntExtra("screenHeight", 0);
             }
 
             Bundle bundle = receivedIntent.getExtras();
@@ -119,7 +126,7 @@ public class MarkerActivity extends AppCompatActivity {
                     break;
                 case RgbThermalMapping:
                     RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(this);
-                    rgbThermalAlgorithm.getGradientAndPositionsAsync(thermalImagePath);
+                    rgbThermalAlgorithm.getGradientAndPositionsAsync(thermalImagePath, screenWidth, screenHeight);
                     break;
                 case MinMaxTemplate:
                     MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
@@ -151,7 +158,8 @@ public class MarkerActivity extends AppCompatActivity {
 
             addMarkers(capturedImageDimensions, imageContainerDimensions, imageViewVerticalOffset);
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Logging.error("setPicture", e);
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         }
@@ -205,10 +213,10 @@ public class MarkerActivity extends AppCompatActivity {
                 public boolean onTouch(View v, MotionEvent event) {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_MOVE:
-                            if((StartPT.x + event.getX() - DownPT.x) < 0 || (StartPT.y + event.getY() - DownPT.y) < 0){
+                            if ((StartPT.x + event.getX() - DownPT.x) < 0 || (StartPT.y + event.getY() - DownPT.y) < 0) {
                                 break;
                             }
-                            if((StartPT.x + event.getX() - DownPT.x) > imageWidth - imageView.getWidth() || (StartPT.y + event.getY() - DownPT.y) > imageHeight - imageView.getHeight()){
+                            if ((StartPT.x + event.getX() - DownPT.x) > imageWidth - imageView.getWidth() || (StartPT.y + event.getY() - DownPT.y) > imageHeight - imageView.getHeight()) {
                                 break;
                             }
                             imageView.setX((int) (StartPT.x + event.getX() - DownPT.x));
@@ -228,7 +236,8 @@ public class MarkerActivity extends AppCompatActivity {
                     return true;
                 }
             });
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Logging.error("SetOnTouchListener", e);
         }
     }
@@ -274,7 +283,8 @@ public class MarkerActivity extends AppCompatActivity {
             int targetPixel = rootElementBitmap.getPixel(x, y);
             Log.e("Target pixel", "x: " + x + ", y: " + y);
             Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Logging.error("getPixelColor", e);
         }
     }
@@ -284,7 +294,8 @@ public class MarkerActivity extends AppCompatActivity {
         try {
             Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
             startActivity(intent);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Logging.error("backOnClick", e);
         }
     }
@@ -316,25 +327,26 @@ public class MarkerActivity extends AppCompatActivity {
             addMinMaxDataIfChosen(bundle);
             intent.putExtras(bundle);
             startActivity(intent);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Logging.error("submitOnClick", e);
         }
     }
 
     private void drawCircles(Bitmap bitmap, int[] eye, int[] nose) {
         for (int i = 0; i < 10; i++) {
-            bitmap.setPixel(eye[0]+i, eye[1], Color.RED);
-            bitmap.setPixel(eye[0]-i, eye[1], Color.RED);
-            bitmap.setPixel(eye[0], eye[1]+i, Color.RED);
-            bitmap.setPixel(eye[0], eye[1]-i, Color.RED);
-            bitmap.setPixel(nose[0]+i, nose[1], Color.RED);
-            bitmap.setPixel(nose[0]-i, nose[1], Color.RED);
-            bitmap.setPixel(nose[0], nose[1]+i, Color.RED);
-            bitmap.setPixel(nose[0], nose[1]-i, Color.RED);
+            bitmap.setPixel(eye[0] + i, eye[1], Color.RED);
+            bitmap.setPixel(eye[0] - i, eye[1], Color.RED);
+            bitmap.setPixel(eye[0], eye[1] + i, Color.RED);
+            bitmap.setPixel(eye[0], eye[1] - i, Color.RED);
+            bitmap.setPixel(nose[0] + i, nose[1], Color.RED);
+            bitmap.setPixel(nose[0] - i, nose[1], Color.RED);
+            bitmap.setPixel(nose[0], nose[1] + i, Color.RED);
+            bitmap.setPixel(nose[0], nose[1] - i, Color.RED);
         }
     }
 
-    private byte[] convertBitmapToByteArray(Bitmap thermalImageBitmapWithDots){
+    private byte[] convertBitmapToByteArray(Bitmap thermalImageBitmapWithDots) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         thermalImageBitmapWithDots.compress(Bitmap.CompressFormat.PNG, 100, stream);
         return stream.toByteArray();

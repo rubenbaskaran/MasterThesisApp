@@ -253,6 +253,8 @@ public class CameraActivity extends AppCompatActivity {
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
+        intent.putExtra("screenHeight", rootView.getHeight());
+        intent.putExtra("screenWidth", rootView.getWidth());
         addMinMaxDataIfChosen(intent);
 
         startActivity(intent);

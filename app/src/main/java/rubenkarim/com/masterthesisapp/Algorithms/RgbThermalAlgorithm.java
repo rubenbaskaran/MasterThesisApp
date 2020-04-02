@@ -51,16 +51,26 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
         return null;
     }
 
-    public void getGradientAndPositionsAsync(String thermalImagePath) {
+    public void getGradientAndPositionsAsync(String thermalImagePath, int deviceScreenWidth, int deviceScreenHeight) {
         Bitmap thermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
         double thermalImageWidth = thermalImageBitmap.getWidth();
         double thermalImageHeight = thermalImageBitmap.getHeight();
         Bitmap rgbImageBitmap = null;
         double rgbImageWidth = 0;
         double rgbImageHeight = 0;
-        int verticalOffset = 25;
-        int horizontalOffset = 10;
         ThermalImageFile thermalImageFile = null;
+        int defaultVerticalOffset = 25;
+        int defaultHorizontalOffset = 10;
+        int defaultScreenHeight = 1680;
+        int defaultScreenWidth = 1080;
+
+        int scaledVerticalOffset = deviceScreenHeight > defaultScreenHeight ?
+                (defaultVerticalOffset * (deviceScreenHeight / defaultScreenHeight))
+                : (defaultVerticalOffset / (defaultScreenHeight / deviceScreenHeight));
+
+        int scaledHorizontalOffset = deviceScreenWidth > defaultScreenWidth ?
+                (defaultHorizontalOffset * (deviceScreenWidth / defaultScreenWidth))
+                : (defaultHorizontalOffset / (defaultScreenWidth / deviceScreenWidth));
 
         try {
             thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
@@ -107,15 +117,15 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
 
                                             FirebaseVisionFaceLandmark rightEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
                                             if (rightEye != null) {
-                                                rightEyeCoordinates = new int[]{(int) (rightEye.getPosition().getX() * widthScalingFactor - horizontalOffset), (int) (rightEye.getPosition().getY() * heightScalingFactor - verticalOffset)};
+                                                rightEyeCoordinates = new int[]{(int) (rightEye.getPosition().getX() * widthScalingFactor - scaledHorizontalOffset), (int) (rightEye.getPosition().getY() * heightScalingFactor - scaledVerticalOffset)};
                                             }
                                             FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
                                             if (leftEye != null) {
-                                                leftEyeCoordinates = new int[]{(int) (leftEye.getPosition().getX() * widthScalingFactor + horizontalOffset), (int) (leftEye.getPosition().getY() * heightScalingFactor - verticalOffset)};
+                                                leftEyeCoordinates = new int[]{(int) (leftEye.getPosition().getX() * widthScalingFactor + scaledHorizontalOffset), (int) (leftEye.getPosition().getY() * heightScalingFactor - scaledVerticalOffset)};
                                             }
                                             FirebaseVisionFaceLandmark nose = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE);
                                             if (nose != null) {
-                                                noseCoordinates = new int[]{(int) (nose.getPosition().getX() * widthScalingFactor), (int) (nose.getPosition().getY() * heightScalingFactor - verticalOffset)};
+                                                noseCoordinates = new int[]{(int) (nose.getPosition().getX() * widthScalingFactor), (int) (nose.getPosition().getY() * heightScalingFactor - scaledVerticalOffset)};
                                             }
 
                                             ((MarkerActivity) markerActivityReference).setPicture(RgbThermalAlgorithm.super.calculateGradient(
