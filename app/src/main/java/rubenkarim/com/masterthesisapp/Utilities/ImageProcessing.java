@@ -116,4 +116,9 @@ public class ImageProcessing {
         JavaImageBuffer javaBuffer = thermalImageFile.getImage();
         return BitmapAndroid.createBitmap(javaBuffer).getBitMap();
     }
+
+    public static Bitmap getBitmap(ThermalImageFile thermalImageFile) {
+        JavaImageBuffer javaBuffer = thermalImageFile.getImage();
+        return BitmapAndroid.createBitmap(javaBuffer).getBitMap();
+    }
 }

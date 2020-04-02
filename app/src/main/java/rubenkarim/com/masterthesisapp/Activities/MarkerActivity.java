@@ -319,39 +319,17 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             recalculateGradient(mThermalImage);
         }
 
-        Bitmap thermalImageBitmapWithMarkers = ImageProcessing.convertThermalImageFileToBitmap(mThermalImage);
-        drawCircles(thermalImageBitmapWithMarkers, gradientAndPositions.getEyePosition(), gradientAndPositions.getNosePosition());
 
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
         intent.putExtra("thermalImagePath", thermalImagePath);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
-        intent.putExtra("thermalImageByteArrayWithMarkers", convertBitmapToByteArray(thermalImageBitmapWithMarkers)); //TODO: Ruben move overview things to overview, SOLID principle #1 Single-responsibility principle
         Bundle bundle = new Bundle();
         bundle.putSerializable("gradientAndPositions", gradientAndPositions);
         addMinMaxDataIfChosen(bundle);
         intent.putExtras(bundle);
         startActivity(intent);
-    }
-
-    private void drawCircles(Bitmap bitmap, int[] eye, int[] nose) {
-        for (int i = 0; i < 10; i++) {
-            bitmap.setPixel(eye[0] + i, eye[1], Color.RED);
-            bitmap.setPixel(eye[0] - i, eye[1], Color.RED);
-            bitmap.setPixel(eye[0], eye[1] + i, Color.RED);
-            bitmap.setPixel(eye[0], eye[1] - i, Color.RED);
-            bitmap.setPixel(nose[0] + i, nose[1], Color.RED);
-            bitmap.setPixel(nose[0] - i, nose[1], Color.RED);
-            bitmap.setPixel(nose[0], nose[1] + i, Color.RED);
-            bitmap.setPixel(nose[0], nose[1] - i, Color.RED);
-        }
-    }
-
-    private byte[] convertBitmapToByteArray(Bitmap thermalImageBitmapWithDots) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        thermalImageBitmapWithDots.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        return stream.toByteArray();
     }
 
     private void recalculateGradient(ThermalImageFile thermalImageFile) {
