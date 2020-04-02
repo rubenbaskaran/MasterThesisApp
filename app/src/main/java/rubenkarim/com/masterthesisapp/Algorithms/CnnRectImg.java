@@ -6,9 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
-import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.ImageFactory;
-import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 
@@ -27,7 +25,6 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 import rubenkarim.com.masterthesisapp.Activities.MarkerActivity;
-import rubenkarim.com.masterthesisapp.Models.GradientModel;
 
 public class CnnRectImg extends AbstractAlgorithm {
 
@@ -73,7 +70,7 @@ public class CnnRectImg extends AbstractAlgorithm {
             }
         }
 
-        algorithmResult.AlgorithmResult(super.calculateGradient(scaledResults, mthermalImageFile));
+        algorithmResult.onResult(super.calculateGradient(scaledResults, mthermalImageFile));
     }
 
     private TensorImage getTensorImage(int[] imgShapeInput, Bitmap thermalImage) {
