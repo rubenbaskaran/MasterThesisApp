@@ -3,6 +3,7 @@ package rubenkarim.com.masterthesisapp.Algorithms;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.ImageFactory;
@@ -24,11 +25,13 @@ import java.io.IOException;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import rubenkarim.com.masterthesisapp.Activities.CameraActivity;
 import rubenkarim.com.masterthesisapp.Activities.MarkerActivity;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
+
 
 // Sample – face-detection – is the simplest implementation of the face detection functionality on Android.
 // It supports 2 modes of execution: available by default Java wrapper for the cascade classifier,
@@ -39,6 +42,7 @@ import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 public class RgbThermalAlgorithm extends AbstractAlgorithm {
 
+    private static final String TAG = RgbThermalAlgorithm.class.getSimpleName();
     private Context markerActivityReference;
 
     public RgbThermalAlgorithm(Context markerActivityReference) {
@@ -46,12 +50,8 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
         this.markerActivityReference = markerActivityReference;
     }
 
-    @Override
-    public GradientModel getGradientAndPositions() {
-        return null;
-    }
 
-    public void getGradientAndPositionsAsync(String thermalImagePath, int deviceScreenWidth, int deviceScreenHeight) {
+    public void getGradientAndPositions(AlgorithmResult algorithmResult, String thermalImagePath, int deviceScreenWidth, int deviceScreenHeight) {
         Bitmap thermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
         double thermalImageWidth = thermalImageBitmap.getWidth();
         double thermalImageHeight = thermalImageBitmap.getHeight();
@@ -129,7 +129,7 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
                                                 noseCoordinates = new int[]{(int) (nose.getPosition().getX() * widthScalingFactor), (int) (nose.getPosition().getY() * heightScalingFactor - scaledVerticalOffset)};
                                             }
 
-                                            ((MarkerActivity) markerActivityReference).setPicture(RgbThermalAlgorithm.super.calculateGradient(
+                                            algorithmResult.AlgorithmResult(RgbThermalAlgorithm.super.calculateGradient(
                                                     rightEyeCoordinates[0],
                                                     rightEyeCoordinates[1],
                                                     leftEyeCoordinates[0],
@@ -153,5 +153,10 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
                                         ((MarkerActivity) markerActivityReference).setPicture(null);
                                     }
                                 });
+    }
+
+    @Override
+    public void getGradientAndPositions(AlgorithmResult algorithmResult) {
+        Log.e(TAG, "getGradientAndPositions: You are calling the wrong method");
     }
 }

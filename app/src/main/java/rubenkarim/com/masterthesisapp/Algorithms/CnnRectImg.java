@@ -41,7 +41,7 @@ public class CnnRectImg extends AbstractAlgorithm {
     }
 
     @Override
-    public GradientModel getGradientAndPositions() {
+    public void getGradientAndPositions(AlgorithmResult algorithmResult) {
         int[] imgShapeInput = mTflite.getInputTensor(0).shape(); // cnn: {1, width: 240, Height: 320, 3} cnnTransferlearning: {1, 320, 320, 3}
         mthermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
         //Bitmap grayBitmap = toGrayscale(mImageBitmap);
@@ -73,7 +73,7 @@ public class CnnRectImg extends AbstractAlgorithm {
             }
         }
 
-        return super.calculateGradient(scaledResults, mthermalImageFile);
+        algorithmResult.AlgorithmResult(super.calculateGradient(scaledResults, mthermalImageFile));
     }
 
     private TensorImage getTensorImage(int[] imgShapeInput, Bitmap thermalImage) {

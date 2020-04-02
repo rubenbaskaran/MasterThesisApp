@@ -51,19 +51,19 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     }
 
     @Override
-    public GradientModel getGradientAndPositions() {
+    public void getGradientAndPositions(AlgorithmResult algorithmResult) {
         int[] rightEyeMax = getMaxMinSpotInRoi(rightEye, "max");
         int[] leftEyeMax = getMaxMinSpotInRoi(leftEye, "max");
         int[] noseMin = getMaxMinSpotInRoi(nose, "min");
 
-        return super.calculateGradient(
+        algorithmResult.AlgorithmResult(super.calculateGradient(
                 rightEyeMax[0],
                 rightEyeMax[1],
                 leftEyeMax[0],
                 leftEyeMax[1],
                 noseMin[0],
                 noseMin[1],
-                capturedImageBitmap);
+                capturedImageBitmap));
     }
 
     private int[] getMaxMinSpotInRoi(RoiModel roiCircle, String category) {
