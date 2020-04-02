@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
+import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
@@ -33,9 +34,10 @@ public class CnnRectImg extends AbstractAlgorithm {
     private final Interpreter mTflite;
     private ThermalImageFile mthermalImageFile;
 
-    public CnnRectImg(MarkerActivity markerActivity, String cnnModelFilePath, ThermalImageFile mThermalImage) throws IOException {
+    public CnnRectImg(MarkerActivity markerActivity, String cnnModelFilePath, String thermalImagePath) throws IOException {
         mTflite = new Interpreter((ByteBuffer) loadModelFile(markerActivity, cnnModelFilePath));
-        this.mthermalImageFile = mThermalImage;
+        ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
+        this.mthermalImageFile = thermalImageFile;
     }
 
     @Override
