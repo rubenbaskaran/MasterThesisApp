@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
-import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 
@@ -25,23 +24,25 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 import rubenkarim.com.masterthesisapp.Activities.MarkerActivity;
+import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 public class CnnRectImg extends AbstractAlgorithm {
 
     private final Interpreter mTflite;
-    private ThermalImageFile mthermalImageFile;
+    private ThermalImageFile mThermalImage;
+    private static final String TAG = CnnRectImg.class.getSimpleName();
 
     public CnnRectImg(MarkerActivity markerActivity, String cnnModelFilePath, ThermalImageFile thermalImage) throws IOException {
         mTflite = new Interpreter((ByteBuffer) loadModelFile(markerActivity, cnnModelFilePath));
-        this.mthermalImageFile = thermalImage;
+        this.mThermalImage = thermalImage;
     }
 
     @Override
     public void getGradientAndPositions(AlgorithmResult algorithmResult) {
         int[] imgShapeInput = mTflite.getInputTensor(0).shape(); // cnn: {1, width: 240, Height: 320, 3} cnnTransferlearning: {1, 320, 320, 3}
-        mthermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
+        mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
         //Bitmap grayBitmap = toGrayscale(mImageBitmap);
-        Bitmap thermalImage = super.getBitmap(mthermalImageFile);
+        Bitmap thermalImage = super.getBitmap(mThermalImage);
 
         //Change Img
         int cnnImgInputSize = 640; //image has not been downsized yet
@@ -56,6 +57,7 @@ public class CnnRectImg extends AbstractAlgorithm {
         //Get predictions
         mTflite.run(tensorImage.getBuffer(), tensorBufferOutput.getBuffer().rewind());
 
+
         float heightProportion = (float) thermalImage.getHeight() / imgShapeInput[2];
         float widthProportion = (float) thermalImage.getWidth() / imgShapeInput[1];
 
@@ -69,7 +71,7 @@ public class CnnRectImg extends AbstractAlgorithm {
             }
         }
 
-        algorithmResult.onResult(super.calculateGradient(scaledResults, mthermalImageFile));
+        algorithmResult.onResult(super.calculateGradient(scaledResults, mThermalImage));
     }
 
     private TensorImage getTensorImage(int[] imgShapeInput, Bitmap thermalImage) {
