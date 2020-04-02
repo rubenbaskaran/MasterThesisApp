@@ -53,6 +53,7 @@ public class ImageProcessing {
             }
         }
         catch (Exception e) {
+            //FIXME: Handle exception or pass it up
             e.printStackTrace();
         }
 
@@ -86,6 +87,7 @@ public class ImageProcessing {
             b.recycle();
         }
         catch (Exception e) {
+            //FIXME: Handle exception or pass it up
             e.printStackTrace();
         }
     }
