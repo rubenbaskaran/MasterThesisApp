@@ -36,11 +36,10 @@ import rubenkarim.com.masterthesisapp.Utilities.Logging;
 public class RgbThermalAlgorithm extends AbstractAlgorithm {
 
     private static final String TAG = RgbThermalAlgorithm.class.getSimpleName();
-    private Context markerActivityReference;
 
-    public RgbThermalAlgorithm(Context markerActivityReference) {
 
-        this.markerActivityReference = markerActivityReference;
+    public RgbThermalAlgorithm() {
+
     }
 
 
@@ -72,7 +71,7 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
             rgbImageBitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
             rgbImageWidth = rgbImageBitmap.getWidth();
             rgbImageHeight = rgbImageBitmap.getHeight();
-        } catch (IOException e) {
+        } catch (NullPointerException | IOException e) {
             //FIXME: Handle exception or pass it up
             Logging.error("getGradientAndPositions", e);
         }
