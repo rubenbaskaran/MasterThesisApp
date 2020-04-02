@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.ThermalImageFile;
+import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.tensorflow.lite.support.image.ImageProcessor;
@@ -93,6 +94,7 @@ public class OverviewActivity extends AppCompatActivity {
     }
 
     private void setPicture(ThermalImageFile thermalImageFile, GradientModel gradientModel) {
+        thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
         Bitmap bmp = ImageProcessing.getBitmap(thermalImageFile);
         drawCirclesOnBitmap(bmp, gradientModel.getEyePosition(), gradientModel.getNosePosition());
         imageView_thermalImageContainer.setImageBitmap(bmp);
