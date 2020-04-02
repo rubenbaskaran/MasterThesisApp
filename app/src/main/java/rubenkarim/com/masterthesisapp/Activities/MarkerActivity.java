@@ -324,7 +324,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
-        intent.putExtra("thermalImageByteArrayWithMarkers", convertBitmapToByteArray(thermalImageBitmapWithMarkers)); //TODO: Ruben move overview things to overview, SOLID principal #1 Single-responsibility principle
+        intent.putExtra("thermalImageByteArrayWithMarkers", convertBitmapToByteArray(thermalImageBitmapWithMarkers)); //TODO: Ruben move overview things to overview, SOLID principle #1 Single-responsibility principle
         Bundle bundle = new Bundle();
         bundle.putSerializable("gradientAndPositions", gradientAndPositions);
         addMinMaxDataIfChosen(bundle);
