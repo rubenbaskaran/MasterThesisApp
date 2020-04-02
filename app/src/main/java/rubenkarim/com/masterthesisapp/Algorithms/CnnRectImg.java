@@ -45,7 +45,7 @@ public class CnnRectImg extends AbstractAlgorithm {
         int[] imgShapeInput = mTflite.getInputTensor(0).shape(); // cnn: {1, width: 240, Height: 320, 3} cnnTransferlearning: {1, 320, 320, 3}
         mthermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
         //Bitmap grayBitmap = toGrayscale(mImageBitmap);
-        Bitmap thermalImage = getBitmap(mthermalImageFile);
+        Bitmap thermalImage = super.getBitmap(mthermalImageFile);
 
         //Change Img
         int cnnImgInputSize = 640; //image has not been downsized yet
@@ -94,11 +94,6 @@ public class CnnRectImg extends AbstractAlgorithm {
         long startOffset = fileDescriptor.getStartOffset();
         long declaredLength = fileDescriptor.getDeclaredLength();
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
-    }
-
-    private Bitmap getBitmap(ThermalImageFile thermalImageFile) {
-        JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-        return BitmapAndroid.createBitmap(javaBuffer).getBitMap();
     }
 
     private BitmapWithBordersInfo addBlackBorder(Bitmap bmp, int minImgSize) {
