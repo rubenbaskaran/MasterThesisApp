@@ -61,7 +61,7 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
         ThermalImageFile thermalImageFile = null;
         int defaultVerticalOffset = 25;
         int defaultHorizontalOffset = 10;
-        int defaultScreenHeight = 1680;
+        int defaultScreenHeight = 1848;
         int defaultScreenWidth = 1080;
 
         int scaledVerticalOffset = deviceScreenHeight > defaultScreenHeight ?
