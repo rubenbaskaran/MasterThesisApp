@@ -23,13 +23,11 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     private int[] center;
     private int radius;
     private ThermalImageFile capturedImageBitmap;
-    private String thermalImagePath;
+    private String mThermalImagePath;
     //endregion
 
-    public MinMaxAlgorithm(String imagePath, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) throws IOException {
-        thermalImagePath = imagePath;
-        ImageProcessing.FixImageOrientation(imagePath);
-        capturedImageBitmap = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
+    public MinMaxAlgorithm(ThermalImageFile thermalImage, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) throws IOException {
+        capturedImageBitmap = thermalImage;
 
         int[] imageOriginalDimensions = new int[]{capturedImageBitmap.getWidth(), capturedImageBitmap.getHeight()};
         int[] cameraPreviewDimensions = new int[]{cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight()};

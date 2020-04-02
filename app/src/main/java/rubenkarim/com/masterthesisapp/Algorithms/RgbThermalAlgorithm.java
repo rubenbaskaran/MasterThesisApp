@@ -36,21 +36,23 @@ import rubenkarim.com.masterthesisapp.Utilities.Logging;
 public class RgbThermalAlgorithm extends AbstractAlgorithm {
 
     private static final String TAG = RgbThermalAlgorithm.class.getSimpleName();
+    private ThermalImageFile mThermalImageFile;
 
 
-    public RgbThermalAlgorithm() {
+    public RgbThermalAlgorithm(ThermalImageFile thermalImage) {
 
+        mThermalImageFile = thermalImage;
     }
 
 
-    public void getGradientAndPositions(AlgorithmResult algorithmResult, String thermalImagePath, int deviceScreenWidth, int deviceScreenHeight) {
-        Bitmap thermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
+    public void getGradientAndPositions(AlgorithmResult algorithmResult, int deviceScreenWidth, int deviceScreenHeight) {
+        mThermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+        Bitmap thermalImageBitmap = super.getBitmap(mThermalImageFile);
         double thermalImageWidth = thermalImageBitmap.getWidth();
         double thermalImageHeight = thermalImageBitmap.getHeight();
         Bitmap rgbImageBitmap = null;
         double rgbImageWidth = 0;
         double rgbImageHeight = 0;
-        ThermalImageFile thermalImageFile = null;
         int defaultVerticalOffset = 25;
         int defaultHorizontalOffset = 10;
         int defaultScreenHeight = 1848;
@@ -64,17 +66,12 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
                 (defaultHorizontalOffset * (deviceScreenWidth / defaultScreenWidth))
                 : (defaultHorizontalOffset / (defaultScreenWidth / deviceScreenWidth));
 
-        try {
-            thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
-            thermalImageFile.getFusion().setFusionMode(FusionMode.VISUAL_ONLY);
-            JavaImageBuffer javaImageBuffer = thermalImageFile.getImage();
-            rgbImageBitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
-            rgbImageWidth = rgbImageBitmap.getWidth();
-            rgbImageHeight = rgbImageBitmap.getHeight();
-        } catch (NullPointerException | IOException e) {
-            //FIXME: Handle exception or pass it up
-            Logging.error("getGradientAndPositions", e);
-        }
+        ThermalImageFile thermalImageFile = mThermalImageFile;
+        thermalImageFile.getFusion().setFusionMode(FusionMode.VISUAL_ONLY);
+        JavaImageBuffer javaImageBuffer = thermalImageFile.getImage();
+        rgbImageBitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
+        rgbImageWidth = rgbImageBitmap.getWidth();
+        rgbImageHeight = rgbImageBitmap.getHeight();
 
         double widthScalingFactor = thermalImageWidth / rgbImageWidth;
         double heightScalingFactor = thermalImageHeight / rgbImageHeight;
@@ -93,12 +90,13 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
         FirebaseVisionFaceDetector detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
         ThermalImageFile finalThermalImageFile = thermalImageFile;
 
-
+        Logging.info(TAG, "Reacted Firebase");
         detector.detectInImage(firebaseVisionImage)
                 .addOnSuccessListener(
                         new OnSuccessListener<List<FirebaseVisionFace>>() {
                             @Override
                             public void onSuccess(List<FirebaseVisionFace> faces) {
+                                Logging.info(TAG, "onSucces");
                                 // Task completed successfully
                                 // [START_EXCLUDE]
                                 // [START get_face_info]

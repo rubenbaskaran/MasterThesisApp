@@ -17,6 +17,10 @@ public class Logging {
         Log.e("Error - " + methodName, stackTrace);
         writeToLog(methodName, stackTrace);
     }
+    public static void info(String tag, String message) {
+        Log.i(tag, message);
+        writeToLog(tag, message);
+    }
 
     private static void writeToLog(String methodName, String stackTrace) {
         File logDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "/Masterthesislogs/");

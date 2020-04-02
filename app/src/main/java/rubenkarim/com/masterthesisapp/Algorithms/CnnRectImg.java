@@ -31,10 +31,9 @@ public class CnnRectImg extends AbstractAlgorithm {
     private final Interpreter mTflite;
     private ThermalImageFile mthermalImageFile;
 
-    public CnnRectImg(MarkerActivity markerActivity, String cnnModelFilePath, String thermalImagePath) throws IOException {
+    public CnnRectImg(MarkerActivity markerActivity, String cnnModelFilePath, ThermalImageFile thermalImage) throws IOException {
         mTflite = new Interpreter((ByteBuffer) loadModelFile(markerActivity, cnnModelFilePath));
-        ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(thermalImagePath);
-        this.mthermalImageFile = thermalImageFile;
+        this.mthermalImageFile = thermalImage;
     }
 
     @Override
