@@ -115,7 +115,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                     cnn.getGradientAndPositions(this);
                 } catch (IOException e) {
                     Logging.error("ExecuteAlgorithm(), CNN", e);
-                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG);
+                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
                 }
                 break;
             case CNNWithTransferLearning:
@@ -125,7 +125,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                     cnnTransferLearning.getGradientAndPositions(this);
                 } catch (IOException e) {
                     Logging.error("ExecuteAlgorithm(), CNNWithTransferLearning", e);
-                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG);
+                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
                 }
                 break;
             case RgbThermalMapping:

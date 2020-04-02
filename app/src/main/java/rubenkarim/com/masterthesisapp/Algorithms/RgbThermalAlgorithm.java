@@ -1,6 +1,5 @@
 package rubenkarim.com.masterthesisapp.Algorithms;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -12,8 +11,6 @@ import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
@@ -25,8 +22,6 @@ import java.io.IOException;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import rubenkarim.com.masterthesisapp.Activities.MarkerActivity;
-import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
@@ -152,5 +147,6 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
     @Override
     public void getGradientAndPositions(AlgorithmResult algorithmResult) {
         Log.e(TAG, "getGradientAndPositions: You are calling the wrong method");
+        throw new UnsupportedOperationException("Use the overloaded method instead!");
     }
 }
