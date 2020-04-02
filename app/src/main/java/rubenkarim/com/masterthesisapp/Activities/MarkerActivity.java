@@ -149,17 +149,23 @@ public class MarkerActivity extends AppCompatActivity {
     }
 
     public void setPicture(GradientModel gradientAndPositions) {
-        this.gradientAndPositions = gradientAndPositions;
-        ImageProcessing.FixImageOrientation(thermalImagePath);
-        Bitmap originalThermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
+        try {
+            this.gradientAndPositions = gradientAndPositions;
+            ImageProcessing.FixImageOrientation(thermalImagePath);
+            Bitmap originalThermalImageBitmap = ImageProcessing.convertToBitmap(thermalImagePath);
 
-        imageView_thermalImageContainer.setImageBitmap(originalThermalImageBitmap);
+            imageView_thermalImageContainer.setImageBitmap(originalThermalImageBitmap);
 
-        capturedImageDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
-        imageContainerDimensions = new int[]{imageWidth, imageHeight};
+            capturedImageDimensions = new int[]{originalThermalImageBitmap.getWidth(), originalThermalImageBitmap.getHeight()};
+            imageContainerDimensions = new int[]{imageWidth, imageHeight};
 
-        addMarkers(capturedImageDimensions, imageContainerDimensions, imageViewVerticalOffset);
-        Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
+            addMarkers(capturedImageDimensions, imageContainerDimensions, imageViewVerticalOffset);
+            Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
+        } catch (IOException e) {
+            Logging.error("setPicture: ", e);
+            Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG);
+
+        }
     }
 
     private void addMarkers(int[] capturedImageDimensions, int[] imageContainerDimensions, int horizontalOffset) {
