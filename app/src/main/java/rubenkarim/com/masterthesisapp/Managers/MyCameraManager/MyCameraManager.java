@@ -13,6 +13,7 @@ import com.flir.thermalsdk.live.Identity;
 import com.flir.thermalsdk.live.connectivity.ConnectionStatusListener;
 import com.flir.thermalsdk.live.discovery.DiscoveryEventListener;
 import com.flir.thermalsdk.live.discovery.DiscoveryFactory;
+import com.flir.thermalsdk.live.remote.Battery;
 import com.flir.thermalsdk.live.remote.Calibration;
 import com.flir.thermalsdk.live.streaming.ThermalImageStreamListener;
 import com.flir.thermalsdk.log.ThermalLog;
@@ -86,6 +87,23 @@ public class MyCameraManager {
             Logging.error(TAG + "calibrateCamera", e);
         }
 
+    }
+
+    public int getBatteryPercentage() throws NullPointerException{
+        return flirCamera.getRemoteControl().getBattery().getPercentage();
+    }
+
+    public void subscribeToBatterInfo(BatteryInfoListener batteryInfoListener){
+        try {
+            flirCamera.getRemoteControl().getBattery().subscribePercentage(new Battery.BatteryPercentageListener() {
+                @Override
+                public void onPercentageChange(int i) {
+                    batteryInfoListener.BatteryPercentageUpdate(i);
+                }
+            });
+        } catch (Exception e) {
+            batteryInfoListener.subscriptionError(e);
+        }
     }
 
     //region ---------- Flir's less crappy setup code ----------
