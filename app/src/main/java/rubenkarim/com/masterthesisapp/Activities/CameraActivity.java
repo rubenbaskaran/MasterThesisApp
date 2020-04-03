@@ -126,6 +126,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void setupFlirCamera() {
+
         myCameraManager.InitCameraSearchAndSub((thermalImage) -> {
             //The image must not be processed on the UI Thread
             JavaImageBuffer javaImageBuffer = thermalImage.getImage();
@@ -138,15 +139,9 @@ public class CameraActivity extends AppCompatActivity {
 
             if(!isCalibrated){ //TODO: find out when the camera should be calibrated
                 Logging.info(TAG, "trying to calibrate");
-                try {
-                    if(myCameraManager == null){
-                    Logging.info(TAG, "WHAT THE FACK");
-                    }
+                    isCalibrated = true;
                     this.myCameraManager.calibrateCamera();
-                } catch (Exception e) {
-                    Logging.error(TAG +" Calibration Error: ", e);
-                    e.printStackTrace();
-                }
+
             }
 
         });
@@ -164,11 +159,14 @@ public class CameraActivity extends AppCompatActivity {
 
             @Override
             public void identityFound(Identity identity) {
+                Logging.info(TAG, "Identity found: " + identity.toString());
+                Snackbar.make(rootView, "identity found: " +identity.cameraType, Snackbar.LENGTH_INDEFINITE).show();
             }
 
             @Override
             public void onError(IOException e) {
                 runOnUiThread(() -> {
+                    Logging.error("Flir Error", e);
                     Snackbar.make(rootView, "Flir error", Snackbar.LENGTH_INDEFINITE).show();
                 });
             }

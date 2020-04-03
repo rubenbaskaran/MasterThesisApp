@@ -81,9 +81,8 @@ public class MyCameraManager {
         flirCamera.getRemoteControl().getCalibration().nuc();
     }
 
-    //region ---------- Flir's crappy setup code ----------
+    //region ---------- Flir's less crappy setup code ----------
     private ThermalImageStreamListener thermalImageStreamListener = () -> {
-        //THIS IS WEIRD!?
         flirCamera.withImage(this::updateThermalListener);
     };
 
@@ -139,7 +138,9 @@ public class MyCameraManager {
 
     private void connectToFlir(Identity identity){
         try {
+            Logging.info(TAG, "connecting to camera");
             flirCamera.connect(identity, connectionStatusListener);
+            flirCamera.subscribeStream(thermalImageStreamListener);
             DiscoveryFactory.getInstance().stop();
 
             if(flirConnectionListener != null){
