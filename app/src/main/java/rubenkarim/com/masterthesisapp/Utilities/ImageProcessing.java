@@ -112,11 +112,11 @@ public class ImageProcessing {
         return FirebaseVisionImage.fromBitmap(bitmap);
     }
 
-    public static Bitmap convertThermalImageFileToBitmap(ThermalImageFile thermalImageFile) {
-        JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-        return BitmapAndroid.createBitmap(javaBuffer).getBitMap();
-    }
-
+    /**
+     * Converts a thermalImageFile to a android bitmap
+     * @param thermalImageFile The flir thermal image.
+     * @return Android bitmap
+     */
     public static Bitmap getBitmap(ThermalImageFile thermalImageFile) {
         JavaImageBuffer javaBuffer = thermalImageFile.getImage();
         return BitmapAndroid.createBitmap(javaBuffer).getBitMap();

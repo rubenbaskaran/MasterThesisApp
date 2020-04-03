@@ -2,4 +2,5 @@
     <string name="app_name">MasterThesisApp</string>
     <string name="permission_rationale">We need the permissions to take a pictures</string>
     <string name="ok">ok</string>
+    <string name="HardRestart">An error accrued try unplugging flir one and restart the app</string>
 </resources>

@@ -13,6 +13,8 @@ import com.flir.thermalsdk.live.Identity;
 import com.flir.thermalsdk.live.connectivity.ConnectionStatusListener;
 import com.flir.thermalsdk.live.discovery.DiscoveryEventListener;
 import com.flir.thermalsdk.live.discovery.DiscoveryFactory;
+import com.flir.thermalsdk.live.remote.Battery;
+import com.flir.thermalsdk.live.remote.Calibration;
 import com.flir.thermalsdk.live.streaming.ThermalImageStreamListener;
 import com.flir.thermalsdk.log.ThermalLog;
 
@@ -27,7 +29,7 @@ public class MyCameraManager {
     private static final String TAG = MyCameraManager.class.getSimpleName();
     private Camera flirCamera;
     private ArrayList<ThermalImagelistener> thermalImageListeners;
-    private FlirConnectionListener flirConnectionListener;
+    private FlirStatusListener flirStatusListener;
     private Context applicationContext;
 
     public MyCameraManager(Context applicationContext) {
@@ -36,7 +38,6 @@ public class MyCameraManager {
         ThermalSdkAndroid.init(applicationContext, enableLoggingInDebug);
         flirCamera = new Camera();
         thermalImageListeners = new ArrayList<>();
-        Logging.info("FLirVersion", ThermalSdkAndroid.getVersion());
     }
 
     public void addThermalImageListener(ThermalImagelistener thermalImagelistener){
@@ -48,8 +49,8 @@ public class MyCameraManager {
         this.thermalImageListeners.add(thermalImagelistener);
     }
 
-    public void subscribeToFlirConnectionStatus(FlirConnectionListener flirConnectionListener){
-        this.flirConnectionListener = flirConnectionListener;
+    public void subscribeToFlirConnectionStatus(FlirStatusListener flirStatusListener){
+        this.flirStatusListener = flirStatusListener;
     }
 
     private void updateThermalListener(ThermalImage thermalImage){
@@ -59,26 +60,50 @@ public class MyCameraManager {
     }
 
     public void close() {
-            Log.i(TAG, "close: CLOSED HAS BEEN CALLED!!!!!");
             if (flirCamera == null) {
-                Log.i(TAG, "close: FLIRCAMER IS NULL CANT CLOSE");
                 return;
             }
             if (flirCamera.isGrabbing()) {
-                Log.i(TAG, "close: FLIRCAMER IS UNSUB STREAMS!");
                 flirCamera.unsubscribeAllStreams();
             }
             flirCamera.disconnect();
 
             if(DiscoveryFactory.getInstance().isDiscovering()){
-                Log.i(TAG, "close: IS CLOSING SCANNING!!!!!!");
                 DiscoveryFactory.getInstance().stop();
             }
     }
 
-    public void calibrateCamera() {
+    public void calibrateCamera() throws NullPointerException {
         Logging.info("FLIRONE", "is calibrating");
         flirCamera.getRemoteControl().getCalibration().nuc();
+        try {
+            flirCamera.getRemoteControl().getCalibration().subscribeCalibrationState(new Calibration.NucStateListener() {
+                @Override
+                public void onNucState(boolean b) {
+                    flirStatusListener.isCalibrating(b);
+                }
+            });
+        } catch (Exception e) {
+            Logging.error(TAG + "calibrateCamera", e);
+        }
+
+    }
+
+    public int getBatteryPercentage() throws NullPointerException{
+        return flirCamera.getRemoteControl().getBattery().getPercentage();
+    }
+
+    public void subscribeToBatterInfo(BatteryInfoListener batteryInfoListener){
+        try {
+            flirCamera.getRemoteControl().getBattery().subscribePercentage(new Battery.BatteryPercentageListener() {
+                @Override
+                public void onPercentageChange(int i) {
+                    batteryInfoListener.BatteryPercentageUpdate(i);
+                }
+            });
+        } catch (Exception e) {
+            batteryInfoListener.subscriptionError(e);
+        }
     }
 
     //region ---------- Flir's less crappy setup code ----------
@@ -89,7 +114,7 @@ public class MyCameraManager {
     private final ConnectionStatusListener connectionStatusListener = new ConnectionStatusListener() {
         @Override
         public void onDisconnected(ErrorCode errorCode) {
-            flirConnectionListener.onDisconnected(errorCode);
+            flirStatusListener.onDisconnected(errorCode);
         }
     };
 
@@ -111,15 +136,15 @@ public class MyCameraManager {
 
                         @Override
                         public void permissionDenied(@NonNull Identity identity) {
-                            if(flirConnectionListener != null){
-                                flirConnectionListener.permissionDenied(identity);
+                            if(flirStatusListener != null){
+                                flirStatusListener.permissionDenied(identity);
                             }
                         }
 
                         @Override
                         public void error(ErrorType errorType, Identity identity) {
-                            if(flirConnectionListener != null){
-                                flirConnectionListener.permissionError(errorType, identity);
+                            if(flirStatusListener != null){
+                                flirStatusListener.permissionError(errorType, identity);
                             }
                         }
                     });
@@ -132,6 +157,7 @@ public class MyCameraManager {
 
         @Override
         public void onDiscoveryError(CommunicationInterface communicationInterface, ErrorCode errorCode) {
+            Logging.info(TAG , " onDiscoveryError: "+ errorCode.toString());
             Log.e(TAG, "onDiscoveryError: " + errorCode + " interface: " + communicationInterface);
         }
     };
@@ -143,14 +169,12 @@ public class MyCameraManager {
             flirCamera.subscribeStream(thermalImageStreamListener);
             DiscoveryFactory.getInstance().stop();
 
-            if(flirConnectionListener != null){
-                flirConnectionListener.identityFound(identity);
+            if(flirStatusListener != null){
+                flirStatusListener.cameraFound(identity);
             }
         } catch (IOException e) {
-            flirConnectionListener.onError(e);
+            flirStatusListener.onConnectionError(e);
         }
-
-
     }
     //endregion
 
