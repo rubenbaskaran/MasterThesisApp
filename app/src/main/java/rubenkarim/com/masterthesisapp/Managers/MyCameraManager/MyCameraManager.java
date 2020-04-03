@@ -152,10 +152,10 @@ public class MyCameraManager {
             DiscoveryFactory.getInstance().stop();
 
             if(flirStatusListener != null){
-                flirStatusListener.identityFound(identity);
+                flirStatusListener.cameraFound(identity);
             }
         } catch (IOException e) {
-            flirStatusListener.onError(e);
+            flirStatusListener.onConnectionError(e);
         }
     }
     //endregion

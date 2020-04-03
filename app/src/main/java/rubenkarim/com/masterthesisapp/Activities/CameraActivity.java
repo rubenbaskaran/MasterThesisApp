@@ -158,13 +158,13 @@ public class CameraActivity extends AppCompatActivity {
             }
 
             @Override
-            public void identityFound(Identity identity) {
+            public void cameraFound(Identity identity) {
                 Logging.info(TAG, "Identity found: " + identity.toString());
                 Snackbar.make(rootView, "Flir one found" +identity.cameraType, Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onError(IOException e) {
+            public void onConnectionError(IOException e) {
                 runOnUiThread(() -> {
                     Logging.error("Flir Error", e);
                     Snackbar.make(rootView, R.string.HardRestart, Snackbar.LENGTH_INDEFINITE).show();
