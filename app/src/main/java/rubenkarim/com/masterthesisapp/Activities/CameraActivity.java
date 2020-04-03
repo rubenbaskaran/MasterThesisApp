@@ -172,6 +172,16 @@ public class CameraActivity extends AppCompatActivity {
             }
 
             @Override
+            public void isCalibrating(boolean isCalibrating) {
+                if(isCalibrating){
+                    Snackbar.make(rootView, "Hold on, camera is calibrating", Snackbar.LENGTH_INDEFINITE).show();
+                } else {
+                    Snackbar.make(rootView, "Camera is ready", Snackbar.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
             public void permissionError(UsbPermissionHandler.UsbPermissionListener.ErrorType errorType, Identity identity) {
                 runOnUiThread(() -> {
                     Snackbar.make(rootView, "Permission error: " + errorType.name(), Snackbar.LENGTH_INDEFINITE).show();
