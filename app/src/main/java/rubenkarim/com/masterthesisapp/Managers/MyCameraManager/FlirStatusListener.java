@@ -6,6 +6,9 @@ import com.flir.thermalsdk.live.Identity;
 
 import java.io.IOException;
 
+/**
+ * Is an interface to listen to the different information from the flir camera
+ */
 public interface FlirStatusListener {
     /**
      * Is call when the camera is disconnected ether by user or another error
