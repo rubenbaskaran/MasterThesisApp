@@ -10,22 +10,22 @@ import com.flir.thermalsdk.image.ThermalImage;
 import com.flir.thermalsdk.live.Camera;
 import com.flir.thermalsdk.live.CommunicationInterface;
 import com.flir.thermalsdk.live.Identity;
-import com.flir.thermalsdk.live.connectivity.ConnectionStatus;
 import com.flir.thermalsdk.live.connectivity.ConnectionStatusListener;
 import com.flir.thermalsdk.live.discovery.DiscoveryEventListener;
 import com.flir.thermalsdk.live.discovery.DiscoveryFactory;
 import com.flir.thermalsdk.live.streaming.ThermalImageStreamListener;
 import com.flir.thermalsdk.log.ThermalLog;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
+import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 public class MyCameraManager {
 
     private static final String TAG = MyCameraManager.class.getSimpleName();
     private Camera flirCamera;
-    private ConnectionStatus connectionStatus;
     private ArrayList<ThermalImagelistener> thermalImageListeners;
     private FlirConnectionListener flirConnectionListener;
     private Context applicationContext;
@@ -36,6 +36,7 @@ public class MyCameraManager {
         ThermalSdkAndroid.init(applicationContext, enableLoggingInDebug);
         flirCamera = new Camera();
         thermalImageListeners = new ArrayList<>();
+        Logging.info("FLirVersion", ThermalSdkAndroid.getVersion());
     }
 
     public void addThermalImageListener(ThermalImagelistener thermalImagelistener){
@@ -75,39 +76,21 @@ public class MyCameraManager {
             }
     }
 
-    //region ---------- Flir's crappy setup code ----------
-    private final Camera.Consumer<ThermalImage> handleIncomingThermalImage = this::updateThermalListener;
+    public void calibrateCamera() {
+        Logging.info("FLIRONE", "is calibrating");
+        flirCamera.getRemoteControl().getCalibration().nuc();
+    }
 
+    //region ---------- Flir's less crappy setup code ----------
     private ThermalImageStreamListener thermalImageStreamListener = () -> {
-        //THIS IS WEIRD!?
-        flirCamera.withImage(this.thermalImageStreamListener, handleIncomingThermalImage);
+        flirCamera.withImage(this::updateThermalListener);
     };
 
-    private final ConnectionStatusListener connectionStatusListener = (connectionStatus, errorCode)->{
-            switch (connectionStatus){
-                case CONNECTING:
-                    if(this.flirConnectionListener != null){
-                        this.flirConnectionListener.onConnecting(connectionStatus);
-                    }
-                case DISCONNECTING:
-                    if(this.flirConnectionListener != null){
-                        this.flirConnectionListener.onDisconnecting(connectionStatus);
-                    }
-
-                case CONNECTED:
-                    if(this.flirConnectionListener != null){
-                        this.flirConnectionListener.onConnected(connectionStatus);
-                    }
-                    flirCamera.subscribeStream(thermalImageStreamListener);
-                    break;
-
-                case DISCONNECTED:
-                    if(this.flirConnectionListener != null){
-                        if (errorCode != null && errorCode.getCode() != 0){
-                            this.flirConnectionListener.onDisconnected(connectionStatus, errorCode);
-                        }
-                    }
-            }
+    private final ConnectionStatusListener connectionStatusListener = new ConnectionStatusListener() {
+        @Override
+        public void onDisconnected(ErrorCode errorCode) {
+            flirConnectionListener.onDisconnected(errorCode);
+        }
     };
 
     private DiscoveryEventListener aDiscoveryEventListener = new DiscoveryEventListener() {
@@ -153,12 +136,18 @@ public class MyCameraManager {
         }
     };
 
-    private void connectToFlir(Identity identity) {
-        flirCamera.connect(identity, connectionStatusListener);
-        DiscoveryFactory.getInstance().stop();
+    private void connectToFlir(Identity identity){
+        try {
+            Logging.info(TAG, "connecting to camera");
+            flirCamera.connect(identity, connectionStatusListener);
+            flirCamera.subscribeStream(thermalImageStreamListener);
+            DiscoveryFactory.getInstance().stop();
 
-        if(flirConnectionListener != null){
-            flirConnectionListener.identityFound(identity);
+            if(flirConnectionListener != null){
+                flirConnectionListener.identityFound(identity);
+            }
+        } catch (IOException e) {
+            flirConnectionListener.onError(e);
         }
 
 

@@ -22,7 +22,6 @@ import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.flir.thermalsdk.live.Identity;
-import com.flir.thermalsdk.live.connectivity.ConnectionStatus;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -57,6 +56,7 @@ public class CameraActivity extends AppCompatActivity {
     private ImageView imageView_faceTemplate;
     private RelativeLayout relativeLayout_eyeNoseTemplate;
     private ProgressBar progressBar_loadingAnimation;
+    private boolean isCalibrated = false;
     //endregion
 
     @Override
@@ -126,6 +126,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void setupFlirCamera() {
+
         myCameraManager.InitCameraSearchAndSub((thermalImage) -> {
             //The image must not be processed on the UI Thread
             JavaImageBuffer javaImageBuffer = thermalImage.getImage();
@@ -135,18 +136,19 @@ public class CameraActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 imageView_cameraPreviewContainer.setImageBitmap(bitmap);
             });
+
+            if(!isCalibrated){ //TODO: find out when the camera should be calibrated
+                Logging.info(TAG, "trying to calibrate");
+                    isCalibrated = true;
+                    this.myCameraManager.calibrateCamera();
+
+            }
+
         });
 
         myCameraManager.subscribeToFlirConnectionStatus(new FlirConnectionListener() {
             @Override
-            public void onConnected(ConnectionStatus connectionStatus) {
-                runOnUiThread(() -> {
-                    Snackbar.make(rootView, "Camera connected", Snackbar.LENGTH_SHORT).show();
-                });
-            }
-
-            @Override
-            public void onDisconnected(ConnectionStatus connectionStatus, ErrorCode errorCode) {
+            public void onDisconnected(ErrorCode errorCode) {
                 runOnUiThread(() -> {
                     if (!errorCode.getMessage().isEmpty()) {
                         Snackbar.make(rootView, "Disconnection Error: " + errorCode.getMessage(), Snackbar.LENGTH_INDEFINITE).show();
@@ -156,18 +158,17 @@ public class CameraActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onDisconnecting(ConnectionStatus connectionStatus) {
-            }
-
-            @Override
-            public void onConnecting(ConnectionStatus connectionStatus) {
-                runOnUiThread(() -> {
-                    Snackbar.make(rootView, "Camera connecting", Snackbar.LENGTH_LONG).show();
-                });
-            }
-
-            @Override
             public void identityFound(Identity identity) {
+                Logging.info(TAG, "Identity found: " + identity.toString());
+                Snackbar.make(rootView, "identity found: " +identity.cameraType, Snackbar.LENGTH_INDEFINITE).show();
+            }
+
+            @Override
+            public void onError(IOException e) {
+                runOnUiThread(() -> {
+                    Logging.error("Flir Error", e);
+                    Snackbar.make(rootView, "Flir error", Snackbar.LENGTH_INDEFINITE).show();
+                });
             }
 
             @Override

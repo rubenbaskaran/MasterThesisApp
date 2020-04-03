@@ -3,19 +3,17 @@ package rubenkarim.com.masterthesisapp.Managers.MyCameraManager;
 import com.flir.thermalsdk.ErrorCode;
 import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
 import com.flir.thermalsdk.live.Identity;
-import com.flir.thermalsdk.live.connectivity.ConnectionStatus;
+
+import java.io.IOException;
 
 public interface FlirConnectionListener {
-    void onConnected(ConnectionStatus connectionStatus);
-    void onDisconnected(ConnectionStatus connectionStatus, ErrorCode errorCode);
-
-    void onDisconnecting(ConnectionStatus connectionStatus);
-
-    void onConnecting(ConnectionStatus connectionStatus);
+    void onDisconnected(ErrorCode errorCode);
 
     void identityFound(Identity identity);
 
     void permissionError(UsbPermissionHandler.UsbPermissionListener.ErrorType errorType, Identity identity);
 
     void permissionDenied(Identity identity);
+
+    void onError(IOException e);
 }
