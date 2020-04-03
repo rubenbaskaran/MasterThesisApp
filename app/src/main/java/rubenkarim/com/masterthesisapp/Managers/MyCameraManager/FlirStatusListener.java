@@ -6,7 +6,7 @@ import com.flir.thermalsdk.live.Identity;
 
 import java.io.IOException;
 
-public interface FlirConnectionListener {
+public interface FlirStatusListener {
     void onDisconnected(ErrorCode errorCode);
 
     void identityFound(Identity identity);
@@ -16,4 +16,6 @@ public interface FlirConnectionListener {
     void permissionDenied(Identity identity);
 
     void onError(IOException e);
+
+    void isCalibrating(boolean isCalibrating);
 }

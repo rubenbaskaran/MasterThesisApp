@@ -32,7 +32,7 @@ import java.util.HashMap;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.FlirConnectionListener;
+import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.FlirStatusListener;
 import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.MyCameraManager;
 import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionListener;
 import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionManager;
@@ -146,7 +146,7 @@ public class CameraActivity extends AppCompatActivity {
 
         });
 
-        myCameraManager.subscribeToFlirConnectionStatus(new FlirConnectionListener() {
+        myCameraManager.subscribeToFlirConnectionStatus(new FlirStatusListener() {
             @Override
             public void onDisconnected(ErrorCode errorCode) {
                 runOnUiThread(() -> {
@@ -160,14 +160,14 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void identityFound(Identity identity) {
                 Logging.info(TAG, "Identity found: " + identity.toString());
-                Snackbar.make(rootView, "identity found: " +identity.cameraType, Snackbar.LENGTH_INDEFINITE).show();
+                Snackbar.make(rootView, "Flir one found" +identity.cameraType, Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(IOException e) {
                 runOnUiThread(() -> {
                     Logging.error("Flir Error", e);
-                    Snackbar.make(rootView, "Flir error", Snackbar.LENGTH_INDEFINITE).show();
+                    Snackbar.make(rootView, R.string.HardRestart, Snackbar.LENGTH_INDEFINITE).show();
                 });
             }
 
