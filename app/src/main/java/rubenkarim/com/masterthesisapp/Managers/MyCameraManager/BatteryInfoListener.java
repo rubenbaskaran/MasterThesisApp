@@ -1,6 +1,6 @@
 package rubenkarim.com.masterthesisapp.Managers.MyCameraManager;
 
-interface BatteryInfoListener {
+public interface BatteryInfoListener {
     void BatteryPercentageUpdate(int percentage);
     void subscriptionError(Exception e);
 }

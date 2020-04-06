@@ -32,6 +32,8 @@ import java.util.HashMap;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import eo.view.batterymeter.BatteryMeterView;
+import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.BatteryInfoListener;
 import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.FlirStatusListener;
 import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.MyCameraManager;
 import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionListener;
@@ -57,6 +59,7 @@ public class CameraActivity extends AppCompatActivity {
     private RelativeLayout relativeLayout_eyeNoseTemplate;
     private ProgressBar progressBar_loadingAnimation;
     private boolean isCalibrated = false;
+    private BatteryMeterView batteryMeterView_BatteryIndicator;
     //endregion
 
     @Override
@@ -68,6 +71,7 @@ public class CameraActivity extends AppCompatActivity {
         imageView_faceTemplate = findViewById(R.id.imageView_faceTemplate);
         progressBar_loadingAnimation = findViewById(R.id.progressBar_cameraViewLoadingAnimation);
         imageView_cameraPreviewContainer = findViewById(R.id.imageView_cameraPreviewContainer);
+        batteryMeterView_BatteryIndicator = findViewById(R.id.batteryMeterView_BatteryIndicator);
 
         if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
             relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
@@ -193,6 +197,18 @@ public class CameraActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     Snackbar.make(rootView, "USB Permission is Denied", Snackbar.LENGTH_INDEFINITE).show();
                 });
+            }
+        });
+
+        myCameraManager.subscribeToBatteryInfo(new BatteryInfoListener() {
+            @Override
+            public void BatteryPercentageUpdate(int percentage) {
+
+            }
+
+            @Override
+            public void subscriptionError(Exception e) {
+
             }
         });
     }
