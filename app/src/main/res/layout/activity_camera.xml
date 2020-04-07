@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/linearLayout_CameraActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -36,6 +37,19 @@
             android:layout_centerInParent="true"
             android:src="@drawable/face_template"
             android:visibility="visible" />
+
+        <eo.view.batterymeter.BatteryMeterView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:padding="10dp"
+            android:id="@+id/batteryMeterView_BatteryIndicator"
+            app:batteryMeterChargingColor="#4caf50"
+            app:batteryMeterColor="#0277bd"
+            app:batteryMeterCriticalChargeLevel="20"
+            app:batteryMeterCriticalColor="#d84315"
+            app:batteryMeterIndicatorColor="@android:color/transparent"
+            app:batteryMeterTheme="rounded"
+            app:batteryMeterUnknownColor="#e0e0e0" />
 
         <RelativeLayout
             android:id="@+id/relativeLayout_eyeNoseTemplate"

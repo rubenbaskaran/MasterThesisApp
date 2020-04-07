@@ -98,7 +98,7 @@ public class ImageProcessing {
         return returnedBitmap;
     }
 
-    public static Bitmap convertToBitmap(String imagePath) throws NullPointerException {
+    private static Bitmap convertToBitmap(String imagePath) throws NullPointerException {
         Bitmap btp;
         btp = BitmapFactory.decodeFile(imagePath);
         if(btp != null){
@@ -106,10 +106,6 @@ public class ImageProcessing {
         } else {
             throw new NullPointerException("image cannot be found or converted imgPath: " + imagePath);
         }
-    }
-
-    public static FirebaseVisionImage convertToFirebaseVisionImage(Bitmap bitmap) {
-        return FirebaseVisionImage.fromBitmap(bitmap);
     }
 
     /**

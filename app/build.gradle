@@ -45,5 +45,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-ml-vision-face-model:19.0.0'
     implementation 'org.tensorflow:tensorflow-lite:+'
     implementation 'org.tensorflow:tensorflow-lite-support:0.0.0-nightly'
-
+    implementation 'eo.view:batterymeter:2.0.0'
 }
