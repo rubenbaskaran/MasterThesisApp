@@ -53,7 +53,7 @@ public class CameraActivity extends AppCompatActivity {
     private View rootView;
     private MyCameraManager myCameraManager;
     private PermissionManager permissionManager;
-    private String thermalImagePath;
+    private String mThermalImagePath;
     private ImageView imageView_cameraPreviewContainer;
     private ImageView imageView_faceTemplate;
     private RelativeLayout relativeLayout_eyeNoseTemplate;
@@ -228,9 +228,9 @@ public class CameraActivity extends AppCompatActivity {
             String defaultImageName = "Thermal_Test_Img4.jpg";
             ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open(defaultImageName));
             thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
-            thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + defaultImageName;
-            thermalImageFile.saveAs(thermalImagePath);
-            imageView_cameraPreviewContainer.setImageBitmap(ImageProcessing.convertToBitmap(thermalImagePath));
+            mThermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + defaultImageName;
+            thermalImageFile.saveAs(mThermalImagePath);
+            imageView_cameraPreviewContainer.setImageBitmap(ImageProcessing.convertToBitmap(mThermalImagePath));
             useDefaultImage = true;
         } catch (IOException e) {
             Snackbar.make(rootView, "an error accrued when open default image", Snackbar.LENGTH_SHORT).show();
@@ -259,8 +259,8 @@ public class CameraActivity extends AppCompatActivity {
                 try {
                     if (isDirectoryCreated) {
                         String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
-                        thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
-                        thermalImage.saveAs(thermalImagePath);
+                        mThermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
+                        thermalImage.saveAs(mThermalImagePath);
                         goToMarkerActivity();
                     } else {
                         Log.i(TAG, "saveThermalImage: ERROR! IMAGE DIR NOT CREATED");
@@ -284,7 +284,7 @@ public class CameraActivity extends AppCompatActivity {
         int imageWidth = imageView_cameraPreviewContainer.getWidth();
 
         Intent intent = new Intent(getApplicationContext(), MarkerActivity.class);
-        intent.putExtra("thermalImagePath", thermalImagePath);
+        intent.putExtra("thermalImagePath", mThermalImagePath);
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
