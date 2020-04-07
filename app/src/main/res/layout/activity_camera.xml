@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout_CameraActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -39,10 +39,10 @@
             android:visibility="visible" />
 
         <eo.view.batterymeter.BatteryMeterView
+            android:id="@+id/batteryMeterView_BatteryIndicator"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:padding="10dp"
-            android:id="@+id/batteryMeterView_BatteryIndicator"
             app:batteryMeterChargingColor="#4caf50"
             app:batteryMeterColor="#0277bd"
             app:batteryMeterCriticalChargeLevel="20"
@@ -96,16 +96,13 @@
         android:weightSum="2">
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="backOnClick"
-            android:text="Back" />
+            style="@style/LeftNavigationButtonStyle"
+            android:background="@drawable/button_background"
+            android:onClick="backOnClick" />
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            style="@style/RightNavigationButtonStyle"
+            android:background="@drawable/button_background"
             android:onClick="takePictureOnClick"
             android:text="Take Picture" />
     </LinearLayout>

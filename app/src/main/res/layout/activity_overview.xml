@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout_rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="7"
-    tools:context=".Activities.OverviewActivity"
-    android:id="@+id/LinearLayout_rootView">
+    tools:context=".Activities.OverviewActivity">
 
     <ImageView
         android:id="@+id/imageView_patientImage"
@@ -16,41 +16,54 @@
         android:background="@color/colorPrimaryDark"
         android:scaleType="fitXY" />
 
-    <EditText
-        android:id="@+id/textView_cprNumber"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5"
-        android:gravity="center"
-        android:hint="Enter CPR number..."
-        android:inputType="number"
-        android:maxLength="10"
-        android:background="@null"/>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.5"
-        android:orientation="horizontal"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="1.5dp"
+        android:layout_weight="1"
+        android:background="@drawable/results_background"
+        android:orientation="vertical"
         android:weightSum="1">
 
-        <TextView
-            android:id="@+id/textView_gradient"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+        <EditText
+            android:id="@+id/textView_cprNumber"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="0.5"
-            android:background="@color/colorAccent"
+            android:background="@null"
             android:gravity="center"
-            android:text="Gradient"
-            android:maxLength="7"/>
+            android:hint="Enter CPR number..."
+            android:inputType="number"
+            android:maxLength="10" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="0.5"
-            android:background="@color/colorPrimary"
-            android:gravity="center"
-            android:text="Health rating" />
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <TextView
+                android:id="@+id/textView_gradient"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="0.5"
+                android:gravity="center"
+                android:maxLength="7"
+                android:text="Gradient" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="0.5"
+                android:gravity="center"
+                android:text="Health rating" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -61,16 +74,13 @@
         android:weightSum="2">
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="backOnClick"
-            android:text="Back" />
+            style="@style/LeftNavigationButtonStyle"
+            android:background="@drawable/button_background"
+            android:onClick="backOnClick" />
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            style="@style/RightNavigationButtonStyle"
+            android:background="@drawable/button_background"
             android:onClick="saveOnClick"
             android:text="Save" />
 

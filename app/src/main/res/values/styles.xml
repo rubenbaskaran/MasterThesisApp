@@ -8,4 +8,39 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="ButtonParentStyle">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="MenuButtonStyle" parent="ButtonParentStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginTop">2.5dp</item>
+        <item name="android:layout_marginBottom">2.5dp</item>
+        <item name="android:layout_marginStart">5dp</item>
+        <item name="android:layout_marginEnd">5dp</item>
+    </style>
+
+    <style name="LeftNavigationButtonStyle" parent="ButtonParentStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:layout_marginStart">5dp</item>
+        <item name="android:layout_marginEnd">2.5dp</item>
+        <item name="android:text">Back</item>
+    </style>
+
+    <style name="RightNavigationButtonStyle" parent="ButtonParentStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:layout_marginStart">2.5dp</item>
+        <item name="android:layout_marginEnd">5dp</item>
+    </style>
+
 </resources>

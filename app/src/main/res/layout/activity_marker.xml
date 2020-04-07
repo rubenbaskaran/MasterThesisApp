@@ -37,16 +37,13 @@
         android:weightSum="2">
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:onClick="backOnClick"
-            android:text="Back" />
+            style="@style/LeftNavigationButtonStyle"
+            android:background="@drawable/button_background"
+            android:onClick="backOnClick" />
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            style="@style/RightNavigationButtonStyle"
+            android:background="@drawable/button_background"
             android:onClick="submitOnClick"
             android:text="Submit" />
     </LinearLayout>
