@@ -76,7 +76,7 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
         double widthScalingFactor = thermalImageWidth / rgbImageWidth;
         double heightScalingFactor = thermalImageHeight / rgbImageHeight;
 
-        FirebaseVisionImage firebaseVisionImage = ImageProcessing.convertToFirebaseVisionImage(rgbImageBitmap);
+        FirebaseVisionImage firebaseVisionImage = convertToFirebaseVisionImage(rgbImageBitmap);
 
         FirebaseVisionFaceDetectorOptions options =
                 new FirebaseVisionFaceDetectorOptions.Builder()
@@ -145,5 +145,9 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
     public void getGradientAndPositions(AlgorithmResult algorithmResult) {
         Log.e(TAG, "getGradientAndPositions: You are calling the wrong method");
         throw new UnsupportedOperationException("Use the overloaded method instead!");
+    }
+
+    private FirebaseVisionImage convertToFirebaseVisionImage(Bitmap bitmap) {
+        return FirebaseVisionImage.fromBitmap(bitmap);
     }
 }

@@ -108,10 +108,6 @@ public class ImageProcessing {
         }
     }
 
-    public static FirebaseVisionImage convertToFirebaseVisionImage(Bitmap bitmap) {
-        return FirebaseVisionImage.fromBitmap(bitmap);
-    }
-
     /**
      * Converts a thermalImageFile to a android bitmap
      * @param thermalImageFile The flir thermal image.
