@@ -96,6 +96,20 @@ public class MyCameraManager {
     public void subscribeToBatteryInfo(BatteryInfoListener batteryInfoListener){
         try {
             flirCamera.getRemoteControl().getBattery().subscribePercentage(i -> batteryInfoListener.BatteryPercentageUpdate(i));
+
+            flirCamera.getRemoteControl().getBattery().subscribeChargingState(new Battery.BatteryStateListener() {
+                @Override
+                public void onStateChange(Battery.ChargingState chargingState) {
+                    switch (chargingState){
+                        case MANAGED_CHARGING:
+                        case MANAGED_CHARGING_ONLY:
+                            batteryInfoListener.isCharging(true);
+                        case NO_CHARGING:
+                            batteryInfoListener.isCharging(false);
+                    }
+                }
+            });
+
         } catch (Exception e) {
             batteryInfoListener.subscriptionError(e);
         }

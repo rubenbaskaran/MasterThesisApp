@@ -92,8 +92,7 @@ public class CameraActivity extends AppCompatActivity {
     private void checkPermissions(HashMap<String, UsbDevice> deviceList) {
         if (PermissionManager.checkPermissions(this, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             startCameraPreview(deviceList);
-        }
-        else {
+        } else {
             permissionManager.requestPermissions(this, new PermissionListener() {
                         @Override
                         public void permissionGranted(String[] permissions) {
@@ -122,8 +121,7 @@ public class CameraActivity extends AppCompatActivity {
         if (!deviceList.isEmpty()) {
             Snackbar.make(rootView, "FLIR camera detected. Trying to connect", Snackbar.LENGTH_SHORT).show();
             setupFlirCamera();
-        }
-        else {
+        } else {
             Snackbar.make(rootView, "Can't find FLIR camera. Using default image", Snackbar.LENGTH_SHORT).show();
             setupDefaultImage();
         }
@@ -141,10 +139,10 @@ public class CameraActivity extends AppCompatActivity {
                 imageView_cameraPreviewContainer.setImageBitmap(bitmap);
             });
 
-            if(!isCalibrated){ //TODO: find out when the camera should be calibrated
+            if (!isCalibrated) { //TODO: find out when the camera should be calibrated
                 Logging.info(TAG, "trying to calibrate");
-                    isCalibrated = true;
-                    this.myCameraManager.calibrateCamera();
+                isCalibrated = true;
+                this.myCameraManager.calibrateCamera();
                 myCameraManager.subscribeToBatteryInfo(new BatteryInfoListener() {
                     @Override
                     public void BatteryPercentageUpdate(int percentage) {
@@ -156,11 +154,16 @@ public class CameraActivity extends AppCompatActivity {
                         Logging.error("BatteryInfoListener", e);
                         batteryMeterView_BatteryIndicator.setChargeLevel(null);
                     }
+
+                    @Override
+                    public void isCharging(boolean b) {
+                        batteryMeterView_BatteryIndicator.setCharging(b);
+                    }
                 });
 
-                try{
+                try {
                     batteryMeterView_BatteryIndicator.setChargeLevel(myCameraManager.getBatteryPercentage());
-                } catch (NullPointerException e){
+                } catch (NullPointerException e) {
                     Logging.error(TAG, e);
                 }
             }
@@ -181,7 +184,7 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void cameraFound(Identity identity) {
                 Logging.info(TAG, "Identity found: " + identity.toString());
-                Snackbar.make(rootView, "Flir one found" +identity.cameraType, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(rootView, "Flir one found" + identity.cameraType, Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
@@ -194,7 +197,7 @@ public class CameraActivity extends AppCompatActivity {
 
             @Override
             public void isCalibrating(boolean isCalibrating) {
-                if(isCalibrating){
+                if (isCalibrating) {
                     Snackbar.make(rootView, "Hold on, camera is calibrating", Snackbar.LENGTH_INDEFINITE).show();
                 } else {
                     Snackbar.make(rootView, "Camera is ready", Snackbar.LENGTH_SHORT).show();
@@ -218,8 +221,6 @@ public class CameraActivity extends AppCompatActivity {
         });
 
 
-
-
     }
 
     private void setupDefaultImage() {
@@ -231,8 +232,7 @@ public class CameraActivity extends AppCompatActivity {
             thermalImageFile.saveAs(thermalImagePath);
             imageView_cameraPreviewContainer.setImageBitmap(ImageProcessing.convertToBitmap(thermalImagePath));
             useDefaultImage = true;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             Snackbar.make(rootView, "an error accrued when open default image", Snackbar.LENGTH_SHORT).show();
             Logging.error("startCameraPreview", e);
         }
@@ -252,8 +252,7 @@ public class CameraActivity extends AppCompatActivity {
     private void saveThermalImage() {
         if (useDefaultImage) {
             goToMarkerActivity();
-        }
-        else {
+        } else {
             myCameraManager.addThermalImageListener((thermalImage) -> {
                 File ImageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
                 boolean isDirectoryCreated = ImageDir.exists() || ImageDir.mkdirs();
@@ -263,14 +262,12 @@ public class CameraActivity extends AppCompatActivity {
                         thermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                         thermalImage.saveAs(thermalImagePath);
                         goToMarkerActivity();
-                    }
-                    else {
+                    } else {
                         Log.i(TAG, "saveThermalImage: ERROR! IMAGE DIR NOT CREATED");
                         Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
                         throw new IOException("Image Directory not created");
                     }
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     //FIXME: Handle exception
                     Log.d(TAG, "saveThermalImage: ERROR: " + e);
                     Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
