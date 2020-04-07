@@ -43,6 +43,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:padding="10dp"
+            android:layout_marginStart="-5dp"
             app:batteryMeterChargingColor="#4caf50"
             app:batteryMeterColor="#0277bd"
             app:batteryMeterCriticalChargeLevel="20"
