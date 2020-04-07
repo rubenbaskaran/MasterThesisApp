@@ -145,7 +145,24 @@ public class CameraActivity extends AppCompatActivity {
                 Logging.info(TAG, "trying to calibrate");
                     isCalibrated = true;
                     this.myCameraManager.calibrateCamera();
+                myCameraManager.subscribeToBatteryInfo(new BatteryInfoListener() {
+                    @Override
+                    public void BatteryPercentageUpdate(int percentage) {
+                        batteryMeterView_BatteryIndicator.setChargeLevel(percentage);
+                    }
 
+                    @Override
+                    public void subscriptionError(Exception e) {
+                        Logging.error("BatteryInfoListener", e);
+                        batteryMeterView_BatteryIndicator.setChargeLevel(null);
+                    }
+                });
+
+                try{
+                    batteryMeterView_BatteryIndicator.setChargeLevel(myCameraManager.getBatteryPercentage());
+                } catch (NullPointerException e){
+                    Logging.error(TAG, e);
+                }
             }
 
         });
@@ -200,23 +217,9 @@ public class CameraActivity extends AppCompatActivity {
             }
         });
 
-        myCameraManager.subscribeToBatteryInfo(new BatteryInfoListener() {
-            @Override
-            public void BatteryPercentageUpdate(int percentage) {
-                batteryMeterView_BatteryIndicator.setChargeLevel(percentage);
-            }
 
-            @Override
-            public void subscriptionError(Exception e) {
-                batteryMeterView_BatteryIndicator.setChargeLevel(null);
-            }
-        });
 
-        try{
-            batteryMeterView_BatteryIndicator.setChargeLevel(myCameraManager.getBatteryPercentage());
-        } catch (NullPointerException e){
-            Logging.error(TAG, e);
-        }
+
     }
 
     private void setupDefaultImage() {

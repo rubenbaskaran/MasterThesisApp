@@ -95,12 +95,7 @@ public class MyCameraManager {
 
     public void subscribeToBatteryInfo(BatteryInfoListener batteryInfoListener){
         try {
-            flirCamera.getRemoteControl().getBattery().subscribePercentage(new Battery.BatteryPercentageListener() {
-                @Override
-                public void onPercentageChange(int i) {
-                    batteryInfoListener.BatteryPercentageUpdate(i);
-                }
-            });
+            flirCamera.getRemoteControl().getBattery().subscribePercentage(i -> batteryInfoListener.BatteryPercentageUpdate(i));
         } catch (Exception e) {
             batteryInfoListener.subscriptionError(e);
         }
