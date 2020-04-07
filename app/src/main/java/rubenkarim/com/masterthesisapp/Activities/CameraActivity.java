@@ -230,7 +230,7 @@ public class CameraActivity extends AppCompatActivity {
             thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
             mThermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + defaultImageName;
             thermalImageFile.saveAs(mThermalImagePath);
-            imageView_cameraPreviewContainer.setImageBitmap(ImageProcessing.convertToBitmap(mThermalImagePath));
+            imageView_cameraPreviewContainer.setImageBitmap(ImageProcessing.getBitmap(thermalImageFile));
             useDefaultImage = true;
         } catch (IOException e) {
             Snackbar.make(rootView, "an error accrued when open default image", Snackbar.LENGTH_SHORT).show();
