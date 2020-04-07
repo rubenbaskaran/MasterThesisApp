@@ -203,14 +203,20 @@ public class CameraActivity extends AppCompatActivity {
         myCameraManager.subscribeToBatteryInfo(new BatteryInfoListener() {
             @Override
             public void BatteryPercentageUpdate(int percentage) {
-
+                batteryMeterView_BatteryIndicator.setChargeLevel(percentage);
             }
 
             @Override
             public void subscriptionError(Exception e) {
-
+                batteryMeterView_BatteryIndicator.setChargeLevel(null);
             }
         });
+
+        try{
+            batteryMeterView_BatteryIndicator.setChargeLevel(myCameraManager.getBatteryPercentage());
+        } catch (NullPointerException e){
+            Logging.error(TAG, e);
+        }
     }
 
     private void setupDefaultImage() {
