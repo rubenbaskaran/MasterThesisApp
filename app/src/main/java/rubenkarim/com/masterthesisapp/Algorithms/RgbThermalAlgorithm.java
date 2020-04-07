@@ -68,7 +68,7 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
 
         ThermalImageFile thermalImageFile = mThermalImageFile;
         thermalImageFile.getFusion().setFusionMode(FusionMode.VISUAL_ONLY);
-        rgbImageBitmap = ImageProcessing.getBitmap(thermalImageFile);
+        rgbImageBitmap = super.getBitmap(thermalImageFile);
         rgbImageWidth = rgbImageBitmap.getWidth();
         rgbImageHeight = rgbImageBitmap.getHeight();
 
