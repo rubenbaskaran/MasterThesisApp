@@ -113,7 +113,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
                 else {
                     if (colorSumInPixelGroup < minValue) {
                         minValue = colorSumInPixelGroup;
-                        position = new int[]{centerPointInPixelGroup[1], centerPointInPixelGroup[2]};
+                        position = new int[]{center[0], centerPointInPixelGroup[2]};
                     }
                 }
             }
