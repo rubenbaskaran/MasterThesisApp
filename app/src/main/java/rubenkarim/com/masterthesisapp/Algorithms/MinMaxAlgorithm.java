@@ -74,77 +74,50 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
         Integer[] centerPointInPixelGroup = null;
         Bitmap bitmap = super.getBitmap(capturedImageBitmap);
 
-        for (int x = leftUpperCornerLocation[0]; x <= leftUpperCornerLocation[0] + width; x += groupSize) {
-            for (int y = leftUpperCornerLocation[1]; y <= leftUpperCornerLocation[1] + height; y += groupSize) {
-
+        for (int x = leftUpperCornerLocation[0]; x < leftUpperCornerLocation[0] + width; x += groupSize) {
+            for (int y = leftUpperCornerLocation[1]; y < leftUpperCornerLocation[1] + height; y += groupSize) {
                 int colorSumInPixelGroup = 0;
                 ArrayList groupOfPixels = new ArrayList();
-                boolean isDirty = false;
 
                 for (int nestedX = x; nestedX < x + groupSize; nestedX++) {
                     for (int nestedY = y; nestedY < y + groupSize; nestedY++) {
                         if (isPixelInsideRoi(nestedX, nestedY)) {
-                            isDirty = true;
                             targetPixel = bitmap.getPixel(nestedX, nestedY);
                             int pixelColorSum = Color.red(targetPixel) + Color.green(targetPixel) + Color.blue(targetPixel);
                             colorSumInPixelGroup += pixelColorSum;
                             groupOfPixels.add(new Integer[]{pixelColorSum, nestedX, nestedY});
+
+                            // Useful for illustrations in the report
+                            // bitmap.setPixel(nestedX, nestedY, Color.RED);
                         }
                     }
                 }
 
-                if(isDirty) {
-                    Comparator<Integer[]> cmp = new Comparator<Integer[]>() {
-                        @Override
-                        public int compare(Integer[] integer, Integer[] t1) {
-                            return integer[0].compareTo(t1[0]);
-                        }
-                    };
-
-                    centerPointInPixelGroup = category.equals("max") ?
-                            Collections.max(groupOfPixels, cmp) :
-                            Collections.min(groupOfPixels, cmp);
-
-                    colorSumInPixelGroup = colorSumInPixelGroup / (groupSize * groupSize);
-
-                    if (category.equals("max")) {
-                        if (colorSumInPixelGroup > maxValue) {
-                            maxValue = colorSumInPixelGroup;
-                            position = new int[]{centerPointInPixelGroup[1], centerPointInPixelGroup[2]};
-                        }
+                Comparator<Integer[]> cmp = new Comparator<Integer[]>() {
+                    @Override
+                    public int compare(Integer[] integer, Integer[] t1) {
+                        return integer[0].compareTo(t1[0]);
                     }
-                    else {
-                        if (colorSumInPixelGroup < minValue) {
-                            minValue = colorSumInPixelGroup;
-                            position = new int[]{centerPointInPixelGroup[1], centerPointInPixelGroup[2]};
-                        }
+                };
+
+                centerPointInPixelGroup = category.equals("max") ?
+                        Collections.max(groupOfPixels, cmp) :
+                        Collections.min(groupOfPixels, cmp);
+
+                if (category.equals("max")) {
+                    if (colorSumInPixelGroup > maxValue) {
+                        maxValue = colorSumInPixelGroup;
+                        position = new int[]{centerPointInPixelGroup[1], centerPointInPixelGroup[2]};
+                    }
+                }
+                else {
+                    if (colorSumInPixelGroup < minValue) {
+                        minValue = colorSumInPixelGroup;
+                        position = new int[]{centerPointInPixelGroup[1], centerPointInPixelGroup[2]};
                     }
                 }
             }
         }
-
-
-//        for (int x = leftUpperCornerLocation[0]; x <= leftUpperCornerLocation[0] + width; x++) {
-//            for (int y = leftUpperCornerLocation[1]; y <= leftUpperCornerLocation[1] + height; y++) {
-//                if (isPixelInsideRoi(x, y)) {
-//                    targetPixel = bitmap.getPixel(x, y);
-//                    colorSum = Color.red(targetPixel) + Color.green(targetPixel) + Color.blue(targetPixel);
-//
-//                    if (category.equals("max")) {
-//                        if (colorSum > maxValue) {
-//                            maxValue = colorSum;
-//                            position = new int[]{x, y};
-//                        }
-//                    } else {
-//                        if (colorSum < minValue) {
-//                            minValue = colorSum;
-//                            position = new int[]{x, y};
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
 
         return position;
     }
