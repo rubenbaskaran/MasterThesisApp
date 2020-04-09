@@ -53,7 +53,7 @@ public class ImageProcessing {
                 default:
                     degree = 0;
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             //FIXME: Handle exception or pass it up
             e.printStackTrace();
         }
@@ -86,7 +86,6 @@ public class ImageProcessing {
         b.recycle();
     }
 
-    //TODO: Remove if not used
     public static Bitmap loadBitmapFromView(View view) {
         //Define a bitmap with the same size as the view
         Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);

@@ -281,7 +281,6 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         //getPixelColor(x, y);
     }
 
-    //TODO: Ruben skal vi bruge denne her metode?
     private void getPixelColor(int x, int y) {
         Bitmap rootElementBitmap = ImageProcessing.loadBitmapFromView(imageView_thermalImageContainer);
 
