@@ -25,4 +25,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
         startActivity(intent);
     }
+
+    // TODO: Add button for extracting data from db and creating csv file
 }

@@ -122,6 +122,10 @@ public class OverviewActivity extends AppCompatActivity {
     public void saveOnClick(View view) {
         String cpr = textView_cprNumber.getText().toString();
 
+        // TODO: Look up CPR number in Patient table
+        // TODO: Save filename, eye position, nose position, gradient, algorithm and CPR
+        // TODO: Encrypt CPR number
+
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
     }
