@@ -10,7 +10,4 @@ public class Observation {
     public long observationId;
 
     public long patientOwnerId;
-
-    @Embedded
-    public Patient patient;
 }

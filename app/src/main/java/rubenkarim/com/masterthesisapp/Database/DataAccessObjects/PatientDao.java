@@ -6,7 +6,9 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import rubenkarim.com.masterthesisapp.Database.Entities.Patient;
+import rubenkarim.com.masterthesisapp.Database.Relationships.PatientWithObservations;
 
 @Dao
 public interface PatientDao {
@@ -25,4 +27,8 @@ public interface PatientDao {
 
     @Delete
     void delete(Patient patient);
+
+    @Transaction
+    @Query("SELECT * FROM Patient")
+    public List<PatientWithObservations> getPatientsWithObsercations();
 }
