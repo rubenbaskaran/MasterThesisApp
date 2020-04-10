@@ -2,7 +2,6 @@ package rubenkarim.com.masterthesisapp.Activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -14,11 +13,11 @@ import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.material.snackbar.Snackbar;
 
-import org.tensorflow.lite.support.image.ImageProcessor;
-
 import java.io.IOException;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
+import rubenkarim.com.masterthesisapp.Database.AppDatabase;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
@@ -74,7 +73,8 @@ public class OverviewActivity extends AppCompatActivity {
         try {
             ThermalImageFile thermalImage = (ThermalImageFile) ImageFactory.createImage(mThermalImagePath);
             setPicture(thermalImage, mGradientAndPositions);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             Logging.error(TAG + " onCreate: ", e);
             Snackbar.make(mRootView, "There was an error with the thermal image file", Snackbar.LENGTH_INDEFINITE).show();
         }
@@ -123,6 +123,8 @@ public class OverviewActivity extends AppCompatActivity {
         String cpr = textView_cprNumber.getText().toString();
 
         // TODO: Save filename, eye position, nose position, gradient, algorithm and CPR
+        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "database-name").build();
 
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
