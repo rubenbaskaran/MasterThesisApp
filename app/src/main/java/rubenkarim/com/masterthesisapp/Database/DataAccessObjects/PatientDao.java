@@ -30,5 +30,5 @@ public interface PatientDao {
 
     @Transaction
     @Query("SELECT * FROM Patient")
-    public List<PatientWithObservations> getPatientsWithObsercations();
+    public List<PatientWithObservations> getPatientsWithObservations();
 }
