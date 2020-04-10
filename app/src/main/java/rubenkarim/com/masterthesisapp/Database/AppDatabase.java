@@ -2,6 +2,7 @@ package rubenkarim.com.masterthesisapp.Database;
 
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
+import rubenkarim.com.masterthesisapp.Database.DataAccessObjects.ObservationDao;
 import rubenkarim.com.masterthesisapp.Database.DataAccessObjects.PatientDao;
 import rubenkarim.com.masterthesisapp.Database.Entities.Patient;
 
@@ -14,5 +15,6 @@ import rubenkarim.com.masterthesisapp.Database.Entities.Patient;
 
 @Database(entities = {Patient.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
-    public abstract PatientDao userDao();
+    public abstract PatientDao patientDao();
+    public abstract ObservationDao observationDao();
 }

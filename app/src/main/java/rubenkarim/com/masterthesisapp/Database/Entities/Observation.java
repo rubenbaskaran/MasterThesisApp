@@ -11,11 +11,6 @@ public class Observation {
 
     public long patientOwnerId;
 
-    public long algorithmChosenId;
-
     @Embedded
     public Patient patient;
-
-    @Embedded
-    public Algorithm algorithm;
 }
