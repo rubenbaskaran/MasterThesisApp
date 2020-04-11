@@ -17,8 +17,8 @@ public interface ObservationDao {
     List<Observation> findByCprNumber(String cprNumber);
 
     @Insert
-    void insertObservations(Observation... observations);
+    long insertObservation(Observation observation);
 
     @Delete
-    void deleteObservations(Observation... observations);
+    int deleteObservations(Observation... observations);
 }

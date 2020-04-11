@@ -19,10 +19,10 @@ public interface PatientDao {
     Patient findByCprNumber(String cprNumber);
 
     @Insert
-    void insertPatients(Patient... patients);
+    long insertPatient(Patient patient);
 
     @Delete
-    void deletePatients(Patient... patients);
+    int deletePatients(Patient... patients);
 
     @Transaction
     @Query("SELECT * FROM Patient")
