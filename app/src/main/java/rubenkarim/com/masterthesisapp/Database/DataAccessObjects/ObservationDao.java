@@ -4,27 +4,17 @@ import java.util.List;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
-import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.Transaction;
-import rubenkarim.com.masterthesisapp.Database.Entities.Patient;
-import rubenkarim.com.masterthesisapp.Database.Relationships.PatientWithObservations;
+import rubenkarim.com.masterthesisapp.Database.Entities.Observation;
 
 @Dao
 public interface ObservationDao {
-    @Query("SELECT * FROM Patient")
-    List<Patient> getAll();
+    @Query("SELECT * FROM Observation")
+    List<Observation> getAll();
 
-    @Query("SELECT * FROM Patient WHERE patientId IN (:patientIds)")
-    List<Patient> loadAllByIds(int[] patientIds);
-
-    @Query("SELECT * FROM Patient WHERE first_name LIKE :first AND " +
-            "last_name LIKE :last LIMIT 1")
-    Patient findByName(String first, String last);
-
-    @Insert
-    void insertAll(Patient... patients);
+    @Query("SELECT * FROM Observation WHERE patientOwnerId LIKE :cprNumber")
+    List<Observation> findByCprNumber(String cprNumber);
 
     @Delete
-    void delete(Patient patient);
+    void delete(Observation observation);
 }
