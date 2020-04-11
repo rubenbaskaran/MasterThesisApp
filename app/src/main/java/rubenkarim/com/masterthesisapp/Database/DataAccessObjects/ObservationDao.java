@@ -4,6 +4,7 @@ import java.util.List;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
+import androidx.room.Insert;
 import androidx.room.Query;
 import rubenkarim.com.masterthesisapp.Database.Entities.Observation;
 
@@ -14,6 +15,9 @@ public interface ObservationDao {
 
     @Query("SELECT * FROM Observation WHERE patientOwnerId LIKE :cprNumber")
     List<Observation> findByCprNumber(String cprNumber);
+
+    @Insert
+    void insertAll(Observation... observations);
 
     @Delete
     void delete(Observation observation);

@@ -18,6 +18,9 @@ public interface PatientDao {
     @Query("SELECT * FROM Patient WHERE cpr_number LIKE :cprNumber")
     Patient findByCprNumber(String cprNumber);
 
+    @Insert
+    void insertAll(Patient... patients);
+
     @Delete
     void delete(Patient patient);
 
