@@ -1,0 +1,130 @@
+Overskrift: Kunstig intelligens til automatisering af patientprognoser
+Under-overskrift: Maskinlæring og termografi kan automatisere målingen af patienters
+kropstemperaturer, så lægen kan få en tidlig indikator på patienternes helbredstilstande.
+Forfattere:
+Af Karim Møller, Software Engineering studerende, M.Sc., Syddansk Universitet
+Af Ruben Baskaran, Software Engineering studerende, M.Sc., Syddansk Universitet
+1
+Data fra kroppen
+Kroppens blodcirkulation centreres omkring de vitale organer i kritisk syge. Dette kan måles i
+form af en nedsat temperatur på kroppens overflade ved blandt andet næsen og fingrene.
+Derudover ved vi at menneskekroppen udsender varmestråling. Denne stråling kan
+opfanges af termografiske kameraer og konverteres til temperaturværdier. Undersøgelser
+har vist at temperaturen ved den inderste øjenkrog kan bruges til at bestemme kroppens
+kernetemperatur, mens den nedkølede perifere temperatur kan måles ved blandt andet
+næsetippen. Temperaturforskellen mellem disse punkter kan hjælpe lægen med at vurdere
+en patients helbredstilstand og prognose.
+Hvem skal behandles først?
+Ved fælles akutmodtagelsen på Odense Universitetshospital anvendes der på nuværende
+tidspunkt farvekoder til at kategorisere patienters behov for behandling. En rød farvekode
+indikerer behov for øjeblikkelig behandling, mens en grøn farvekode indikerer at patienten
+ikke er i en umiddelbar livstruende tilstand. Derimellem har man også farvekoderne orange
+og gul. Disse farvekoder bestemmes ud fra målinger på vitale parametre samt umiddelbare
+observationer af patienten. På trods af denne kategorisering af patienterne er der stadig
+tilfælde (31%), hvor patienter som var kategoriseret til farvekoden grøn eller gul, som
+indenfor 24 timer, pludselig mærker en markant forringelse af deres tilstand .
+1
+En ny måde at stille prognoser
+Der er behov for en måde at kunne forudsige om patienter er i risiko for pludselig at blive
+kritisk syge, selvom de indledende målinger og observationer indikerer det modsatte.
+Baseret på dette behov igangsatte Odense Universitetshospital en undersøgelse. Denne
+konkluderede, at der er en association mellem temperaturforskellen på kroppens
+kernetemperatur og kroppens perifere temperatur samt hvorvidt der er en forhøjet risiko for
+at en patients helbred forværres. For at beregne denne temperaturforskel kan termografiske
+kameraer anvendes. Fordelene ved at bruge disse kameraer er, at de ikke er invasive.
+Temperaturmålingerne kan derfor foretages nemt og hurtigt .
+2
+En manuel og tidskrævende proces
+Dette nyfundne prognostiske værktøj kræver, at en sygeplejerske både tager billedet af
+patienten, men også at sygeplejersken manuelt åbner billedet på computeren. På
+computeren skal sygeplejersken både markere det varme punkt ved øjet samt det kolde
+punkt ved næsen for derefter at kunne beregne temperaturforskellen. Ved at bruge kunstig
+intelligens er det muligt at automatisere denne manuelle og tidskrævende proces.
+Assistenten med kunstig intelligens
+Målet med dette specialeprojekt er at automatisere processen efter sygeplejersken har taget
+det termiske billede af patienten. Vi har derfor automatiseret lokaliseringen af øjenkrogen og
+næsetippen samt automatiseret beregningen af temperaturforskellen mellem de to punkter.
+Denne løsning kan dermed fungere som et assisterende værktøj til både at stille en
+prognose, men også til at overvåge eksisterende patienters udvikling over en længere
+periode. En høj temperaturforskel vil indikere, at patientens tilstand er i risiko for at blive
+1 Tjek kilder
+2 Tjek kilder
+2
+forværret, da dette er en indikation på at blodet trækker sig ind til de vitale organer. En lav
+temperaturforskel vil indikere en mere normal helbredstilstand.
+Vejen til løsningen
+Vi har udviklet 4 forskellige løsninger, som kan finde øjenkrogen og næsetippen på termiske
+billeder. Fælles for løsningerne er, at de skal virke på en mobiltelefon, som
+sundhedspersonalet går rundt med. Med mobiltelefonen kan de fotografere patienter og
+automatisk beregne forskellen mellem kernetemperaturen og den perifere temperatur. Den
+mobiltelefon som er brugt i dette projekt, kan både tage termiske billeder og helt normale
+billeder.
+Deep learning
+Tre ud af de fire udviklede løsninger anvender kunstig intelligens til at analysere de billeder
+som personalet tager. Den type af kunstige intelligens som bliver brugt i dette projekt hedder
+deep learning. En af løsningerne består i at træne en deep learning algoritme fra bunden af.
+Dette er dog en udfordring da vi har et lille datasæt.
+Vi har derfor også implementeret en løsning, som anvender en metode, hvor det ikke er
+nødvendigt at have et ligeså stort datasæt. Denne metode kaldes for transfer learning og
+virker ved at man genbruger dele af en allerede færdigudviklet deep learning algoritme og
+kun udvikler en mindre del af algoritmen selv.
+Den tredje løsning bruger en eksisterende deep learning algoritme til at finde de ønskede
+punkter på det normale billede. Derefter kan disse punkter overføres til det termiske billede.
+På den måde er det muligt at bestemme øjenkrogens og næsetippens position på det
+termiske billede.
+Billedgenkendelse uden kunstig intelligens
+Den sidste løsning adskiller sig væsentligt fra de andre løsninger, da den slet ikke anvender
+kunstig intelligens til at løse opgaven. Undersøgelser har vist, at i 81% af alle tilfælde er det
+varmeste punkt i ansigtet øjenkrogen . For at udnytte dette får sundhedspersonalet vist en
+3
+skabelon med vejledende cirkler til øjne og næse regioner. Ved hjælp af denne skabelon kan
+sundhedspersonalet sørge for at patientens ansigt er korrekt placeret når billedet tages.
+Algoritmen er på den måde afgrænset til kun at søge efter de ønskede punkter indenfor
+bestemte regioner. Denne løsning har dog den ulempe, at resultatet afhænger meget af at
+patientens ansigt er placeret korrekt indenfor skabelonen.
+Hvad byder fremtiden?
+Den endelige løsning ender ud med en enkelt algoritme, som skal være den der fungerer
+bedst i praksis. Systemet skal installeres på sygehuset som en fast enhed eller som en del
+af det daglige udstyr som sygeplejersken går rundt med. I første omgang skal systemet
+bruges ved ambulance indgangen. Her skal en sygeplejerske tage imod patienterne ved at
+scanne dem og samtidig registrere dem med et identifikationsnummer. Herfra vil
+temperaturforskellen mellem øjenkrogen og næsetippen være tilgængelig på patientens
+journal. Temperaturforskellen giver så sygeplejersken og lægen et hint om hvilken risikoprofil
+patienten har. Systemet kan også anvendes ved de almindelige indgange for at scanne
+3 Tjek kilder
+3
+patienter når de kommer ind ad døren. På den måde bliver sundhedspersonalet
+opmærksom på patienter hvis helbred har en forhøjet risiko for at blive forværret allerede
+inden de når at sætte sig ind i venteværelset. Herefter vil en opfølgning med termisk kamera
+på sengestuerne kunne hjælpe sundhedspersonalet med at overvåge en patients tilstand.
+Dette vil hjælpe sundhedspersonalet med at prioritere patienterne korrekt og dermed
+behandle dem før patienternes tilstande bliver livstruende.
+Ordbog
+Kunstig intelligens Er et begreb for en række metoder der
+foretager handlinger som forbindes med
+menneskelig intelligens.
+Maskinlæring Er en disciplin indenfor kunstig intelligens,
+som beskæftiger sig med algoritmer, der
+kan lære at genkende mønstre i store
+mængder data.
+Deep learning Er et begreb for en gruppe af
+maskinlæringsalgoritmer, som er opbygget i
+stil med det neurale netværk i en
+menneskehjerne.
+Termografi Er en metode til at måle varmestrålingen fra
+et fysisk objekt eller en overflade.
+Varmestråling Er usynlig elektromagnetisk stråling som
+udsendes af alt stof med en temperatur
+større end det absolutte nulpunkt, strålingen
+føles som varme.
+Kilder
+1 Henriksen DP, Brabrand M, Lassen AT. Prognosis and Risk Factors for Deterioration
+in Patients Admitted to a Medical Emergency Department. PLoS One. 2014; 9(4):
+e94649. doi: 10.1371/journal.pone.0094649.
+2 Holm JK, Kellett JG, Jensen NH, Hansen SN, Jensen K, Brabrand M. Prognostic value
+of infrared thermography in an emergency department. European Journal of
+Emergency Medicine. 2018 Jun;25(3):204-208. doi: 10.1097/MEJ.0000000000000441.
+3 Marzec, M., Lamża, A., Wróbel, Z. et al. Fast eye localization from thermal images
+using neural networks. Multimed Tools Appl (2016).
+https://doi.org/10.1007/s11042-016-4094-7.
+4
