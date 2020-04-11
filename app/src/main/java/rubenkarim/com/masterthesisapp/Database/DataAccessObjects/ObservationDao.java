@@ -11,10 +11,10 @@ import rubenkarim.com.masterthesisapp.Database.Entities.Observation;
 @Dao
 public interface ObservationDao {
     @Query("SELECT * FROM Observation")
-    List<Observation> getAll();
+    List<Observation> getAllObservations();
 
     @Query("SELECT * FROM Observation WHERE patientOwnerId LIKE :cprNumber")
-    List<Observation> findByCprNumber(String cprNumber);
+    List<Observation> findObservationsByCprNumber(String cprNumber);
 
     @Insert
     long insertObservation(Observation observation);

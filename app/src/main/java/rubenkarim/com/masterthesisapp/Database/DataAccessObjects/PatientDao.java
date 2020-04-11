@@ -13,10 +13,10 @@ import rubenkarim.com.masterthesisapp.Database.Relationships.PatientWithObservat
 @Dao
 public interface PatientDao {
     @Query("SELECT * FROM Patient")
-    List<Patient> getAll();
+    List<Patient> getAllPatients();
 
     @Query("SELECT * FROM Patient WHERE cpr_number LIKE :cprNumber")
-    Patient findByCprNumber(String cprNumber);
+    Patient findPatientByCprNumber(String cprNumber);
 
     @Insert
     long insertPatient(Patient patient);
