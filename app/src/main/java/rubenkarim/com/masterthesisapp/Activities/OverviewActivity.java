@@ -153,9 +153,9 @@ public class OverviewActivity extends AppCompatActivity {
             List<Patient> patients = db.patientDao().getAllPatients();
 
             Patient patient = new Patient();
-            patient.cprNumber = "hello";
+            patient.cprNumber = "bye";
             db.patientDao().insertPatient(patient);
-            Patient person = db.patientDao().findPatientByCprNumber("hello");
+            Patient person = db.patientDao().findPatientByCprNumber("bye");
             return "ok";
         }
     }

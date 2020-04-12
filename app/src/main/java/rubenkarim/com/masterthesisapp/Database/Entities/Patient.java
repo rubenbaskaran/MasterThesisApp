@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey;
 @Entity(indices = {@Index(value = {"cpr_number"},
         unique = true)})
 public class Patient {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     public int patientId;
 
     @ColumnInfo(name = "cpr_number")

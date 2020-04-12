@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey;
 
 @Entity
 public class Observation {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     public long observationId;
 
     public long patientOwnerId;
