@@ -127,35 +127,16 @@ public class OverviewActivity extends AppCompatActivity {
         String cpr = textView_cprNumber.getText().toString();
 
         // TODO: Save filename, eye position, nose position, gradient, algorithm and CPR
-        DatabaseConnection db = new DatabaseConnection();
-        try {
-            String result = db.execute().get();
-        }
-        catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
+            List<Patient> patients = db.patientDao().getAllPatients();
+            Patient patient = new Patient();
+            patient.cprNumber = "hello";
+            db.patientDao().insertPatient(patient);
+            Patient person = db.patientDao().findPatientByCprNumber("hello");
+        });
 
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
-    }
-
-    public class DatabaseConnection extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
-
-            List<Patient> patients = db.patientDao().getAllPatients();
-
-            Patient patient = new Patient();
-            patient.cprNumber = "bye";
-            db.patientDao().insertPatient(patient);
-            Patient person = db.patientDao().findPatientByCprNumber("bye");
-            return "ok";
-        }
     }
 }
