@@ -1,17 +1,18 @@
 package rubenkarim.com.masterthesisapp.Database.Entities;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(indices = {@Index(value = {"cpr_number"},
-        unique = true)})
+@Entity(indices = {@Index(value = {"cpr_number"}, unique = true)})
 public class Patient {
     @PrimaryKey(autoGenerate = true)
     public int patientId;
 
     @ColumnInfo(name = "cpr_number")
+    @NonNull
     public String cprNumber;
 }
 
