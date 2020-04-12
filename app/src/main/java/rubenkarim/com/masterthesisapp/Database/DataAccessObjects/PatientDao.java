@@ -24,6 +24,9 @@ public interface PatientDao {
     @Delete
     int deletePatients(Patient... patients);
 
+    @Query("DELETE FROM Patient")
+    void deleteAllPatients();
+
     @Transaction
     @Query("SELECT * FROM Patient")
     public List<PatientWithObservations> getPatientsWithObservations();

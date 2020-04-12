@@ -19,6 +19,9 @@ public interface ObservationDao {
     @Insert
     long insertObservation(Observation observation);
 
+    @Query("DELETE FROM Observation")
+    void deleteAllObservations();
+
     @Delete
     int deleteObservations(Observation... observations);
 }
