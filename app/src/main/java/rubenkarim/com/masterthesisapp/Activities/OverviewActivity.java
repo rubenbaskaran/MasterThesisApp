@@ -3,6 +3,7 @@ package rubenkarim.com.masterthesisapp.Activities;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -14,10 +15,13 @@ import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 import rubenkarim.com.masterthesisapp.Database.AppDatabase;
+import rubenkarim.com.masterthesisapp.Database.Entities.Patient;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
@@ -123,10 +127,36 @@ public class OverviewActivity extends AppCompatActivity {
         String cpr = textView_cprNumber.getText().toString();
 
         // TODO: Save filename, eye position, nose position, gradient, algorithm and CPR
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "database-name").build();
+        DatabaseConnection db = new DatabaseConnection();
+        try {
+            String result = db.execute().get();
+        }
+        catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
 
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
+    }
+
+    public class DatabaseConnection extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+                    AppDatabase.class, "database-name").build();
+
+            List<Patient> patients = db.patientDao().getAllPatients();
+
+            Patient patient = new Patient();
+            patient.cprNumber = "hello";
+            db.patientDao().insertPatient(patient);
+            Patient person = db.patientDao().findPatientByCprNumber("hello");
+            return "ok";
+        }
     }
 }
