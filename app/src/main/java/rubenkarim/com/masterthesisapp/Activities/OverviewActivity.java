@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 import rubenkarim.com.masterthesisapp.Database.AppDatabase;
+import rubenkarim.com.masterthesisapp.Database.Entities.Observation;
 import rubenkarim.com.masterthesisapp.Database.Entities.Patient;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.R;
@@ -130,10 +131,12 @@ public class OverviewActivity extends AppCompatActivity {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
             List<Patient> patients = db.patientDao().getAllPatients();
+            List<Observation> observations = db.observationDao().getAllObservations();
+
             Patient patient = new Patient();
-            patient.cprNumber = "hello";
+            patient.cprNumber = cpr.isEmpty() ? "0123456789" : cpr;
             db.patientDao().insertPatient(patient);
-            Patient person = db.patientDao().findPatientByCprNumber("hello");
+            Patient person = db.patientDao().findPatientByCprNumber("0123456789");
         });
 
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
