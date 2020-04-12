@@ -147,8 +147,7 @@ public class OverviewActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                    AppDatabase.class, "database-name").build();
+            AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
 
             List<Patient> patients = db.patientDao().getAllPatients();
 
