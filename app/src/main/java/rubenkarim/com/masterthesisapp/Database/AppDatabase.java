@@ -20,7 +20,6 @@ import rubenkarim.com.masterthesisapp.Database.Entities.Patient;
 @Database(entities = {Patient.class, Observation.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract PatientDao patientDao();
-
     public abstract ObservationDao observationDao();
 
     private static volatile AppDatabase INSTANCE;
@@ -30,7 +29,7 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class, "database-name")
+                            AppDatabase.class, "masterthesisapp_database")
                             .build();
                 }
             }
