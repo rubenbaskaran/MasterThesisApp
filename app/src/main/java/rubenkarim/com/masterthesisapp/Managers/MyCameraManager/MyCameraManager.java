@@ -172,17 +172,21 @@ public class MyCameraManager {
     };
 
     private void connectToFlir(Identity identity){
-        try {
-            Logging.info(TAG, "connecting to camera");
-            flirCamera.connect(identity, connectionStatusListener);
-            flirCamera.subscribeStream(thermalImageStreamListener);
-            DiscoveryFactory.getInstance().stop();
+        Logging.info(TAG, "connecting to camera");
 
-            if(flirStatusListener != null){
-                flirStatusListener.cameraFound(identity);
+        new Thread(()->{
+            try {
+                flirCamera.connect(identity, connectionStatusListener);
+            } catch (IOException e) {
+                flirStatusListener.onConnectionError(e);
             }
-        } catch (IOException e) {
-            flirStatusListener.onConnectionError(e);
+        }).start();
+
+        flirCamera.subscribeStream(thermalImageStreamListener);
+        DiscoveryFactory.getInstance().stop();
+
+        if(flirStatusListener != null){
+            flirStatusListener.cameraFound(identity);
         }
     }
     //endregion
