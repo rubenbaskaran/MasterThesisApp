@@ -147,6 +147,7 @@ public class OverviewActivity extends AppCompatActivity {
             observation.nosepositionx = mGradientAndPositions.getNosePosition()[0];
             observation.nosepositiony = mGradientAndPositions.getNosePosition()[1];
             observation.markersadjusted = mGradientAndPositions.isMarkersAdjusted();
+            observation.chosenAlgorithm = String.valueOf(GlobalVariables.getCurrentAlgorithm());
 
             AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
             db.observationDao().insertObservation(observation);

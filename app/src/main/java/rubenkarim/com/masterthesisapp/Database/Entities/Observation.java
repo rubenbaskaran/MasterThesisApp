@@ -35,4 +35,7 @@ public class Observation {
 
     @NonNull
     public boolean markersadjusted;
+
+    @NonNull
+    public String chosenAlgorithm;
 }
