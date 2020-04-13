@@ -8,6 +8,7 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.FileUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -23,6 +24,8 @@ import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.flir.thermalsdk.live.Identity;
 import com.google.android.material.snackbar.Snackbar;
+
+import org.tensorflow.lite.support.common.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -228,10 +231,20 @@ public class CameraActivity extends AppCompatActivity {
             String defaultImageName = "Thermal_Test_Img4.jpg";
             ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open(defaultImageName));
             thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
-            mThermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + defaultImageName;
-            thermalImageFile.saveAs(mThermalImagePath);
-            imageView_cameraPreviewContainer.setImageBitmap(ImageProcessing.getBitmap(thermalImageFile));
-            useDefaultImage = true;
+            File folder = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + File.separator + "Masterthesisimages" + File.separator);
+            boolean success = true;
+            if (!folder.exists()) {
+                success = folder.mkdirs();
+            }
+            if (success) {
+                mThermalImagePath =  this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + defaultImageName;
+                thermalImageFile.saveAs(mThermalImagePath);
+                imageView_cameraPreviewContainer.setImageBitmap(ImageProcessing.getBitmap(thermalImageFile));
+                useDefaultImage = true;
+            } else {
+                throw new IOException("Save Folder cannot be created");
+            }
+
         } catch (IOException e) {
             Snackbar.make(rootView, "an error accrued when open default image", Snackbar.LENGTH_SHORT).show();
             Logging.error("startCameraPreview", e);

@@ -119,14 +119,19 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     private void ExecuteAlgorithm() {
         switch (GlobalVariables.getCurrentAlgorithm()) {
             case CNN:
-                try {
-                    String cnnModelFile = "RGB_yinguobingCNNV1.tflite";
-                    CnnRectImg cnn = new CnnRectImg(this, cnnModelFile, mThermalImage);
-                    cnn.getGradientAndPositions(this);
-                } catch (IOException e) {
-                    Logging.error("ExecuteAlgorithm(), CNN", e);
-                    Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
-                }
+
+                    new Thread(()->{
+                        try {
+                            String cnnModelFile = "RGB_yinguobingCNNV1.tflite";
+                            CnnRectImg cnn = new CnnRectImg(this, cnnModelFile, mThermalImage);
+                            cnn.getGradientAndPositions(this);
+                        } catch (IOException e) {
+                            Logging.error("ExecuteAlgorithm(), CNN", e);
+                            Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
+                        }
+                    }).start();
+
+
                 break;
             case CNNWithTransferLearning:
                 try {
