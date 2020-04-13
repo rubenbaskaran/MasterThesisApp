@@ -10,7 +10,7 @@ public class Observation {
     public long observationId;
 
     @NonNull
-    public String patientOwnerId;
+    public String cprnumber;
 
     @NonNull
     public String filepath;

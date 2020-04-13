@@ -3,10 +3,10 @@ package rubenkarim.com.masterthesisapp.Activities;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.flir.thermalsdk.image.ImageFactory;
@@ -15,16 +15,13 @@ import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
 import rubenkarim.com.masterthesisapp.Database.AppDatabase;
 import rubenkarim.com.masterthesisapp.Database.Entities.Observation;
-import rubenkarim.com.masterthesisapp.Database.Entities.Patient;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.R;
+import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
@@ -43,6 +40,7 @@ public class OverviewActivity extends AppCompatActivity {
     private MinMaxDataTransferContainer minMaxData;
     private int imageViewVerticalOffset;
     private View mRootView;
+    private ProgressBar progressBar_overviewProgressbar;
     //endregion
 
     @Override
@@ -52,6 +50,7 @@ public class OverviewActivity extends AppCompatActivity {
         imageView_thermalImageContainer = findViewById(R.id.imageView_patientImage);
         textView_cprNumber = findViewById(R.id.textView_cprNumber);
         mRootView = findViewById(R.id.LinearLayout_rootView);
+        progressBar_overviewProgressbar = findViewById(R.id.progressBar_overviewLoadingAnimation);
 
         Intent receivedIntent = getIntent();
         if (receivedIntent.hasExtra("thermalImagePath")) {
@@ -125,21 +124,36 @@ public class OverviewActivity extends AppCompatActivity {
     }
 
     public void saveOnClick(View view) {
-        String cpr = textView_cprNumber.getText().toString();
+        String cprNumber = textView_cprNumber.getText().toString();
 
-        // TODO: Save filename, eye position, nose position, gradient, algorithm and CPR
+        if(cprNumber.isEmpty()){
+            Snackbar.make(mRootView, "Please enter CPR number", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
+        String[] filepathSplitted = mThermalImagePath.split("/");
+        String filename = filepathSplitted[filepathSplitted.length-1];
+
         AppDatabase.databaseWriteExecutor.execute(() -> {
+            runOnUiThread(() -> Animation.showLoadingAnimation(progressBar_overviewProgressbar, null, null));
+
+            Observation observation = new Observation();
+            observation.cprnumber = cprNumber;
+            observation.filepath = mThermalImagePath;
+            observation.filename = filename;
+            observation.gradient = mGradientAndPositions.getGradient();
+            observation.eyepositionx = mGradientAndPositions.getEyePosition()[0];
+            observation.eyepositiony = mGradientAndPositions.getEyePosition()[1];
+            observation.nosepositionx = mGradientAndPositions.getNosePosition()[0];
+            observation.nosepositiony = mGradientAndPositions.getNosePosition()[1];
+
             AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
-            List<Patient> patients = db.patientDao().getAllPatients();
-            List<Observation> observations = db.observationDao().getAllObservations();
+            db.observationDao().insertObservation(observation);
 
-            Patient patient = new Patient();
-            patient.cprNumber = cpr.isEmpty() ? "0123456789" : cpr;
-            db.patientDao().insertPatient(patient);
-            Patient person = db.patientDao().findPatientByCprNumber("0123456789");
+            runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_overviewProgressbar, null, null));
+
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
         });
-
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(intent);
     }
 }

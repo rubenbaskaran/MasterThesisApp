@@ -13,7 +13,7 @@ public interface ObservationDao {
     @Query("SELECT * FROM Observation")
     List<Observation> getAllObservations();
 
-    @Query("SELECT * FROM Observation WHERE patientOwnerId LIKE :cprNumber")
+    @Query("SELECT * FROM Observation WHERE cprnumber LIKE :cprNumber")
     List<Observation> findObservationsByCprNumber(String cprNumber);
 
     @Insert

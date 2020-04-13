@@ -9,13 +9,10 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import rubenkarim.com.masterthesisapp.Database.DataAccessObjects.ObservationDao;
-import rubenkarim.com.masterthesisapp.Database.DataAccessObjects.PatientDao;
 import rubenkarim.com.masterthesisapp.Database.Entities.Observation;
-import rubenkarim.com.masterthesisapp.Database.Entities.Patient;
 
-@Database(entities = {Patient.class, Observation.class}, version = 1)
+@Database(entities = {Observation.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
-    public abstract PatientDao patientDao();
     public abstract ObservationDao observationDao();
 
     // To run database operations asynchronously on a background thread.

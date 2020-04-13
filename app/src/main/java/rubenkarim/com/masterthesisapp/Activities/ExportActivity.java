@@ -14,12 +14,10 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Database.AppDatabase;
 import rubenkarim.com.masterthesisapp.Database.Entities.Observation;
-import rubenkarim.com.masterthesisapp.Database.Entities.Patient;
 import rubenkarim.com.masterthesisapp.R;
 
 public class ExportActivity extends AppCompatActivity {
@@ -36,11 +34,15 @@ public class ExportActivity extends AppCompatActivity {
     public void createCsvOnClick(View view) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
-            List<Patient> patients = db.patientDao().getAllPatients();
             List<Observation> observations = db.observationDao().getAllObservations();
 
-            File logDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "/Masterthesisexports/");
-            boolean isDirectoryCreated = logDirectory.exists() || logDirectory.mkdirs();
+            if (observations.isEmpty()) {
+                Snackbar.make(linearLayout_exportActivity, "Database is empty", Snackbar.LENGTH_SHORT).show();
+                return;
+            }
+
+            File exportDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "/Masterthesisexports/");
+            boolean isDirectoryCreated = exportDirectory.exists() || exportDirectory.mkdirs();
 
             if (isDirectoryCreated) {
                 String dateTime = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new Timestamp(System.currentTimeMillis()));
@@ -48,8 +50,28 @@ public class ExportActivity extends AppCompatActivity {
                 File file = new File(filepath);
                 StringBuilder stringBuilder = new StringBuilder();
 
-                // TODO: Iterate through all observations
-                stringBuilder.append(dateTime).append(",").append(patients.get(0).patientId).append(",").append(patients.get(0).cprNumber);
+                addColumnNames(stringBuilder);
+
+                for (Observation obs : observations) {
+                    stringBuilder.append(obs.observationId)
+                            .append(",")
+                            .append(obs.cprnumber)
+                            .append(",")
+                            .append(obs.filepath)
+                            .append(",")
+                            .append(obs.filename)
+                            .append(",")
+                            .append(obs.gradient)
+                            .append(",")
+                            .append(obs.eyepositionx)
+                            .append(",")
+                            .append(obs.eyepositiony)
+                            .append(",")
+                            .append(obs.nosepositionx)
+                            .append(",")
+                            .append(obs.nosepositiony)
+                            .append(System.lineSeparator());
+                }
 
                 try {
                     FileWriter fileWriter = new FileWriter(file);
@@ -60,24 +82,46 @@ public class ExportActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+            else {
+                Snackbar.make(linearLayout_exportActivity, "Couldn't create export directory", Snackbar.LENGTH_SHORT).show();
+            }
         });
+    }
+
+    private void addColumnNames(StringBuilder stringBuilder) {
+        stringBuilder.append("observationId")
+                .append(",")
+                .append("cprnumber")
+                .append(",")
+                .append("filepath")
+                .append(",")
+                .append("filename")
+                .append(",")
+                .append("gradient")
+                .append(",")
+                .append("eyepositionx")
+                .append(",")
+                .append("eyepositiony")
+                .append(",")
+                .append("nosepositionx")
+                .append(",")
+                .append("nosepositiony")
+                .append(System.lineSeparator());
     }
 
     public void clearDatabaseOnClick(View view) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
-            int numberOfPatients = db.patientDao().getAllPatients().size();
             int numberOfObservations = db.observationDao().getAllObservations().size();
-            String outputMessageOnSuccess = "Removed: " + numberOfPatients + " patient(s) and " + numberOfObservations + " observation(s)";
+            String outputMessageOnSuccess = "Removed: " + numberOfObservations + " observation(s)";
 
-            if (numberOfPatients == 0 && numberOfObservations == 0) {
+            if (numberOfObservations == 0) {
                 Snackbar.make(linearLayout_exportActivity, "Database already empty", Snackbar.LENGTH_SHORT).show();
             }
             else {
-                db.patientDao().deleteAllPatients();
                 db.observationDao().deleteAllObservations();
 
-                if (db.patientDao().getAllPatients().isEmpty() && db.observationDao().getAllObservations().isEmpty()) {
+                if (db.observationDao().getAllObservations().isEmpty()) {
                     Snackbar.make(linearLayout_exportActivity, outputMessageOnSuccess, Snackbar.LENGTH_LONG).show();
                 }
                 else {
