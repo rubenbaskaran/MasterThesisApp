@@ -32,4 +32,7 @@ public class Observation {
 
     @NonNull
     public double gradient;
+
+    @NonNull
+    public boolean markersadjusted;
 }

@@ -79,6 +79,8 @@ public class ExportActivity extends AppCompatActivity {
                             .append(obs.nosepositionx)
                             .append(",")
                             .append(obs.nosepositiony)
+                            .append(",")
+                            .append(obs.markersadjusted)
                             .append(System.lineSeparator());
                 }
 
@@ -107,7 +109,7 @@ public class ExportActivity extends AppCompatActivity {
     private void addColumnNames(StringBuilder stringBuilder) {
         stringBuilder.append("observationId")
                 .append(",")
-                .append("cprnumber")
+                .append("cprNumber")
                 .append(",")
                 .append("filepath")
                 .append(",")
@@ -115,13 +117,15 @@ public class ExportActivity extends AppCompatActivity {
                 .append(",")
                 .append("gradient")
                 .append(",")
-                .append("eyepositionx")
+                .append("eyePositionX")
                 .append(",")
-                .append("eyepositiony")
+                .append("eyePositionY")
                 .append(",")
-                .append("nosepositionx")
+                .append("nosePositionX")
                 .append(",")
-                .append("nosepositiony")
+                .append("nosePositionY")
+                .append(",")
+                .append("markersAdjusted")
                 .append(System.lineSeparator());
     }
 
