@@ -122,7 +122,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private void startCameraPreview(HashMap<String, UsbDevice> deviceList) {
         if (!deviceList.isEmpty()) {
-            Snackbar.make(rootView, "FLIR camera detected. Trying to connect", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(rootView, "FLIR camera detected. Trying to connect", Snackbar.LENGTH_INDEFINITE).show();
             setupFlirCamera();
         } else {
             Snackbar.make(rootView, "Can't find FLIR camera. Using default image", Snackbar.LENGTH_SHORT).show();
