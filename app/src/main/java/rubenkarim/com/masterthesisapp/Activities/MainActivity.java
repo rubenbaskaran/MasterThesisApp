@@ -25,4 +25,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
         startActivity(intent);
     }
+
+    public void exportDataOnClick(View view) {
+        Intent intent = new Intent(getApplicationContext(), ExportActivity.class);
+        startActivity(intent);
+    }
 }
