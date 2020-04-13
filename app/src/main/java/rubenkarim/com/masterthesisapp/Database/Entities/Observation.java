@@ -31,6 +31,12 @@ public class Observation {
     public int nosepositiony;
 
     @NonNull
+    public double eyeTemperature;
+
+    @NonNull
+    public double noseTemperature;
+
+    @NonNull
     public double gradient;
 
     @NonNull
