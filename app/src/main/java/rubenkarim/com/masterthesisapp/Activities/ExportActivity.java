@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -28,6 +29,7 @@ public class ExportActivity extends AppCompatActivity {
 
     private LinearLayout linearLayout_exportActivity;
     private ProgressBar progressBar_exportProgressbar;
+    private File mExportDirectory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,9 @@ public class ExportActivity extends AppCompatActivity {
         setContentView(R.layout.activity_export);
         linearLayout_exportActivity = findViewById(R.id.linearLayout_ExportActivity);
         progressBar_exportProgressbar = findViewById(R.id.progressBar_exportLoadingAnimation);
+        TextView textView_pathToCsv = findViewById(R.id.textView_pathToCSV);
+        mExportDirectory = new File(this.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "/Masterthesisexports/");
+        textView_pathToCsv.setText("CSV Files is saved at: \n" +mExportDirectory.getPath());
     }
 
     public void createCsvOnClick(View view) {
@@ -50,8 +55,7 @@ public class ExportActivity extends AppCompatActivity {
                 return;
             }
 
-            File exportDirectory = new File(this.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "/Masterthesisexports/");
-            boolean isDirectoryCreated = exportDirectory.exists() || exportDirectory.mkdirs();
+            boolean isDirectoryCreated = mExportDirectory.exists() || mExportDirectory.mkdirs();
 
             if (isDirectoryCreated) {
                 String dateTime = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new Timestamp(System.currentTimeMillis()));
