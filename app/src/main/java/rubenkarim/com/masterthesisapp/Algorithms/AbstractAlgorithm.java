@@ -36,11 +36,15 @@ public abstract class AbstractAlgorithm {
         if( temperatureRightEye > temperatureLeftEye){
             return new GradientModel((temperatureRightEye - temperatureNose),
                     new int[]{rigthEye.getPosition().x, rigthEye.getPosition().y},
-                    new int[]{nose.getPosition().x, nose.getPosition().y});
+                    new int[]{nose.getPosition().x, nose.getPosition().y},
+                    rigthEye.getValue().value,
+                    nose.getValue().value);
         } else {
             return new GradientModel((temperatureLeftEye - temperatureNose),
                     new int[]{leftEye.getPosition().x, leftEye.getPosition().y},
-                    new int[]{nose.getPosition().x, nose.getPosition().y});
+                    new int[]{nose.getPosition().x, nose.getPosition().y},
+                    leftEye.getValue().value,
+                    nose.getValue().value);
         }
 
     }
