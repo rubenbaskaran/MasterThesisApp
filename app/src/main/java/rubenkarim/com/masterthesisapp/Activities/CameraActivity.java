@@ -145,7 +145,11 @@ public class CameraActivity extends AppCompatActivity {
             if (!isCalibrated) { //TODO: find out when the camera should be calibrated
                 Logging.info(this, TAG, "trying to calibrate");
                 isCalibrated = true;
-                this.myCameraManager.calibrateCamera();
+                try {
+                    this.myCameraManager.calibrateCamera();
+                } catch (NullPointerException e) {
+                    Logging.error(this, "setupFlirCamera", e);
+                }
                 myCameraManager.subscribeToBatteryInfo(new BatteryInfoListener() {
                     @Override
                     public void BatteryPercentageUpdate(int percentage) {
@@ -268,12 +272,12 @@ public class CameraActivity extends AppCompatActivity {
             goToMarkerActivity();
         } else {
             myCameraManager.addThermalImageListener((thermalImage) -> {
-                File ImageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
+                File ImageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
                 boolean isDirectoryCreated = ImageDir.exists() || ImageDir.mkdirs();
                 try {
                     if (isDirectoryCreated) {
                         String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
-                        mThermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
+                        mThermalImagePath =this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                         thermalImage.saveAs(mThermalImagePath);
                         goToMarkerActivity();
                     } else {
