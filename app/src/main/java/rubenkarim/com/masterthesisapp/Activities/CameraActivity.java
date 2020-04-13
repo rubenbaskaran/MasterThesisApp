@@ -276,7 +276,7 @@ public class CameraActivity extends AppCompatActivity {
                 boolean isDirectoryCreated = ImageDir.exists() || ImageDir.mkdirs();
                 try {
                     if (isDirectoryCreated) {
-                        String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
+                        String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal.jpg";
                         mThermalImagePath =this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                         thermalImage.saveAs(mThermalImagePath);
                         goToMarkerActivity();

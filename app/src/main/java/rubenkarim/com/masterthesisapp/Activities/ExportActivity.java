@@ -50,12 +50,12 @@ public class ExportActivity extends AppCompatActivity {
                 return;
             }
 
-            File exportDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "/Masterthesisexports/");
+            File exportDirectory = new File(this.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "/Masterthesisexports/");
             boolean isDirectoryCreated = exportDirectory.exists() || exportDirectory.mkdirs();
 
             if (isDirectoryCreated) {
                 String dateTime = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss").format(new Timestamp(System.currentTimeMillis()));
-                String filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath() + "/Masterthesisexports/" + dateTime + ".csv";
+                String filepath = this.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).getPath() + "/Masterthesisexports/" + dateTime + ".csv";
                 File file = new File(filepath);
                 StringBuilder stringBuilder = new StringBuilder();
 
