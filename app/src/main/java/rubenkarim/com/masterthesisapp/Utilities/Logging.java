@@ -33,7 +33,7 @@ public class Logging {
         }
 
         if (isDirectoryCreated) {
-            String filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath() + "/Masterthesislogs/log.txt";
+            String filepath = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).getPath() + "/Masterthesislogs/log.txt";
             File file = new File(filepath);
             StringBuilder stringBuilder = new StringBuilder();
             String dateTime = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Timestamp(System.currentTimeMillis()));
