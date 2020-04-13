@@ -74,7 +74,7 @@ public class MyCameraManager {
     }
 
     public void calibrateCamera() throws NullPointerException {
-        Logging.info("FLIRONE", "is calibrating");
+        Logging.info(applicationContext,"FLIRONE", "is calibrating");
         flirCamera.getRemoteControl().getCalibration().nuc();
         try {
             flirCamera.getRemoteControl().getCalibration().subscribeCalibrationState(new Calibration.NucStateListener() {
@@ -84,7 +84,7 @@ public class MyCameraManager {
                 }
             });
         } catch (Exception e) {
-            Logging.error(TAG + "calibrateCamera", e);
+            Logging.error(applicationContext,TAG + "calibrateCamera", e);
         }
 
     }
@@ -166,13 +166,13 @@ public class MyCameraManager {
 
         @Override
         public void onDiscoveryError(CommunicationInterface communicationInterface, ErrorCode errorCode) {
-            Logging.info(TAG , " onDiscoveryError: "+ errorCode.toString());
+            Logging.info(applicationContext, TAG , " onDiscoveryError: "+ errorCode.toString());
             Log.e(TAG, "onDiscoveryError: " + errorCode + " interface: " + communicationInterface);
         }
     };
 
     private void connectToFlir(Identity identity){
-        Logging.info(TAG, "connecting to camera");
+        Logging.info(applicationContext, TAG, "connecting to camera");
 
         try {
             flirCamera.connect(identity, connectionStatusListener);
