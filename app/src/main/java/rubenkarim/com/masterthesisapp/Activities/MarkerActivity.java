@@ -309,8 +309,8 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
 
         if (eyeAdjusted || noseAdjusted) {
             recalculateGradient(mThermalImage);
+            mGradientAndPositions.setMarkersAdjusted(true);
         }
-
 
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
         intent.putExtra("thermalImagePath", mThermalImagePath);
