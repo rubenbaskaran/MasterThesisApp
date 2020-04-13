@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:weightSum="6"
+    android:weightSum="7"
     tools:context=".Activities.MainActivity">
 
     <Space
@@ -43,6 +43,22 @@
         android:onClick="ChooseAlgorithmOnClick"
         android:tag="3"
         android:text="Max-Min Template"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#000000"
+        android:layout_marginTop="2.5dp"
+        android:layout_marginBottom="2.5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"/>
+
+    <Button
+        android:id="@+id/button_exportData"
+        style="@style/MenuButtonStyle"
+        android:background="@drawable/button_background"
+        android:onClick="exportDataOnClick"
+        android:text="Export Data"/>
 
     <Space
         android:layout_width="match_parent"

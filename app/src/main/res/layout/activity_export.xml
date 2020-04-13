@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="8"
+    tools:context=".Activities.ExportActivity">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2.5" />
+
+    <Button
+        style="@style/MenuButtonStyle"
+        android:background="@drawable/button_background"
+        android:onClick="createCsvOnClick"
+        android:text="Create CSV file" />
+
+    <Button
+        style="@style/MenuButtonStyle"
+        android:background="@drawable/button_background"
+        android:onClick="clearDatabaseOnClick"
+        android:text="Clear database" />
+
+    <Button
+        style="@style/MenuButtonStyle"
+        android:background="@drawable/button_background"
+        android:onClick="backOnClick"
+        android:text="Back" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2.5" />
+
+</LinearLayout>

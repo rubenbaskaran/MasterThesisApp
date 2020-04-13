@@ -26,5 +26,8 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    // TODO: Add button for extracting data from db and creating csv file
+    public void exportDataOnClick(View view) {
+        Intent intent = new Intent(getApplicationContext(), ExportActivity.class);
+        startActivity(intent);
+    }
 }
