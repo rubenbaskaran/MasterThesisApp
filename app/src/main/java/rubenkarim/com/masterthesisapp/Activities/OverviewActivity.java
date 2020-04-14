@@ -79,7 +79,7 @@ public class OverviewActivity extends AppCompatActivity {
             setPicture(thermalImage, mGradientAndPositions);
         }
         catch (IOException e) {
-            Logging.error(TAG + " onCreate: ", e);
+            Logging.error(this,TAG + " onCreate: ", e);
             Snackbar.make(mRootView, "There was an error with the thermal image file", Snackbar.LENGTH_INDEFINITE).show();
         }
     }
