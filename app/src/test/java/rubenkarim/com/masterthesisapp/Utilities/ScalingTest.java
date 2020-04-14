@@ -32,9 +32,22 @@ class ScalingTest {
 
     @Test
     void upscaleCoordinatesFromImageToScreen() {
+        int[] positionInCapturedImage = new int[] {2,2};
+        int[] capturedImageDimensions = new int[] {3,3};
+        int[] imageContainerDimensions = new int[] {5,5};
+
+        int[] result = Scaling.upscaleCoordinatesFromImageToScreen(positionInCapturedImage,capturedImageDimensions,imageContainerDimensions);
+        assertArrayEquals(new int[]{3,3},result,"coordinates are not scaled up correctly");
+
     }
 
     @Test
     void downscaleCoordinatesFromScreenToImage() {
+        int[] positionInCapturedImage = new int[] {3,3};
+        int[] capturedImageDimensions = new int[] {5,5};
+        int[] imageContainerDimensions = new int[] {3,3};
+
+        int[] result = Scaling.downscaleCoordinatesFromScreenToImage(positionInCapturedImage,capturedImageDimensions,imageContainerDimensions);
+        assertArrayEquals(new int[]{2,2},result,"coordinates are not scaled down correctly");
     }
 }
