@@ -83,7 +83,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                 mThermalImage = (ThermalImageFile) ImageFactory.createImage(mThermalImagePath);
                 mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
             } catch (IOException e) {
-                Logging.error(TAG + " onCreate: ", e);
+                Logging.error(this,TAG + " onCreate: ", e);
                 Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_INDEFINITE).show();
             }
         }
@@ -126,7 +126,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                             CnnRectImg cnn = new CnnRectImg(this, cnnModelFile, mThermalImage);
                             cnn.getGradientAndPositions(this);
                         } catch (IOException e) {
-                            Logging.error("ExecuteAlgorithm(), CNN", e);
+                            Logging.error(this,"ExecuteAlgorithm(), CNN", e);
                             Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
                         }
                     }).start();
@@ -141,7 +141,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                         CnnRectImg cnnTransferLearning = new CnnRectImg(this, cnnTransferLearningModelFile, mThermalImage);
                         cnnTransferLearning.getGradientAndPositions(this);
                     } catch (IOException e) {
-                        Logging.error("ExecuteAlgorithm(), CNNWithTransferLearning", e);
+                        Logging.error(this,"ExecuteAlgorithm(), CNNWithTransferLearning", e);
                         Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
                     }
                 }).start();
@@ -149,8 +149,8 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                 break;
             case RgbThermalMapping:
                 new Thread(()->{
-                    Logging.info(TAG, "starting RGB");
-                    RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(mThermalImage);
+                    Logging.info(this,TAG, "starting RGB");
+                    RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(this, mThermalImage);
                     rgbThermalAlgorithm.getGradientAndPositions(this, screenWidth, screenHeight);
                 }).start();
 
@@ -167,7 +167,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                         );
                         minMaxAlgorithm.getGradientAndPositions(this);
                     } catch (IOException e) {
-                        Logging.error("ExecuteAlgorithm(), MinMaxTemplate", e);
+                        Logging.error(this,"ExecuteAlgorithm(), MinMaxTemplate", e);
                         Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
                     }
                 }).start();

@@ -4,9 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
-import com.flir.thermalsdk.image.ImageFactory;
-import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -18,11 +15,9 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
 import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
 
-import java.io.IOException;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 
@@ -36,11 +31,12 @@ import rubenkarim.com.masterthesisapp.Utilities.Logging;
 public class RgbThermalAlgorithm extends AbstractAlgorithm {
 
     private static final String TAG = RgbThermalAlgorithm.class.getSimpleName();
+    private Context mApplicationContext;
     private ThermalImageFile mThermalImageFile;
 
 
-    public RgbThermalAlgorithm(ThermalImageFile thermalImage) {
-
+    public RgbThermalAlgorithm(Context context, ThermalImageFile thermalImage) {
+        this.mApplicationContext = context;
         mThermalImageFile = thermalImage;
     }
 
@@ -89,13 +85,13 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
         FirebaseVisionFaceDetector detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
         ThermalImageFile finalThermalImageFile = thermalImageFile;
 
-        Logging.info(TAG, "Reacted Firebase");
+        Logging.info(mApplicationContext, TAG, "Reacted Firebase");
         detector.detectInImage(firebaseVisionImage)
                 .addOnSuccessListener(
                         new OnSuccessListener<List<FirebaseVisionFace>>() {
                             @Override
                             public void onSuccess(List<FirebaseVisionFace> faces) {
-                                Logging.info(TAG, "onSucces");
+                                Logging.info(mApplicationContext, TAG, "onSucces");
                                 // Task completed successfully
                                 // [START_EXCLUDE]
                                 // [START get_face_info]
@@ -106,15 +102,15 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
 
                                     FirebaseVisionFaceLandmark rightEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
                                     if (rightEye != null) {
-                                        rightEyeCoordinates = new int[]{(int) (rightEye.getPosition().getX() * widthScalingFactor - scaledHorizontalOffset), (int) (rightEye.getPosition().getY() * heightScalingFactor - scaledVerticalOffset)};
+                                        rightEyeCoordinates = new int[]{(int)Math.round((rightEye.getPosition().getX() * widthScalingFactor - scaledHorizontalOffset)), (int)Math.round((rightEye.getPosition().getY() * heightScalingFactor - scaledVerticalOffset))};
                                     }
                                     FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
                                     if (leftEye != null) {
-                                        leftEyeCoordinates = new int[]{(int) (leftEye.getPosition().getX() * widthScalingFactor + scaledHorizontalOffset), (int) (leftEye.getPosition().getY() * heightScalingFactor - scaledVerticalOffset)};
+                                        leftEyeCoordinates = new int[]{(int)Math.round((leftEye.getPosition().getX() * widthScalingFactor + scaledHorizontalOffset)), (int)Math.round((leftEye.getPosition().getY() * heightScalingFactor - scaledVerticalOffset))};
                                     }
                                     FirebaseVisionFaceLandmark nose = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE);
                                     if (nose != null) {
-                                        noseCoordinates = new int[]{(int) (nose.getPosition().getX() * widthScalingFactor), (int) (nose.getPosition().getY() * heightScalingFactor - scaledVerticalOffset)};
+                                        noseCoordinates = new int[]{(int)Math.round((nose.getPosition().getX() * widthScalingFactor)), (int)Math.round((nose.getPosition().getY() * heightScalingFactor - scaledVerticalOffset))};
                                     }
 
                                     algorithmResult.onResult(RgbThermalAlgorithm.super.calculateGradient(

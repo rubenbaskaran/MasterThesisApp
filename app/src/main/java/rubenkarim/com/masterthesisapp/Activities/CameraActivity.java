@@ -143,9 +143,13 @@ public class CameraActivity extends AppCompatActivity {
             });
 
             if (!isCalibrated) { //TODO: find out when the camera should be calibrated
-                Logging.info(TAG, "trying to calibrate");
+                Logging.info(this, TAG, "trying to calibrate");
                 isCalibrated = true;
-                this.myCameraManager.calibrateCamera();
+                try {
+                    this.myCameraManager.calibrateCamera();
+                } catch (NullPointerException e) {
+                    Logging.error(this, "setupFlirCamera", e);
+                }
                 myCameraManager.subscribeToBatteryInfo(new BatteryInfoListener() {
                     @Override
                     public void BatteryPercentageUpdate(int percentage) {
@@ -154,7 +158,7 @@ public class CameraActivity extends AppCompatActivity {
 
                     @Override
                     public void subscriptionError(Exception e) {
-                        Logging.error("BatteryInfoListener", e);
+                        Logging.error(getApplicationContext(),"BatteryInfoListener", e);
                         batteryMeterView_BatteryIndicator.setChargeLevel(null);
                     }
 
@@ -167,7 +171,7 @@ public class CameraActivity extends AppCompatActivity {
                 try {
                     batteryMeterView_BatteryIndicator.setChargeLevel(myCameraManager.getBatteryPercentage());
                 } catch (NullPointerException e) {
-                    Logging.error(TAG, e);
+                    Logging.error(this,TAG, e);
                 }
             }
 
@@ -186,14 +190,14 @@ public class CameraActivity extends AppCompatActivity {
 
             @Override
             public void cameraFound(Identity identity) {
-                Logging.info(TAG, "Identity found: " + identity.toString());
+                Logging.info(getApplicationContext(),TAG, "Identity found: " + identity.toString());
                 Snackbar.make(rootView, "Flir one found" + identity.cameraType, Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
             public void onConnectionError(IOException e) {
                 runOnUiThread(() -> {
-                    Logging.error("Flir Error", e);
+                    Logging.error(getApplicationContext(),"Flir Error", e);
                     Snackbar.make(rootView, R.string.HardRestart, Snackbar.LENGTH_INDEFINITE).show();
                 });
             }
@@ -231,12 +235,13 @@ public class CameraActivity extends AppCompatActivity {
             String defaultImageName = "Thermal_Test_Img4.jpg";
             ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open(defaultImageName));
             thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
-            File folder = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + File.separator + "Masterthesisimages" + File.separator);
+            File folder = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + File.separator + "Masterthesisimages");
             boolean success = true;
             if (!folder.exists()) {
                 success = folder.mkdirs();
             }
             if (success) {
+                Logging.info(this,TAG, "folder created");
                 mThermalImagePath =  this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + defaultImageName;
                 thermalImageFile.saveAs(mThermalImagePath);
                 imageView_cameraPreviewContainer.setImageBitmap(ImageProcessing.getBitmap(thermalImageFile));
@@ -247,7 +252,7 @@ public class CameraActivity extends AppCompatActivity {
 
         } catch (IOException e) {
             Snackbar.make(rootView, "an error accrued when open default image", Snackbar.LENGTH_SHORT).show();
-            Logging.error("startCameraPreview", e);
+            Logging.error(this,"startCameraPreview", e);
         }
     }
 
@@ -267,12 +272,12 @@ public class CameraActivity extends AppCompatActivity {
             goToMarkerActivity();
         } else {
             myCameraManager.addThermalImageListener((thermalImage) -> {
-                File ImageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
+                File ImageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
                 boolean isDirectoryCreated = ImageDir.exists() || ImageDir.mkdirs();
                 try {
                     if (isDirectoryCreated) {
-                        String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal";
-                        mThermalImagePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
+                        String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal.jpg";
+                        mThermalImagePath =this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                         thermalImage.saveAs(mThermalImagePath);
                         goToMarkerActivity();
                     } else {
