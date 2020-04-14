@@ -106,15 +106,15 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
 
                                     FirebaseVisionFaceLandmark rightEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
                                     if (rightEye != null) {
-                                        rightEyeCoordinates = new int[]{(int) (rightEye.getPosition().getX() * widthScalingFactor - scaledHorizontalOffset), (int) (rightEye.getPosition().getY() * heightScalingFactor - scaledVerticalOffset)};
+                                        rightEyeCoordinates = new int[]{(int)Math.round((rightEye.getPosition().getX() * widthScalingFactor - scaledHorizontalOffset)), (int)Math.round((rightEye.getPosition().getY() * heightScalingFactor - scaledVerticalOffset))};
                                     }
                                     FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
                                     if (leftEye != null) {
-                                        leftEyeCoordinates = new int[]{(int) (leftEye.getPosition().getX() * widthScalingFactor + scaledHorizontalOffset), (int) (leftEye.getPosition().getY() * heightScalingFactor - scaledVerticalOffset)};
+                                        leftEyeCoordinates = new int[]{(int)Math.round((leftEye.getPosition().getX() * widthScalingFactor + scaledHorizontalOffset)), (int)Math.round((leftEye.getPosition().getY() * heightScalingFactor - scaledVerticalOffset))};
                                     }
                                     FirebaseVisionFaceLandmark nose = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.NOSE_BASE);
                                     if (nose != null) {
-                                        noseCoordinates = new int[]{(int) (nose.getPosition().getX() * widthScalingFactor), (int) (nose.getPosition().getY() * heightScalingFactor - scaledVerticalOffset)};
+                                        noseCoordinates = new int[]{(int)Math.round((nose.getPosition().getX() * widthScalingFactor)), (int)Math.round((nose.getPosition().getY() * heightScalingFactor - scaledVerticalOffset))};
                                     }
 
                                     algorithmResult.onResult(RgbThermalAlgorithm.super.calculateGradient(

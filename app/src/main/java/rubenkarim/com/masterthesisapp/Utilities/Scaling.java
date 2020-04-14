@@ -9,7 +9,7 @@ public class Scaling {
         double width = roi.getWidth() * scalingFactorX;
         double height = roi.getHeight() * scalingFactorY;
 
-        return new RoiModel(new int[]{(int) positionX, (int) positionY}, (int) width, (int) height);
+        return new RoiModel(new int[]{(int)Math.round(positionX), (int)Math.round(positionY)}, (int)Math.round(width), (int)Math.round(height));
     }
 
     public static int[] upscaleCoordinatesFromImageToScreen(int[] positionInCapturedImage, int[] capturedImageDimensions, int[] imageContainerDimensions) {
@@ -29,7 +29,7 @@ public class Scaling {
         positionInImageContainerX = Math.min(positionInImageContainerX, imageContainerWidth-1);
         positionInImageContainerY = Math.min(positionInImageContainerY, imageContainerHeight-1);
 
-        return new int[]{(int)positionInImageContainerX, (int)positionInImageContainerY};
+        return new int[]{(int)Math.round(positionInImageContainerX), (int)Math.round(positionInImageContainerY)};
     }
 
     public static int[] downscaleCoordinatesFromScreenToImage(int[] positionInImageContainer, int[] capturedImageDimensions, int[] imageContainerDimensions) {
@@ -49,6 +49,6 @@ public class Scaling {
         positionInCapturedImageX = Math.min(positionInCapturedImageX, capturedImageWidth-1);
         positionInCapturedImageY = Math.min(positionInCapturedImageY, capturedImageHeight-1);
 
-        return new int[]{(int)positionInCapturedImageX, (int)positionInCapturedImageY};
+        return new int[]{(int)Math.round(positionInCapturedImageX), (int)Math.round(positionInCapturedImageY)};
     }
 }
