@@ -15,8 +15,8 @@ public abstract class AbstractAlgorithm {
     public abstract void getGradientAndPositions(AlgorithmResult algorithmResult);
 
     protected GradientModel calculateGradient(float[] coordinates, ThermalImageFile thermalImageFile){
-        return calculateGradient((int) coordinates[0], (int) coordinates[1], (int) coordinates[2],
-                (int) coordinates[3], (int) coordinates[4], (int) coordinates[5], thermalImageFile);
+        return calculateGradient(Math.round(coordinates[0]), Math.round(coordinates[1]), Math.round(coordinates[2]),
+                Math.round(coordinates[3]), Math.round(coordinates[4]), Math.round(coordinates[5]), thermalImageFile);
     }
 
     protected GradientModel calculateGradient(int rigthEyeX, int rigthEyeY, int leftEyeX, int leftEyeY, int noseX, int noseY, ThermalImageFile thermalImageFile){
