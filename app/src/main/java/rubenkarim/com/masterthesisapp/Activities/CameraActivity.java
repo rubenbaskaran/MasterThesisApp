@@ -232,7 +232,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private void setupDefaultImage() {
         try {
-            String defaultImageName = "Thermal_Test_Img4.jpg";
+            String defaultImageName = "Thermal_Test_Img.jpg";
             ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open(defaultImageName));
             thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
             File folder = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + File.separator + "Masterthesisimages");

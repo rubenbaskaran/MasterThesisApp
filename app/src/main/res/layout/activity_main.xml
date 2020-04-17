@@ -10,7 +10,11 @@
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="0.5" />
+
+    <TextView
+        style="@style/textViewRoleStyle"
+        android:text="User"/>
 
     <Button
         android:id="@+id/button_cnn"
@@ -53,16 +57,20 @@
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"/>
 
+    <TextView
+        style="@style/textViewRoleStyle"
+        android:text="Admin"/>
+
     <Button
         android:id="@+id/button_exportData"
         style="@style/MenuButtonStyle"
-        android:background="@drawable/button_background"
+        android:background="@drawable/export_button_background"
         android:onClick="exportDataOnClick"
         android:text="Export Data"/>
 
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="0.5" />
 
 </LinearLayout>

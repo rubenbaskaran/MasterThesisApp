@@ -5,4 +5,5 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="colorBlack">#000000</color>
     <color name="buttonBackgroundColor">#2C5364</color>
+    <color name="exportButtonBackgroundColor">#2C5350</color>
 </resources>
