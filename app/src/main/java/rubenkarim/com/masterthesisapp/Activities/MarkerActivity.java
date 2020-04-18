@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.AlgorithmResult;
-import rubenkarim.com.masterthesisapp.Algorithms.CnnRectImg;
+import rubenkarim.com.masterthesisapp.Algorithms.CnnAlgorithm;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
 import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithm;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
@@ -123,7 +123,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                     new Thread(()->{
                         try {
                             String cnnModelFile = "RGB_yinguobingCNNV1.tflite";
-                            CnnRectImg cnn = new CnnRectImg(this, cnnModelFile, mThermalImage);
+                            CnnAlgorithm cnn = new CnnAlgorithm(this, cnnModelFile, mThermalImage);
                             cnn.getGradientAndPositions(this);
                         } catch (IOException e) {
                             Logging.error(this,"ExecuteAlgorithm(), CNN", e);
@@ -138,7 +138,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                     try {
 
                         String cnnTransferLearningModelFile = "RGB_InceptionV3.tflite";
-                        CnnRectImg cnnTransferLearning = new CnnRectImg(this, cnnTransferLearningModelFile, mThermalImage);
+                        CnnAlgorithm cnnTransferLearning = new CnnAlgorithm(this, cnnTransferLearningModelFile, mThermalImage);
                         cnnTransferLearning.getGradientAndPositions(this);
                     } catch (IOException e) {
                         Logging.error(this,"ExecuteAlgorithm(), CNNWithTransferLearning", e);

@@ -24,15 +24,14 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 import rubenkarim.com.masterthesisapp.Activities.MarkerActivity;
-import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
-public class CnnRectImg extends AbstractAlgorithm {
+public class CnnAlgorithm extends AbstractAlgorithm {
 
     private final Interpreter mTflite;
     private ThermalImageFile mThermalImage;
-    private static final String TAG = CnnRectImg.class.getSimpleName();
+    private static final String TAG = CnnAlgorithm.class.getSimpleName();
 
-    public CnnRectImg(MarkerActivity markerActivity, String cnnModelFilePath, ThermalImageFile thermalImage) throws IOException {
+    public CnnAlgorithm(MarkerActivity markerActivity, String cnnModelFilePath, ThermalImageFile thermalImage) throws IOException {
         mTflite = new Interpreter((ByteBuffer) loadModelFile(markerActivity, cnnModelFilePath));
         this.mThermalImage = thermalImage;
     }
