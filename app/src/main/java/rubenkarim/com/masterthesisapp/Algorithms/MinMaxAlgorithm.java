@@ -27,7 +27,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     private String mThermalImagePath;
     //endregion
 
-    public MinMaxAlgorithm(ThermalImageFile thermalImage, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) throws IOException {
+    public MinMaxAlgorithm(ThermalImageFile thermalImage, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) {
         capturedImageBitmap = thermalImage;
 
         int[] imageOriginalDimensions = new int[]{capturedImageBitmap.getWidth(), capturedImageBitmap.getHeight()};
