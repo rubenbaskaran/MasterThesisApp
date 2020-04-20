@@ -20,7 +20,7 @@ public class NeuralNetworkLoader {
         return loadNNModelFile(context, cnnModelFile);
     }
 
-    private static MappedByteBuffer loadNNModelFile(Context context, String MODEL_FILE) throws IOException {
+    public static MappedByteBuffer loadNNModelFile(Context context, String MODEL_FILE) throws IOException {
         AssetFileDescriptor fileDescriptor = context.getAssets().openFd(MODEL_FILE);
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
         FileChannel fileChannel = inputStream.getChannel();

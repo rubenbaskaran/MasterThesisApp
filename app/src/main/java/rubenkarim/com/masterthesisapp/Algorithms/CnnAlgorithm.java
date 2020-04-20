@@ -31,7 +31,7 @@ public class CnnAlgorithm extends AbstractAlgorithm {
     private ThermalImageFile mThermalImage;
     private static final String TAG = CnnAlgorithm.class.getSimpleName();
 
-    public CnnAlgorithm(MappedByteBuffer cnnModel, ThermalImageFile thermalImage) throws IOException {
+    public CnnAlgorithm(MappedByteBuffer cnnModel, ThermalImageFile thermalImage) {
         mTflite = new Interpreter((ByteBuffer) cnnModel);
         this.mThermalImage = thermalImage;
     }
