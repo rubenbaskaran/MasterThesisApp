@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import rubenkarim.com.masterthesisapp.Activities.MarkerActivity;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
+import rubenkarim.com.masterthesisapp.Utilities.NeuralNetworkLoader;
 
 class CnnAlgorithmTest {
 
@@ -22,7 +23,7 @@ class CnnAlgorithmTest {
     void setUp() throws IOException {
         String cnnPath = "";
         ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage("");
-        cnnAlgorithm = new CnnAlgorithm(new MarkerActivity(), cnnPath, thermalImageFile);
+        cnnAlgorithm = new CnnAlgorithm(NeuralNetworkLoader.loadNNModelFile(this, ), cnnPath, thermalImageFile);
     }
 
     @Test

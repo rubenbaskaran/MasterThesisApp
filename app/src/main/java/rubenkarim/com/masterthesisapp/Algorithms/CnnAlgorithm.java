@@ -31,8 +31,8 @@ public class CnnAlgorithm extends AbstractAlgorithm {
     private ThermalImageFile mThermalImage;
     private static final String TAG = CnnAlgorithm.class.getSimpleName();
 
-    public CnnAlgorithm(MarkerActivity markerActivity, String cnnModelFilePath, ThermalImageFile thermalImage) throws IOException {
-        mTflite = new Interpreter((ByteBuffer) loadModelFile(markerActivity, cnnModelFilePath));
+    public CnnAlgorithm(MappedByteBuffer cnnModel, ThermalImageFile thermalImage) throws IOException {
+        mTflite = new Interpreter((ByteBuffer) cnnModel);
         this.mThermalImage = thermalImage;
     }
 
@@ -81,16 +81,6 @@ public class CnnAlgorithm extends AbstractAlgorithm {
                 .add(new NormalizeOp(0, 255)).build();
         inputImageBuffer.load(thermalImage);
         return imageProcessor.process(inputImageBuffer);
-    }
-
-
-    private MappedByteBuffer loadModelFile(Activity activity, String MODEL_FILE) throws IOException {
-        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(MODEL_FILE);
-        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-        FileChannel fileChannel = inputStream.getChannel();
-        long startOffset = fileDescriptor.getStartOffset();
-        long declaredLength = fileDescriptor.getDeclaredLength();
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
 
     private BitmapWithBordersInfo addBlackBorder(Bitmap bmp, int minImgSize) {
