@@ -39,7 +39,7 @@ public class ExportActivity extends AppCompatActivity {
         progressBar_exportProgressbar = findViewById(R.id.progressBar_exportLoadingAnimation);
         TextView textView_pathToCsv = findViewById(R.id.textView_pathToCSV);
         mExportDirectory = new File(this.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "/Masterthesisexports/");
-        textView_pathToCsv.setText("CSV Files is saved at: \n" +mExportDirectory.getPath());
+        textView_pathToCsv.setText("CSV file is saved at: \n" +mExportDirectory.getPath());
     }
 
     public void createCsvOnClick(View view) {
@@ -161,7 +161,7 @@ public class ExportActivity extends AppCompatActivity {
 
                             if (numberOfObservations == 0) {
                                 runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null, null));
-                                Snackbar.make(linearLayout_exportActivity, "Database already empty", Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(linearLayout_exportActivity, "Database is already empty", Snackbar.LENGTH_SHORT).show();
                             }
                             else {
                                 db.observationDao().deleteAllObservations();
