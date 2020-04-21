@@ -1,4 +1,4 @@
-package rubenkarim.com.masterthesisapp.Managers.FlirOneManager;
+package rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera;
 
 public interface IThermalCamera {
 

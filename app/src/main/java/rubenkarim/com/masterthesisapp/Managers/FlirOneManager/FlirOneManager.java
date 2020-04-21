@@ -22,6 +22,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
+import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.BatteryInfoListener;
+import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalCamera;
+import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.StatusListener;
+import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.ThermalImagelistener;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 public class FlirOneManager implements IThermalCamera {

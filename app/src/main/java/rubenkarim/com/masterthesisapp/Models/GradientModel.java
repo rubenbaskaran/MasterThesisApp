@@ -4,15 +4,15 @@ import java.io.Serializable;
 
 public class GradientModel implements Serializable {
 
-    private double Gradient;
+    private double gradient;
     private int[] eyePosition;
     private int[] nosePosition;
     private double eyeTemperature;
     private double noseTemperature;
-    private boolean markersAdjusted = false;
+    private boolean isMarkersAdjusted = false;
 
     public GradientModel(double gradient, int[] eyePosition, int[] nosePosition, double eyeTemperature, double noseTemperature) {
-        Gradient = gradient;
+        this.gradient = gradient;
         this.eyePosition = eyePosition;
         this.nosePosition = nosePosition;
         this.eyeTemperature = eyeTemperature;
@@ -20,11 +20,11 @@ public class GradientModel implements Serializable {
     }
 
     public double getGradient() {
-        return Gradient;
+        return gradient;
     }
 
     public void setGradient(double gradient) {
-        Gradient = gradient;
+        this.gradient = gradient;
     }
 
     public int[] getEyePosition() {
@@ -60,10 +60,10 @@ public class GradientModel implements Serializable {
     }
 
     public boolean isMarkersAdjusted() {
-        return markersAdjusted;
+        return isMarkersAdjusted;
     }
 
     public void setMarkersAdjusted(boolean markersAdjusted) {
-        this.markersAdjusted = markersAdjusted;
+        this.isMarkersAdjusted = markersAdjusted;
     }
 }
