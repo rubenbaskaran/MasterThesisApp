@@ -8,7 +8,6 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.FileUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -25,8 +24,6 @@ import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.flir.thermalsdk.live.Identity;
 import com.google.android.material.snackbar.Snackbar;
 
-import org.tensorflow.lite.support.common.FileUtil;
-
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -37,8 +34,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import eo.view.batterymeter.BatteryMeterView;
 import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.BatteryInfoListener;
-import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.FlirStatusListener;
-import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.MyCameraManager;
+import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.IThermalCamera;
+import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.StatusListener;
+import rubenkarim.com.masterthesisapp.Managers.MyCameraManager.FlirOneManager;
 import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionListener;
 import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionManager;
 import rubenkarim.com.masterthesisapp.R;
@@ -53,9 +51,9 @@ public class CameraActivity extends AppCompatActivity {
     //region Properties
     private static final String TAG = CameraActivity.class.getSimpleName();
     private boolean useDefaultImage = false;
-    private View rootView;
-    private MyCameraManager myCameraManager;
-    private PermissionManager permissionManager;
+    private View mRootView;
+    private IThermalCamera mIThermalCamera;
+    private PermissionManager mPermissionManager;
     private String mThermalImagePath;
     private ImageView imageView_cameraPreviewContainer;
     private ImageView imageView_faceTemplate;
@@ -69,7 +67,7 @@ public class CameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-        rootView = findViewById(R.id.linearLayout_CameraActivity);
+        mRootView = findViewById(R.id.linearLayout_CameraActivity);
         relativeLayout_eyeNoseTemplate = findViewById(R.id.relativeLayout_eyeNoseTemplate);
         imageView_faceTemplate = findViewById(R.id.imageView_faceTemplate);
         progressBar_loadingAnimation = findViewById(R.id.progressBar_cameraViewLoadingAnimation);
@@ -81,8 +79,8 @@ public class CameraActivity extends AppCompatActivity {
             imageView_faceTemplate.setVisibility(View.INVISIBLE);
         }
 
-        permissionManager = new PermissionManager();
-        myCameraManager = new MyCameraManager(getApplicationContext());
+        mPermissionManager = new PermissionManager();
+        mIThermalCamera = new FlirOneManager(getApplicationContext());
 
         checkPermissions(getListOfUsbDevices());
     }
@@ -96,16 +94,16 @@ public class CameraActivity extends AppCompatActivity {
         if (PermissionManager.checkPermissions(this, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             startCameraPreview(deviceList);
         } else {
-            permissionManager.requestPermissions(this, new PermissionListener() {
+            mPermissionManager.requestPermissions(this, new PermissionListener() {
                         @Override
                         public void permissionGranted(String[] permissions) {
-                            Snackbar.make(rootView, "permissions allowed", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(mRootView, "permissions allowed", Snackbar.LENGTH_SHORT).show();
                             startCameraPreview(deviceList);
                         }
 
                         @Override
                         public void permissionDenied(String[] permissions) {
-                            Snackbar.make(rootView, "crucial permissions have been denied come back to allow permissions", Snackbar.LENGTH_INDEFINITE).show();
+                            Snackbar.make(mRootView, "crucial permissions have been denied come back to allow permissions", Snackbar.LENGTH_INDEFINITE).show();
                         }
                     },
                     Manifest.permission.CAMERA,
@@ -117,22 +115,22 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        permissionManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        mPermissionManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void startCameraPreview(HashMap<String, UsbDevice> deviceList) {
         if (!deviceList.isEmpty()) {
-            Snackbar.make(rootView, "FLIR camera detected. Trying to connect", Snackbar.LENGTH_INDEFINITE).show();
+            Snackbar.make(mRootView, "FLIR camera detected. Trying to connect", Snackbar.LENGTH_INDEFINITE).show();
             setupFlirCamera();
         } else {
-            Snackbar.make(rootView, "Can't find FLIR camera. Using default image", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, "Can't find FLIR camera. Using default image", Snackbar.LENGTH_SHORT).show();
             setupDefaultImage();
         }
     }
 
     private void setupFlirCamera() {
 
-        myCameraManager.InitCameraSearchAndSub((thermalImage) -> {
+        mIThermalCamera.InitCameraSearchAndSub((thermalImage) -> {
             //The image must not be processed on the UI Thread
             JavaImageBuffer javaImageBuffer = thermalImage.getImage();
             thermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
@@ -146,11 +144,11 @@ public class CameraActivity extends AppCompatActivity {
                 Logging.info(this, TAG, "trying to calibrate");
                 isCalibrated = true;
                 try {
-                    this.myCameraManager.calibrateCamera();
+                    this.mIThermalCamera.calibrateCamera();
                 } catch (NullPointerException e) {
                     Logging.error(this, "setupFlirCamera", e);
                 }
-                myCameraManager.subscribeToBatteryInfo(new BatteryInfoListener() {
+                mIThermalCamera.SubscribeToBatteryInfo(new BatteryInfoListener() {
                     @Override
                     public void BatteryPercentageUpdate(int percentage) {
                         batteryMeterView_BatteryIndicator.setChargeLevel(percentage);
@@ -169,7 +167,7 @@ public class CameraActivity extends AppCompatActivity {
                 });
 
                 try {
-                    batteryMeterView_BatteryIndicator.setChargeLevel(myCameraManager.getBatteryPercentage());
+                    batteryMeterView_BatteryIndicator.setChargeLevel(mIThermalCamera.getBatteryPercentage());
                 } catch (NullPointerException e) {
                     Logging.error(this,TAG, e);
                 }
@@ -177,12 +175,12 @@ public class CameraActivity extends AppCompatActivity {
 
         });
 
-        myCameraManager.subscribeToFlirConnectionStatus(new FlirStatusListener() {
+        mIThermalCamera.SubscribeToConnectionStatus(new StatusListener() {
             @Override
             public void onDisconnected(ErrorCode errorCode) {
                 runOnUiThread(() -> {
                     if (!errorCode.getMessage().isEmpty()) {
-                        Snackbar.make(rootView, "Disconnection Error: " + errorCode.getMessage(), Snackbar.LENGTH_INDEFINITE).show();
+                        Snackbar.make(mRootView, "Disconnection Error: " + errorCode.getMessage(), Snackbar.LENGTH_INDEFINITE).show();
                         Log.i(TAG, "onDisconnection: ERROR: " + errorCode.toString());
                     }
                 });
@@ -191,23 +189,23 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void cameraFound(Identity identity) {
                 Logging.info(getApplicationContext(),TAG, "Identity found: " + identity.toString());
-                Snackbar.make(rootView, "Flir one found" + identity.cameraType, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mRootView, "Flir one found" + identity.cameraType, Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
             public void onConnectionError(IOException e) {
                 runOnUiThread(() -> {
                     Logging.error(getApplicationContext(),"Flir Error", e);
-                    Snackbar.make(rootView, R.string.HardRestart, Snackbar.LENGTH_INDEFINITE).show();
+                    Snackbar.make(mRootView, R.string.HardRestart, Snackbar.LENGTH_INDEFINITE).show();
                 });
             }
 
             @Override
             public void isCalibrating(boolean isCalibrating) {
                 if (isCalibrating) {
-                    Snackbar.make(rootView, "Hold on, camera is calibrating", Snackbar.LENGTH_INDEFINITE).show();
+                    Snackbar.make(mRootView, "Hold on, camera is calibrating", Snackbar.LENGTH_INDEFINITE).show();
                 } else {
-                    Snackbar.make(rootView, "Camera is ready", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mRootView, "Camera is ready", Snackbar.LENGTH_SHORT).show();
                 }
 
             }
@@ -215,14 +213,14 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void permissionError(UsbPermissionHandler.UsbPermissionListener.ErrorType errorType, Identity identity) {
                 runOnUiThread(() -> {
-                    Snackbar.make(rootView, "Permission error: " + errorType.name(), Snackbar.LENGTH_INDEFINITE).show();
+                    Snackbar.make(mRootView, "Permission error: " + errorType.name(), Snackbar.LENGTH_INDEFINITE).show();
                 });
             }
 
             @Override
             public void permissionDenied(Identity identity) {
                 runOnUiThread(() -> {
-                    Snackbar.make(rootView, "USB Permission is Denied", Snackbar.LENGTH_INDEFINITE).show();
+                    Snackbar.make(mRootView, "USB Permission is Denied", Snackbar.LENGTH_INDEFINITE).show();
                 });
             }
         });
@@ -251,7 +249,7 @@ public class CameraActivity extends AppCompatActivity {
             }
 
         } catch (IOException e) {
-            Snackbar.make(rootView, "an error accrued when open default image", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, "an error accrued when open default image", Snackbar.LENGTH_SHORT).show();
             Logging.error(this,"startCameraPreview", e);
         }
     }
@@ -259,7 +257,7 @@ public class CameraActivity extends AppCompatActivity {
     public void takePictureOnClick(View view) {
         // Fix for Android Studio bug (returning to previous activity on "stop app")
         if (GlobalVariables.getCurrentAlgorithm() == null) {
-            Snackbar.make(rootView, "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
             return;
         }
 
@@ -271,7 +269,7 @@ public class CameraActivity extends AppCompatActivity {
         if (useDefaultImage) {
             goToMarkerActivity();
         } else {
-            myCameraManager.addThermalImageListener((thermalImage) -> {
+            mIThermalCamera.SubscribeToThermalImage((thermalImage) -> {
                 File ImageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
                 boolean isDirectoryCreated = ImageDir.exists() || ImageDir.mkdirs();
                 try {
@@ -306,8 +304,8 @@ public class CameraActivity extends AppCompatActivity {
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         intent.putExtra("imageHeight", imageHeight);
         intent.putExtra("imageWidth", imageWidth);
-        intent.putExtra("screenHeight", rootView.getHeight());
-        intent.putExtra("screenWidth", rootView.getWidth());
+        intent.putExtra("screenHeight", mRootView.getHeight());
+        intent.putExtra("screenWidth", mRootView.getWidth());
         addMinMaxDataIfChosen(intent);
 
         startActivity(intent);
@@ -334,9 +332,9 @@ public class CameraActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        if (myCameraManager != null) {
-            myCameraManager.close();
-            myCameraManager = null;
+        if (mIThermalCamera != null) {
+            mIThermalCamera.close();
+            mIThermalCamera = null;
         }
         super.onPause();
     }

@@ -24,15 +24,14 @@ import java.util.ArrayList;
 import androidx.annotation.NonNull;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
-public class MyCameraManager {
-
-    private static final String TAG = MyCameraManager.class.getSimpleName();
+public class FlirOneManager implements IThermalCamera {
+    private static final String TAG = FlirOneManager.class.getSimpleName();
     private Camera flirCamera;
     private ArrayList<ThermalImagelistener> thermalImageListeners;
-    private FlirStatusListener flirStatusListener;
+    private StatusListener statusListener;
     private Context applicationContext;
 
-    public MyCameraManager(Context applicationContext) {
+    public FlirOneManager(Context applicationContext) {
         this.applicationContext = applicationContext;
         ThermalLog.LogLevel enableLoggingInDebug =ThermalLog.LogLevel.DEBUG;
         ThermalSdkAndroid.init(applicationContext, enableLoggingInDebug);
@@ -40,17 +39,20 @@ public class MyCameraManager {
         thermalImageListeners = new ArrayList<>();
     }
 
-    public void addThermalImageListener(ThermalImagelistener thermalImagelistener){
+    @Override
+    public void SubscribeToThermalImage(ThermalImagelistener thermalImagelistener){
         this.thermalImageListeners.add(thermalImagelistener);
     }
 
+    @Override
     public void InitCameraSearchAndSub(ThermalImagelistener thermalImagelistener){
         DiscoveryFactory.getInstance().scan(aDiscoveryEventListener, CommunicationInterface.USB);
         this.thermalImageListeners.add(thermalImagelistener);
     }
 
-    public void subscribeToFlirConnectionStatus(FlirStatusListener flirStatusListener){
-        this.flirStatusListener = flirStatusListener;
+    @Override
+    public void SubscribeToConnectionStatus(StatusListener statusListener){
+        this.statusListener = statusListener;
     }
 
     private void updateThermalListener(ThermalImage thermalImage){
@@ -59,6 +61,7 @@ public class MyCameraManager {
         }
     }
 
+    @Override
     public void close() {
             if (flirCamera == null) {
                 return;
@@ -73,6 +76,7 @@ public class MyCameraManager {
             }
     }
 
+    @Override
     public void calibrateCamera() throws NullPointerException {
         Logging.info(applicationContext,"FLIRONE", "is calibrating");
         flirCamera.getRemoteControl().getCalibration().nuc();
@@ -80,7 +84,7 @@ public class MyCameraManager {
             flirCamera.getRemoteControl().getCalibration().subscribeCalibrationState(new Calibration.NucStateListener() {
                 @Override
                 public void onNucState(boolean b) {
-                    flirStatusListener.isCalibrating(b);
+                    statusListener.isCalibrating(b);
                 }
             });
         } catch (Exception e) {
@@ -93,7 +97,8 @@ public class MyCameraManager {
         return flirCamera.getRemoteControl().getBattery().getPercentage();
     }
 
-    public void subscribeToBatteryInfo(BatteryInfoListener batteryInfoListener){
+    @Override
+    public void SubscribeToBatteryInfo(BatteryInfoListener batteryInfoListener){
         try {
             flirCamera.getRemoteControl().getBattery().subscribePercentage(i -> batteryInfoListener.BatteryPercentageUpdate(i));
 
@@ -123,7 +128,7 @@ public class MyCameraManager {
     private final ConnectionStatusListener connectionStatusListener = new ConnectionStatusListener() {
         @Override
         public void onDisconnected(ErrorCode errorCode) {
-            flirStatusListener.onDisconnected(errorCode);
+            statusListener.onDisconnected(errorCode);
         }
     };
 
@@ -145,15 +150,15 @@ public class MyCameraManager {
 
                         @Override
                         public void permissionDenied(@NonNull Identity identity) {
-                            if(flirStatusListener != null){
-                                flirStatusListener.permissionDenied(identity);
+                            if(statusListener != null){
+                                statusListener.permissionDenied(identity);
                             }
                         }
 
                         @Override
                         public void error(ErrorType errorType, Identity identity) {
-                            if(flirStatusListener != null){
-                                flirStatusListener.permissionError(errorType, identity);
+                            if(statusListener != null){
+                                statusListener.permissionError(errorType, identity);
                             }
                         }
                     });
@@ -179,13 +184,13 @@ public class MyCameraManager {
             flirCamera.subscribeStream(thermalImageStreamListener);
             DiscoveryFactory.getInstance().stop();
         } catch (IOException e) {
-            flirStatusListener.onConnectionError(e);
+            statusListener.onConnectionError(e);
         }
 
 
 
-        if(flirStatusListener != null){
-            flirStatusListener.cameraFound(identity);
+        if(statusListener != null){
+            statusListener.cameraFound(identity);
         }
     }
     //endregion
