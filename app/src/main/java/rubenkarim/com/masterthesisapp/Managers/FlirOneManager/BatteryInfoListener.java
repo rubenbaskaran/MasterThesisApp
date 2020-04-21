@@ -1,4 +1,4 @@
-package rubenkarim.com.masterthesisapp.Managers.MyCameraManager;
+package rubenkarim.com.masterthesisapp.Managers.FlirOneManager;
 
 public interface BatteryInfoListener {
     void BatteryPercentageUpdate(int percentage);

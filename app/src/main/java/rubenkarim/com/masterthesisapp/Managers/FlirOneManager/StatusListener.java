@@ -1,4 +1,4 @@
-package rubenkarim.com.masterthesisapp.Managers.MyCameraManager;
+package rubenkarim.com.masterthesisapp.Managers.FlirOneManager;
 
 import com.flir.thermalsdk.ErrorCode;
 import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
