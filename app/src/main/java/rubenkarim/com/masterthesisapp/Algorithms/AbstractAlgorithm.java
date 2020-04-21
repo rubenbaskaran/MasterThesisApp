@@ -14,20 +14,20 @@ public abstract class AbstractAlgorithm {
 
     public abstract void getGradientAndPositions(AlgorithmResult algorithmResult);
 
-    protected GradientModel calculateGradient(float[] coordinates, ThermalImageFile thermalImageFile){
+    protected GradientModel calculateGradient(float[] coordinates, ThermalImageFile thermalImg){
         return calculateGradient(Math.round(coordinates[0]), Math.round(coordinates[1]), Math.round(coordinates[2]),
-                Math.round(coordinates[3]), Math.round(coordinates[4]), Math.round(coordinates[5]), thermalImageFile);
+                Math.round(coordinates[3]), Math.round(coordinates[4]), Math.round(coordinates[5]), thermalImg);
     }
 
-    protected GradientModel calculateGradient(int rigthEyeX, int rigthEyeY, int leftEyeX, int leftEyeY, int noseX, int noseY, ThermalImageFile thermalImageFile){
+    protected GradientModel calculateGradient(int rigthEyeX, int rigthEyeY, int leftEyeX, int leftEyeY, int noseX, int noseY, ThermalImageFile thermalImg){
 
-        thermalImageFile.getMeasurements().addSpot(rigthEyeX, rigthEyeY);
-        thermalImageFile.getMeasurements().addSpot(leftEyeX, leftEyeY);
-        thermalImageFile.getMeasurements().addSpot(noseX,noseY);
+        thermalImg.getMeasurements().addSpot(rigthEyeX, rigthEyeY);
+        thermalImg.getMeasurements().addSpot(leftEyeX, leftEyeY);
+        thermalImg.getMeasurements().addSpot(noseX,noseY);
 
-        MeasurementSpot rigthEye = thermalImageFile.getMeasurements().getSpots().get(0);
-        MeasurementSpot leftEye = thermalImageFile.getMeasurements().getSpots().get(1);
-        MeasurementSpot nose = thermalImageFile.getMeasurements().getSpots().get(2);
+        MeasurementSpot rigthEye = thermalImg.getMeasurements().getSpots().get(0);
+        MeasurementSpot leftEye = thermalImg.getMeasurements().getSpots().get(1);
+        MeasurementSpot nose = thermalImg.getMeasurements().getSpots().get(2);
 
         final double temperatureRightEye = rigthEye.getValue().value;
         final double temperatureLeftEye = leftEye.getValue().value;

@@ -3,6 +3,22 @@ package rubenkarim.com.masterthesisapp.Models;
 import java.io.Serializable;
 
 public class GradientModel implements Serializable {
+
+    private double Gradient;
+    private int[] eyePosition;
+    private int[] nosePosition;
+    private double eyeTemperature;
+    private double noseTemperature;
+    private boolean markersAdjusted = false;
+
+    public GradientModel(double gradient, int[] eyePosition, int[] nosePosition, double eyeTemperature, double noseTemperature) {
+        Gradient = gradient;
+        this.eyePosition = eyePosition;
+        this.nosePosition = nosePosition;
+        this.eyeTemperature = eyeTemperature;
+        this.noseTemperature = noseTemperature;
+    }
+
     public double getGradient() {
         return Gradient;
     }
@@ -49,20 +65,5 @@ public class GradientModel implements Serializable {
 
     public void setMarkersAdjusted(boolean markersAdjusted) {
         this.markersAdjusted = markersAdjusted;
-    }
-
-    private double Gradient;
-    private int[] eyePosition;
-    private int[] nosePosition;
-    private double eyeTemperature;
-    private double noseTemperature;
-    private boolean markersAdjusted = false;
-
-    public GradientModel(double gradient, int[] eyePosition, int[] nosePosition, double eyeTemperature, double noseTemperature) {
-        Gradient = gradient;
-        this.eyePosition = eyePosition;
-        this.nosePosition = nosePosition;
-        this.eyeTemperature = eyeTemperature;
-        this.noseTemperature = noseTemperature;
     }
 }
