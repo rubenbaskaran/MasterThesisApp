@@ -1,11 +1,8 @@
 package rubenkarim.com.masterthesisapp.Activities;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -22,12 +19,10 @@ import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 
 import androidx.appcompat.app.AppCompatActivity;
+import rubenkarim.com.masterthesisapp.Algorithms.AbstractAlgorithm;
 import rubenkarim.com.masterthesisapp.Algorithms.AlgorithmResult;
 import rubenkarim.com.masterthesisapp.Algorithms.CnnAlgorithm;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
@@ -325,10 +320,8 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     }
 
     private void recalculateGradient(ThermalImageFile thermalImageFile) {
-        thermalImageFile.getMeasurements().addSpot(mGradientAndPositions.getEyePosition()[0], mGradientAndPositions.getEyePosition()[1]);
-        thermalImageFile.getMeasurements().addSpot(mGradientAndPositions.getNosePosition()[0], mGradientAndPositions.getNosePosition()[1]);
-        double eye = thermalImageFile.getMeasurements().getSpots().get(0).getValue().value;
-        double nose = thermalImageFile.getMeasurements().getSpots().get(1).getValue().value;
+        double eye = AbstractAlgorithm.calculateTemperature(mGradientAndPositions.getEyePosition()[0], mGradientAndPositions.getEyePosition()[1], thermalImageFile);
+        double nose = AbstractAlgorithm.calculateTemperature(mGradientAndPositions.getNosePosition()[0], mGradientAndPositions.getNosePosition()[1], thermalImageFile);
         mGradientAndPositions.setGradient(eye - nose);
     }
 

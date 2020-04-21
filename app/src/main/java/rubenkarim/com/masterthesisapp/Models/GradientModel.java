@@ -12,7 +12,7 @@ public class GradientModel implements Serializable {
     private boolean isMarkersAdjusted = false;
 
     public GradientModel(double gradient, int[] eyePosition, int[] nosePosition, double eyeTemperature, double noseTemperature) {
-        this.gradient = gradient;
+        this.setGradient(gradient);
         this.eyePosition = eyePosition;
         this.nosePosition = nosePosition;
         this.eyeTemperature = eyeTemperature;
@@ -24,7 +24,7 @@ public class GradientModel implements Serializable {
     }
 
     public void setGradient(double gradient) {
-        this.gradient = gradient;
+        this.gradient = Math.abs(gradient);
     }
 
     public int[] getEyePosition() {

@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
-import com.flir.thermalsdk.image.ThermalValue;
 import com.flir.thermalsdk.image.measurements.MeasurementSpot;
 
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
@@ -52,5 +51,11 @@ public abstract class AbstractAlgorithm {
     protected Bitmap getBitmap(ThermalImageFile thermalImageFile) {
         JavaImageBuffer javaBuffer = thermalImageFile.getImage();
         return BitmapAndroid.createBitmap(javaBuffer).getBitMap();
+    }
+
+    public static Double calculateTemperature(int x, int y, ThermalImageFile thermalImg){
+        thermalImg.getMeasurements().addSpot(x, y);
+        MeasurementSpot measurementSpot = thermalImg.getMeasurements().getSpots().get(0);
+        return measurementSpot.getValue().value;
     }
 }
