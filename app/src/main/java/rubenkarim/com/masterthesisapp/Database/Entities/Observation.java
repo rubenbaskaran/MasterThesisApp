@@ -40,7 +40,10 @@ public class Observation {
     public double gradient;
 
     @NonNull
-    public boolean markersadjusted;
+    public boolean eyemarkeradjusted;
+
+    @NonNull
+    public boolean nosemarkeradjusted;
 
     @NonNull
     public String chosenAlgorithm;

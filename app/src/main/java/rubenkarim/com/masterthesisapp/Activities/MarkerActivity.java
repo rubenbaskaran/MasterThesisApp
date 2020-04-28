@@ -1,11 +1,8 @@
 package rubenkarim.com.masterthesisapp.Activities;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -22,10 +19,7 @@ import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.AlgorithmResult;
@@ -302,14 +296,15 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     public void submitOnClick(View view) {
         if (eyeAdjusted) {
             mGradientAndPositions.setEyePosition(Scaling.downscaleCoordinatesFromScreenToImage(new int[]{adjustedEyePositionX, adjustedEyePositionY}, capturedImageDimensions, imageContainerDimensions));
+            mGradientAndPositions.setEyeMarkerAdjusted(true);
         }
         if (noseAdjusted) {
             mGradientAndPositions.setNosePosition(Scaling.downscaleCoordinatesFromScreenToImage(new int[]{adjustedNosePositionX, adjustedNosePositionY}, capturedImageDimensions, imageContainerDimensions));
+            mGradientAndPositions.setNoseMarkerAdjusted(true);
         }
 
         if (eyeAdjusted || noseAdjusted) {
             recalculateGradient(mThermalImage);
-            mGradientAndPositions.setMarkersAdjusted(true);
         }
 
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
@@ -329,6 +324,8 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         thermalImageFile.getMeasurements().addSpot(mGradientAndPositions.getNosePosition()[0], mGradientAndPositions.getNosePosition()[1]);
         double eye = thermalImageFile.getMeasurements().getSpots().get(0).getValue().value;
         double nose = thermalImageFile.getMeasurements().getSpots().get(1).getValue().value;
+        mGradientAndPositions.setEyeTemperature(eye);
+        mGradientAndPositions.setNoseTemperature(nose);
         mGradientAndPositions.setGradient(eye - nose);
     }
 

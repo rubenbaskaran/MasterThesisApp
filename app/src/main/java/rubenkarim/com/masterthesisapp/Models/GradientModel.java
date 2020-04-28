@@ -43,12 +43,20 @@ public class GradientModel implements Serializable {
         this.noseTemperature = noseTemperature;
     }
 
-    public boolean isMarkersAdjusted() {
-        return markersAdjusted;
+    public boolean isEyeMarkerAdjusted() {
+        return eyeMarkerAdjusted;
     }
 
-    public void setMarkersAdjusted(boolean markersAdjusted) {
-        this.markersAdjusted = markersAdjusted;
+    public void setEyeMarkerAdjusted(boolean eyeMarkerAdjusted) {
+        this.eyeMarkerAdjusted = eyeMarkerAdjusted;
+    }
+
+    public boolean isNoseMarkerAdjusted() {
+        return noseMarkerAdjusted;
+    }
+
+    public void setNoseMarkerAdjusted(boolean noseMarkerAdjusted) {
+        this.noseMarkerAdjusted = noseMarkerAdjusted;
     }
 
     private double Gradient;
@@ -56,7 +64,8 @@ public class GradientModel implements Serializable {
     private int[] nosePosition;
     private double eyeTemperature;
     private double noseTemperature;
-    private boolean markersAdjusted = false;
+    private boolean eyeMarkerAdjusted = false;
+    private boolean noseMarkerAdjusted = false;
 
     public GradientModel(double gradient, int[] eyePosition, int[] nosePosition, double eyeTemperature, double noseTemperature) {
         Gradient = gradient;
