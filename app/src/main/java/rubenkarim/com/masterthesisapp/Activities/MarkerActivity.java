@@ -1,7 +1,9 @@
 package rubenkarim.com.masterthesisapp.Activities;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PointF;
@@ -20,11 +22,14 @@ import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.AlgorithmResult;
-import rubenkarim.com.masterthesisapp.Algorithms.CnnRectImg;
+import rubenkarim.com.masterthesisapp.Algorithms.CnnAlgorithm;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
 import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithm;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
@@ -35,6 +40,7 @@ import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 import rubenkarim.com.masterthesisapp.Utilities.MinMaxDataTransferContainer;
+import rubenkarim.com.masterthesisapp.Utilities.NeuralNetworkLoader;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
 public class MarkerActivity extends AppCompatActivity implements AlgorithmResult {
@@ -84,7 +90,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                 mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
             } catch (IOException e) {
                 Logging.error(this,TAG + " onCreate: ", e);
-                Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_INDEFINITE).show();
+                Snackbar.make(mRootView, R.string.errorThermal_Img, Snackbar.LENGTH_INDEFINITE).show();
             }
         }
         if (receivedIntent.hasExtra("imageViewVerticalOffset")) {
@@ -119,57 +125,47 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     private void ExecuteAlgorithm() {
         switch (GlobalVariables.getCurrentAlgorithm()) {
             case CNN:
-
                     new Thread(()->{
                         try {
-                            String cnnModelFile = "RGB_yinguobingCNNV1.tflite";
-                            CnnRectImg cnn = new CnnRectImg(this, cnnModelFile, mThermalImage);
+                            CnnAlgorithm cnn = new CnnAlgorithm(NeuralNetworkLoader.loadCnn(this), mThermalImage);
                             cnn.getGradientAndPositions(this);
                         } catch (IOException e) {
                             Logging.error(this,"ExecuteAlgorithm(), CNN", e);
-                            Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
+                            Snackbar.make(mRootView, R.string.errorAlgorithm, Snackbar.LENGTH_LONG).show();
                         }
                     }).start();
-
-
                 break;
+
             case CNNWithTransferLearning:
                 new Thread(()->{
                     try {
-
-                        String cnnTransferLearningModelFile = "RGB_InceptionV3.tflite";
-                        CnnRectImg cnnTransferLearning = new CnnRectImg(this, cnnTransferLearningModelFile, mThermalImage);
+                        CnnAlgorithm cnnTransferLearning = new CnnAlgorithm(NeuralNetworkLoader.loadCnnTransferLearning(this), mThermalImage);
                         cnnTransferLearning.getGradientAndPositions(this);
                     } catch (IOException e) {
                         Logging.error(this,"ExecuteAlgorithm(), CNNWithTransferLearning", e);
-                        Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(mRootView, R.string.errorAlgorithm, Snackbar.LENGTH_LONG).show();
                     }
                 }).start();
-
                 break;
+
             case RgbThermalMapping:
                 new Thread(()->{
                     Logging.info(this,TAG, "starting RGB");
-                    RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(this, mThermalImage);
+                    RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(mThermalImage);
                     rgbThermalAlgorithm.getGradientAndPositions(this, screenWidth, screenHeight);
                 }).start();
-
                 break;
+
             case MinMaxTemplate:
                 new Thread(()->{
-                    try {
-                        MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
-                                mThermalImage,
-                                new RoiModel(minMaxData.getLeftEyeLocation(), minMaxData.getLeftEyeWidth(), minMaxData.getLeftEyeHeight()),
-                                new RoiModel(minMaxData.getRightEyeLocation(), minMaxData.getRightEyeWidth(), minMaxData.getRightEyeHeight()),
-                                new RoiModel(minMaxData.getNoseLocation(), minMaxData.getNoseWidth(), minMaxData.getNoseHeight()),
-                                new RoiModel(minMaxData.getCameraPreviewContainerLocation(), minMaxData.getCameraPreviewContainerWidth(), minMaxData.getCameraPreviewContainerHeight())
-                        );
-                        minMaxAlgorithm.getGradientAndPositions(this);
-                    } catch (IOException e) {
-                        Logging.error(this,"ExecuteAlgorithm(), MinMaxTemplate", e);
-                        Snackbar.make(mRootView, "There was an error with the thermal image file try take a new picture", Snackbar.LENGTH_LONG).show();
-                    }
+                    MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
+                            mThermalImage,
+                            new RoiModel(minMaxData.getLeftEyeLocation(), minMaxData.getLeftEyeWidth(), minMaxData.getLeftEyeHeight()),
+                            new RoiModel(minMaxData.getRightEyeLocation(), minMaxData.getRightEyeWidth(), minMaxData.getRightEyeHeight()),
+                            new RoiModel(minMaxData.getNoseLocation(), minMaxData.getNoseWidth(), minMaxData.getNoseHeight()),
+                            new RoiModel(minMaxData.getCameraPreviewContainerLocation(), minMaxData.getCameraPreviewContainerWidth(), minMaxData.getCameraPreviewContainerHeight())
+                    );
+                    minMaxAlgorithm.getGradientAndPositions(this);
                 }).start();
                 break;
         }
@@ -185,6 +181,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
 
     @Override
     public void onError(String errorMessage) {
+        Logging.info(this, TAG,"Algorithm: " + errorMessage);
         runOnUiThread(() -> {
             Snackbar.make(mRootView, errorMessage, Snackbar.LENGTH_LONG).show();
         });
@@ -292,20 +289,9 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         }
         Log.e(String.valueOf(marker.getTag()), "x: " + x + ", y: " + y);
 
-        //getPixelColor(x, y);
     }
 
-    private void getPixelColor(int x, int y) {
-        Bitmap rootElementBitmap = ImageProcessing.loadBitmapFromView(imageView_thermalImageContainer);
 
-        // Setting screen boundary programmatically
-        x = x < 0 ? 0 : Math.min(x, imageWidth - 1);
-        y = y < 0 ? 0 : Math.min(y, imageHeight - 1);
-
-        int targetPixel = rootElementBitmap.getPixel(x, y);
-        Log.e("Target pixel", "x: " + x + ", y: " + y);
-        Log.e("Pixel color", Color.red(targetPixel) + "," + Color.green(targetPixel) + "," + Color.blue(targetPixel));
-    }
 
     //region Navigation buttons
     public void backOnClick(View view) {

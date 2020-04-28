@@ -24,16 +24,15 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 import rubenkarim.com.masterthesisapp.Activities.MarkerActivity;
-import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
-public class CnnRectImg extends AbstractAlgorithm {
+public class CnnAlgorithm extends AbstractAlgorithm {
 
     private final Interpreter mTflite;
     private ThermalImageFile mThermalImage;
-    private static final String TAG = CnnRectImg.class.getSimpleName();
+    private static final String TAG = CnnAlgorithm.class.getSimpleName();
 
-    public CnnRectImg(MarkerActivity markerActivity, String cnnModelFilePath, ThermalImageFile thermalImage) throws IOException {
-        mTflite = new Interpreter((ByteBuffer) loadModelFile(markerActivity, cnnModelFilePath));
+    public CnnAlgorithm(MappedByteBuffer cnnModel, ThermalImageFile thermalImage) {
+        mTflite = new Interpreter((ByteBuffer) cnnModel);
         this.mThermalImage = thermalImage;
     }
 
@@ -82,16 +81,6 @@ public class CnnRectImg extends AbstractAlgorithm {
                 .add(new NormalizeOp(0, 255)).build();
         inputImageBuffer.load(thermalImage);
         return imageProcessor.process(inputImageBuffer);
-    }
-
-
-    private MappedByteBuffer loadModelFile(Activity activity, String MODEL_FILE) throws IOException {
-        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(MODEL_FILE);
-        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-        FileChannel fileChannel = inputStream.getChannel();
-        long startOffset = fileDescriptor.getStartOffset();
-        long declaredLength = fileDescriptor.getDeclaredLength();
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
 
     private BitmapWithBordersInfo addBlackBorder(Bitmap bmp, int minImgSize) {

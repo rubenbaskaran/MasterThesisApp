@@ -31,12 +31,10 @@ import rubenkarim.com.masterthesisapp.Utilities.Logging;
 public class RgbThermalAlgorithm extends AbstractAlgorithm {
 
     private static final String TAG = RgbThermalAlgorithm.class.getSimpleName();
-    private Context mApplicationContext;
     private ThermalImageFile mThermalImageFile;
 
 
-    public RgbThermalAlgorithm(Context context, ThermalImageFile thermalImage) {
-        this.mApplicationContext = context;
+    public RgbThermalAlgorithm(ThermalImageFile thermalImage) {
         mThermalImageFile = thermalImage;
     }
 
@@ -85,13 +83,11 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
         FirebaseVisionFaceDetector detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
         ThermalImageFile finalThermalImageFile = thermalImageFile;
 
-        Logging.info(mApplicationContext, TAG, "Reacted Firebase");
         detector.detectInImage(firebaseVisionImage)
                 .addOnSuccessListener(
                         new OnSuccessListener<List<FirebaseVisionFace>>() {
                             @Override
                             public void onSuccess(List<FirebaseVisionFace> faces) {
-                                Logging.info(mApplicationContext, TAG, "onSucces");
                                 // Task completed successfully
                                 // [START_EXCLUDE]
                                 // [START get_face_info]
