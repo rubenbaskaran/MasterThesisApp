@@ -1,7 +1,5 @@
 package rubenkarim.com.masterthesisapp.Algorithms;
 
-import android.app.Activity;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -17,21 +15,16 @@ import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.image.ops.ResizeOp;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 
-import rubenkarim.com.masterthesisapp.Activities.MarkerActivity;
-
-public class CnnAlgorithm extends AbstractAlgorithm {
+public class CnnAlgorithmTask extends AbstractAlgorithmTask {
 
     private final Interpreter mTflite;
     private ThermalImageFile mThermalImage;
-    private static final String TAG = CnnAlgorithm.class.getSimpleName();
+    private static final String TAG = CnnAlgorithmTask.class.getSimpleName();
 
-    public CnnAlgorithm(MappedByteBuffer cnnModel, ThermalImageFile thermalImage) {
+    public CnnAlgorithmTask(MappedByteBuffer cnnModel, ThermalImageFile thermalImage) {
         mTflite = new Interpreter((ByteBuffer) cnnModel);
         this.mThermalImage = thermalImage;
     }

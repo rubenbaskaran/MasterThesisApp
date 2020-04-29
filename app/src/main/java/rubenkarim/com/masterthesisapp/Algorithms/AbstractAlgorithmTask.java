@@ -9,7 +9,7 @@ import com.flir.thermalsdk.image.measurements.MeasurementSpot;
 
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 
-public abstract class AbstractAlgorithm {
+public abstract class AbstractAlgorithmTask implements IAlgorithm {
 
     public abstract void getGradientAndPositions(AlgorithmResult algorithmResult);
 

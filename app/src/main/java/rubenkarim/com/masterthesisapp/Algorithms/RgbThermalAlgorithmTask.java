@@ -1,6 +1,5 @@
 package rubenkarim.com.masterthesisapp.Algorithms;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
@@ -18,7 +17,6 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 
 // Sample – face-detection – is the simplest implementation of the face detection functionality on Android.
@@ -28,18 +26,22 @@ import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 // Checkout DetectionBasedTracker.java and FdActivity.java
 
-public class RgbThermalAlgorithm extends AbstractAlgorithm {
+public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
 
-    private static final String TAG = RgbThermalAlgorithm.class.getSimpleName();
+    private static final String TAG = RgbThermalAlgorithmTask.class.getSimpleName();
     private ThermalImageFile mThermalImageFile;
+    private int deviceScreenWidth;
+    private int deviceScreenHeight;
 
 
-    public RgbThermalAlgorithm(ThermalImageFile thermalImage) {
+    public RgbThermalAlgorithmTask(ThermalImageFile thermalImage, int deviceScreenWidth, int deviceScreenHeight) {
         mThermalImageFile = thermalImage;
+        this.deviceScreenWidth = deviceScreenWidth;
+        this.deviceScreenHeight = deviceScreenHeight;
     }
 
-
-    public void getGradientAndPositions(AlgorithmResult algorithmResult, int deviceScreenWidth, int deviceScreenHeight) {
+    @Override
+    public void getGradientAndPositions(AlgorithmResult algorithmResult) {
         mThermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
         Bitmap thermalImageBitmap = super.getBitmap(mThermalImageFile);
         double thermalImageWidth = thermalImageBitmap.getWidth();
@@ -109,7 +111,7 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
                                         noseCoordinates = new int[]{(int)Math.round((nose.getPosition().getX() * widthScalingFactor)), (int)Math.round((nose.getPosition().getY() * heightScalingFactor - scaledVerticalOffset))};
                                     }
 
-                                    algorithmResult.onResult(RgbThermalAlgorithm.super.calculateGradient(
+                                    algorithmResult.onResult(RgbThermalAlgorithmTask.super.calculateGradient(
                                             rightEyeCoordinates[0],
                                             rightEyeCoordinates[1],
                                             leftEyeCoordinates[0],
@@ -130,12 +132,6 @@ public class RgbThermalAlgorithm extends AbstractAlgorithm {
                                 algorithmResult.onError("Face detection error");
                             }
                         });
-    }
-
-    @Override
-    public void getGradientAndPositions(AlgorithmResult algorithmResult) {
-        Log.e(TAG, "getGradientAndPositions: You are calling the wrong method");
-        throw new UnsupportedOperationException("Use the overloaded method instead!");
     }
 
     private FirebaseVisionImage convertToFirebaseVisionImage(Bitmap bitmap) {

@@ -22,11 +22,12 @@ import com.google.android.material.snackbar.Snackbar;
 import java.io.IOException;
 
 import androidx.appcompat.app.AppCompatActivity;
-import rubenkarim.com.masterthesisapp.Algorithms.AbstractAlgorithm;
+import rubenkarim.com.masterthesisapp.Algorithms.AbstractAlgorithmTask;
 import rubenkarim.com.masterthesisapp.Algorithms.AlgorithmResult;
-import rubenkarim.com.masterthesisapp.Algorithms.CnnAlgorithm;
-import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithm;
-import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithm;
+import rubenkarim.com.masterthesisapp.Algorithms.CnnAlgorithmTask;
+import rubenkarim.com.masterthesisapp.Algorithms.IAlgorithm;
+import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithmTask;
+import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithmTask;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.R;
@@ -122,7 +123,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNN:
                     new Thread(()->{
                         try {
-                            CnnAlgorithm cnn = new CnnAlgorithm(NeuralNetworkLoader.loadCnn(this), mThermalImage);
+                            CnnAlgorithmTask cnn = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnn(this), mThermalImage);
                             cnn.getGradientAndPositions(this);
                         } catch (IOException e) {
                             Logging.error(this,"ExecuteAlgorithm(), CNN", e);
@@ -134,7 +135,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNNWithTransferLearning:
                 new Thread(()->{
                     try {
-                        CnnAlgorithm cnnTransferLearning = new CnnAlgorithm(NeuralNetworkLoader.loadCnnTransferLearning(this), mThermalImage);
+                        CnnAlgorithmTask cnnTransferLearning = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnnTransferLearning(this), mThermalImage);
                         cnnTransferLearning.getGradientAndPositions(this);
                     } catch (IOException e) {
                         Logging.error(this,"ExecuteAlgorithm(), CNNWithTransferLearning", e);
@@ -146,14 +147,14 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case RgbThermalMapping:
                 new Thread(()->{
                     Logging.info(this,TAG, "starting RGB");
-                    RgbThermalAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithm(mThermalImage);
-                    rgbThermalAlgorithm.getGradientAndPositions(this, screenWidth, screenHeight);
+                    RgbThermalAlgorithmTask rgbThermalAlgorithm = new RgbThermalAlgorithmTask(mThermalImage, screenWidth, screenHeight);
+                    rgbThermalAlgorithm.getGradientAndPositions(this);
                 }).start();
                 break;
 
             case MinMaxTemplate:
                 new Thread(()->{
-                    MinMaxAlgorithm minMaxAlgorithm = new MinMaxAlgorithm(
+                    MinMaxAlgorithmTask minMaxAlgorithm = new MinMaxAlgorithmTask(
                             mThermalImage,
                             new RoiModel(minMaxData.getLeftEyeLocation(), minMaxData.getLeftEyeWidth(), minMaxData.getLeftEyeHeight()),
                             new RoiModel(minMaxData.getRightEyeLocation(), minMaxData.getRightEyeWidth(), minMaxData.getRightEyeHeight()),
@@ -320,8 +321,8 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     }
 
     private void recalculateGradient(ThermalImageFile thermalImageFile) {
-        double eye = AbstractAlgorithm.calculateTemperature(mGradientAndPositions.getEyePosition()[0], mGradientAndPositions.getEyePosition()[1], thermalImageFile);
-        double nose = AbstractAlgorithm.calculateTemperature(mGradientAndPositions.getNosePosition()[0], mGradientAndPositions.getNosePosition()[1], thermalImageFile);
+        double eye = AbstractAlgorithmTask.calculateTemperature(mGradientAndPositions.getEyePosition()[0], mGradientAndPositions.getEyePosition()[1], thermalImageFile);
+        double nose = AbstractAlgorithmTask.calculateTemperature(mGradientAndPositions.getNosePosition()[0], mGradientAndPositions.getNosePosition()[1], thermalImageFile);
         mGradientAndPositions.setGradient(eye - nose);
     }
 
