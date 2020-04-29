@@ -1,4 +1,4 @@
-package rubenkarim.com.masterthesisapp.Managers.MyCameraManager;
+package rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera;
 
 import com.flir.thermalsdk.ErrorCode;
 import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * Is an interface to listen to the different information from the flir camera
  */
-public interface FlirStatusListener {
+public interface StatusListener {
     /**
      * Is call when the camera is disconnected ether by user or another error
      * @param errorCode The errorCode describing the error(contains a descriptive text)

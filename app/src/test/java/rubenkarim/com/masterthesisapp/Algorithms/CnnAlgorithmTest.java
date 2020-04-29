@@ -1,11 +1,7 @@
 package rubenkarim.com.masterthesisapp.Algorithms;
 
-import android.util.Log;
-
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.ThermalImageFile;
-
-import junit.framework.TestFailure;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,17 +12,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
-import rubenkarim.com.masterthesisapp.Activities.MarkerActivity;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
-import rubenkarim.com.masterthesisapp.Utilities.NeuralNetworkLoader;
 
 class CnnAlgorithmTest {
 
-    CnnAlgorithm mCnnAlgorithm;
+    CnnAlgorithmTask mCnnAlgorithm;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -40,7 +33,7 @@ class CnnAlgorithmTest {
         long startOffset = 0;
         long declaredLength = fileChannel.size();
         MappedByteBuffer m = fileChannel.map(FileChannel.MapMode.READ_ONLY,startOffset,declaredLength);
-        mCnnAlgorithm = new CnnAlgorithm(m, thermalImageFile);
+        mCnnAlgorithm = new CnnAlgorithmTask(m, thermalImageFile);
         System.out.println("done");
     }
 

@@ -4,7 +4,7 @@ import com.flir.thermalsdk.image.ThermalImageFile;
 
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 
-public class TestAlgorthm extends AbstractAlgorithm {
+public class TestAlgorthm extends AbstractAlgorithmTask {
     @Override
     public void getGradientAndPositions(AlgorithmResult algorithmResult) {
 

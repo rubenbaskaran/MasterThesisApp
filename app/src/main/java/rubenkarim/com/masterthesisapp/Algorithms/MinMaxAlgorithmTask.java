@@ -5,7 +5,6 @@ import android.graphics.Color;
 
 import com.flir.thermalsdk.image.ThermalImageFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,7 +12,7 @@ import java.util.Comparator;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
-public class MinMaxAlgorithm extends AbstractAlgorithm {
+public class MinMaxAlgorithmTask extends AbstractAlgorithmTask {
 
     //region Properties
     private RoiModel leftEye;
@@ -27,7 +26,7 @@ public class MinMaxAlgorithm extends AbstractAlgorithm {
     private String mThermalImagePath;
     //endregion
 
-    public MinMaxAlgorithm(ThermalImageFile thermalImage, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) {
+    public MinMaxAlgorithmTask(ThermalImageFile thermalImage, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) {
         capturedImageBitmap = thermalImage;
 
         int[] imageOriginalDimensions = new int[]{capturedImageBitmap.getWidth(), capturedImageBitmap.getHeight()};
