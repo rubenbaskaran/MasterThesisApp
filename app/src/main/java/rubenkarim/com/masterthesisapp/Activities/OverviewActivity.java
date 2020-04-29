@@ -148,7 +148,8 @@ public class OverviewActivity extends AppCompatActivity {
             observation.nosepositiony = mGradientAndPositions.getNosePosition()[1];
             observation.eyeTemperature = mGradientAndPositions.getEyeTemperature();
             observation.noseTemperature = mGradientAndPositions.getNoseTemperature();
-            observation.markersadjusted = mGradientAndPositions.isMarkersAdjusted();
+            observation.eyemarkeradjusted = mGradientAndPositions.isEyeMarkerAdjusted();
+            observation.nosemarkeradjusted = mGradientAndPositions.isNoseMarkerAdjusted();
             observation.chosenAlgorithm = String.valueOf(GlobalVariables.getCurrentAlgorithm());
 
             AppDatabase db = AppDatabase.getDatabase(getApplicationContext());

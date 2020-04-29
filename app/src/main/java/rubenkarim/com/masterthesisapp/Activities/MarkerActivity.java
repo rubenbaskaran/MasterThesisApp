@@ -298,14 +298,15 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     public void submitOnClick(View view) {
         if (eyeAdjusted) {
             mGradientAndPositions.setEyePosition(Scaling.downscaleCoordinatesFromScreenToImage(new int[]{adjustedEyePositionX, adjustedEyePositionY}, capturedImageDimensions, imageContainerDimensions));
+            mGradientAndPositions.setEyeMarkerAdjusted(true);
         }
         if (noseAdjusted) {
             mGradientAndPositions.setNosePosition(Scaling.downscaleCoordinatesFromScreenToImage(new int[]{adjustedNosePositionX, adjustedNosePositionY}, capturedImageDimensions, imageContainerDimensions));
+            mGradientAndPositions.setNoseMarkerAdjusted(true);
         }
 
         if (eyeAdjusted || noseAdjusted) {
             recalculateGradient(mThermalImage);
-            mGradientAndPositions.setMarkersAdjusted(true);
         }
 
         Intent intent = new Intent(getApplicationContext(), OverviewActivity.class);
@@ -323,6 +324,8 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     private void recalculateGradient(ThermalImageFile thermalImageFile) {
         double eye = AbstractAlgorithmTask.calculateTemperature(mGradientAndPositions.getEyePosition()[0], mGradientAndPositions.getEyePosition()[1], thermalImageFile);
         double nose = AbstractAlgorithmTask.calculateTemperature(mGradientAndPositions.getNosePosition()[0], mGradientAndPositions.getNosePosition()[1], thermalImageFile);
+        mGradientAndPositions.setEyeTemperature(eye);
+        mGradientAndPositions.setNoseTemperature(nose);
         mGradientAndPositions.setGradient(eye - nose);
     }
 

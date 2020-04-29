@@ -88,7 +88,9 @@ public class ExportActivity extends AppCompatActivity {
                             .append(",")
                             .append(obs.gradient)
                             .append(",")
-                            .append(obs.markersadjusted)
+                            .append(obs.eyemarkeradjusted)
+                            .append(",")
+                            .append(obs.nosemarkeradjusted)
                             .append(",")
                             .append(obs.chosenAlgorithm)
                             .append(System.lineSeparator());
@@ -139,7 +141,9 @@ public class ExportActivity extends AppCompatActivity {
                 .append(",")
                 .append("gradient")
                 .append(",")
-                .append("markersAdjusted")
+                .append("eyeMarkerAdjusted")
+                .append(",")
+                .append("noseMarkerAdjusted")
                 .append(",")
                 .append("chosenAlgorithm")
                 .append(System.lineSeparator());
