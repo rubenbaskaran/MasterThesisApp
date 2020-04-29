@@ -6,7 +6,7 @@ import rubenkarim.com.masterthesisapp.Models.GradientModel;
 
 public class TestAlgorthm extends AbstractAlgorithmTask {
     @Override
-    public void getGradientAndPositions(AlgorithmResult algorithmResult) {
+    public void getGradientAndPositions(AlgorithmResultListener algorithmResultListener) {
 
     }
 

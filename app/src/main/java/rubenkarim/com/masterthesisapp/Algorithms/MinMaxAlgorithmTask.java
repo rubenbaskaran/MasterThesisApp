@@ -47,12 +47,12 @@ public class MinMaxAlgorithmTask extends AbstractAlgorithmTask {
     }
 
     @Override
-    public void getGradientAndPositions(AlgorithmResult algorithmResult) {
+    public void getGradientAndPositions(AlgorithmResultListener algorithmResultListener) {
         int[] rightEyeMax = getMaxMinSpotInRoi(rightEye, "max");
         int[] leftEyeMax = getMaxMinSpotInRoi(leftEye, "max");
         int[] noseMin = getMaxMinSpotInRoi(nose, "min");
 
-        algorithmResult.onResult(super.calculateGradient(
+        algorithmResultListener.onResult(super.calculateGradient(
                 rightEyeMax[0],
                 rightEyeMax[1],
                 leftEyeMax[0],

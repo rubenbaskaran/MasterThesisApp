@@ -1,7 +1,6 @@
 package rubenkarim.com.masterthesisapp.Algorithms;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
@@ -41,7 +40,7 @@ public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
     }
 
     @Override
-    public void getGradientAndPositions(AlgorithmResult algorithmResult) {
+    public void getGradientAndPositions(AlgorithmResultListener algorithmResultListener) {
         mThermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
         Bitmap thermalImageBitmap = super.getBitmap(mThermalImageFile);
         double thermalImageWidth = thermalImageBitmap.getWidth();
@@ -111,7 +110,7 @@ public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
                                         noseCoordinates = new int[]{(int)Math.round((nose.getPosition().getX() * widthScalingFactor)), (int)Math.round((nose.getPosition().getY() * heightScalingFactor - scaledVerticalOffset))};
                                     }
 
-                                    algorithmResult.onResult(RgbThermalAlgorithmTask.super.calculateGradient(
+                                    algorithmResultListener.onResult(RgbThermalAlgorithmTask.super.calculateGradient(
                                             rightEyeCoordinates[0],
                                             rightEyeCoordinates[1],
                                             leftEyeCoordinates[0],
@@ -121,7 +120,7 @@ public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
                                             finalThermalImageFile
                                     ));
                                 } else {
-                                    algorithmResult.onError("No faces found");
+                                    algorithmResultListener.onError("No faces found");
                                 }
                             }
                         })
@@ -129,7 +128,7 @@ public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
                         new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                algorithmResult.onError("Face detection error");
+                                algorithmResultListener.onError("Face detection error");
                             }
                         });
     }

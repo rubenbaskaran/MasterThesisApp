@@ -9,9 +9,9 @@ import com.flir.thermalsdk.image.measurements.MeasurementSpot;
 
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 
-public abstract class AbstractAlgorithmTask implements IAlgorithm {
+public abstract class AbstractAlgorithmTask {
 
-    public abstract void getGradientAndPositions(AlgorithmResult algorithmResult);
+    public abstract void getGradientAndPositions(AlgorithmResultListener algorithmResultListener);
 
     protected GradientModel calculateGradient(float[] coordinates, ThermalImageFile thermalImg){
         return calculateGradient(Math.round(coordinates[0]), Math.round(coordinates[1]), Math.round(coordinates[2]),

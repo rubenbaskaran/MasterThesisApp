@@ -39,7 +39,7 @@ class CnnAlgorithmTest {
 
     @Test
     void getGradientAndPositions() {
-        mCnnAlgorithm.getGradientAndPositions(new AlgorithmResult() {
+        mCnnAlgorithm.getGradientAndPositions(new AlgorithmResultListener() {
             @Override
             public void onResult(GradientModel gradientModel) {
                 assertNotNull(gradientModel);

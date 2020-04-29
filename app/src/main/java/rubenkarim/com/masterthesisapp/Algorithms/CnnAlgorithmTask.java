@@ -30,7 +30,7 @@ public class CnnAlgorithmTask extends AbstractAlgorithmTask {
     }
 
     @Override
-    public void getGradientAndPositions(AlgorithmResult algorithmResult) {
+    public void getGradientAndPositions(AlgorithmResultListener algorithmResultListener) {
         int[] imgShapeInput = mTflite.getInputTensor(0).shape(); // cnn: {1, width: 240, Height: 320, 3} cnnTransferlearning: {1, 320, 320, 3}
         mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
         //Bitmap grayBitmap = toGrayscale(mImageBitmap);
@@ -63,7 +63,7 @@ public class CnnAlgorithmTask extends AbstractAlgorithmTask {
             }
         }
 
-        algorithmResult.onResult(super.calculateGradient(scaledResults, mThermalImage));
+        algorithmResultListener.onResult(super.calculateGradient(scaledResults, mThermalImage));
     }
 
     private TensorImage getTensorImage(int[] imgShapeInput, Bitmap thermalImage) {

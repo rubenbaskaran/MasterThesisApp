@@ -23,9 +23,8 @@ import java.io.IOException;
 
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.AbstractAlgorithmTask;
-import rubenkarim.com.masterthesisapp.Algorithms.AlgorithmResult;
+import rubenkarim.com.masterthesisapp.Algorithms.AlgorithmResultListener;
 import rubenkarim.com.masterthesisapp.Algorithms.CnnAlgorithmTask;
-import rubenkarim.com.masterthesisapp.Algorithms.IAlgorithm;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithmTask;
 import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithmTask;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
@@ -39,7 +38,7 @@ import rubenkarim.com.masterthesisapp.Utilities.MinMaxDataTransferContainer;
 import rubenkarim.com.masterthesisapp.Utilities.NeuralNetworkLoader;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
-public class MarkerActivity extends AppCompatActivity implements AlgorithmResult {
+public class MarkerActivity extends AppCompatActivity implements AlgorithmResultListener {
 
     //region Properties
     private static final String TAG = MarkerActivity.class.getSimpleName();
@@ -123,7 +122,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNN:
                     new Thread(()->{
                         try {
-                            IAlgorithm cnn = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnn(this), mThermalImage);
+                            AbstractAlgorithmTask cnn = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnn(this), mThermalImage);
                             cnn.getGradientAndPositions(this);
                         } catch (IOException e) {
                             Logging.error(this,"ExecuteAlgorithm(), CNN", e);
@@ -135,7 +134,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNNWithTransferLearning:
                 new Thread(()->{
                     try {
-                        IAlgorithm cnnTransferLearning = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnnTransferLearning(this), mThermalImage);
+                        AbstractAlgorithmTask cnnTransferLearning = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnnTransferLearning(this), mThermalImage);
                         cnnTransferLearning.getGradientAndPositions(this);
                     } catch (IOException e) {
                         Logging.error(this,"ExecuteAlgorithm(), CNNWithTransferLearning", e);
@@ -147,14 +146,14 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case RgbThermalMapping:
                 new Thread(()->{
                     Logging.info(this,TAG, "starting RGB");
-                    IAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithmTask(mThermalImage, screenWidth, screenHeight);
+                    AbstractAlgorithmTask rgbThermalAlgorithm = new RgbThermalAlgorithmTask(mThermalImage, screenWidth, screenHeight);
                     rgbThermalAlgorithm.getGradientAndPositions(this);
                 }).start();
                 break;
 
             case MinMaxTemplate:
                 new Thread(()->{
-                    IAlgorithm minMaxAlgorithm = new MinMaxAlgorithmTask(
+                    AbstractAlgorithmTask minMaxAlgorithm = new MinMaxAlgorithmTask(
                             mThermalImage,
                             new RoiModel(minMaxData.getLeftEyeLocation(), minMaxData.getLeftEyeWidth(), minMaxData.getLeftEyeHeight()),
                             new RoiModel(minMaxData.getRightEyeLocation(), minMaxData.getRightEyeWidth(), minMaxData.getRightEyeHeight()),

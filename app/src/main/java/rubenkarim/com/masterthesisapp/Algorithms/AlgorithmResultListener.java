@@ -2,7 +2,7 @@ package rubenkarim.com.masterthesisapp.Algorithms;
 
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 
-public interface AlgorithmResult {
+public interface AlgorithmResultListener {
     void onResult(GradientModel gradientModel);
     void onError(String errorMessage);
 }
