@@ -123,7 +123,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNN:
                     new Thread(()->{
                         try {
-                            CnnAlgorithmTask cnn = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnn(this), mThermalImage);
+                            IAlgorithm cnn = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnn(this), mThermalImage);
                             cnn.getGradientAndPositions(this);
                         } catch (IOException e) {
                             Logging.error(this,"ExecuteAlgorithm(), CNN", e);
@@ -135,7 +135,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNNWithTransferLearning:
                 new Thread(()->{
                     try {
-                        CnnAlgorithmTask cnnTransferLearning = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnnTransferLearning(this), mThermalImage);
+                        IAlgorithm cnnTransferLearning = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnnTransferLearning(this), mThermalImage);
                         cnnTransferLearning.getGradientAndPositions(this);
                     } catch (IOException e) {
                         Logging.error(this,"ExecuteAlgorithm(), CNNWithTransferLearning", e);
@@ -147,14 +147,14 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case RgbThermalMapping:
                 new Thread(()->{
                     Logging.info(this,TAG, "starting RGB");
-                    RgbThermalAlgorithmTask rgbThermalAlgorithm = new RgbThermalAlgorithmTask(mThermalImage, screenWidth, screenHeight);
+                    IAlgorithm rgbThermalAlgorithm = new RgbThermalAlgorithmTask(mThermalImage, screenWidth, screenHeight);
                     rgbThermalAlgorithm.getGradientAndPositions(this);
                 }).start();
                 break;
 
             case MinMaxTemplate:
                 new Thread(()->{
-                    MinMaxAlgorithmTask minMaxAlgorithm = new MinMaxAlgorithmTask(
+                    IAlgorithm minMaxAlgorithm = new MinMaxAlgorithmTask(
                             mThermalImage,
                             new RoiModel(minMaxData.getLeftEyeLocation(), minMaxData.getLeftEyeWidth(), minMaxData.getLeftEyeHeight()),
                             new RoiModel(minMaxData.getRightEyeLocation(), minMaxData.getRightEyeWidth(), minMaxData.getRightEyeHeight()),
