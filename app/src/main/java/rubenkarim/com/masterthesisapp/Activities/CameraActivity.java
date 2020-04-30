@@ -130,7 +130,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private void setupFlirCamera() {
 
-        mIThermalCamera.InitCameraSearchAndSub((thermalImage) -> {
+        mIThermalCamera.initCameraSearchAndSub((thermalImage) -> {
             //The image must not be processed on the UI Thread
             JavaImageBuffer javaImageBuffer = thermalImage.getImage();
             thermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
@@ -148,7 +148,7 @@ public class CameraActivity extends AppCompatActivity {
                 } catch (NullPointerException e) {
                     Logging.error(this, "setupFlirCamera", e);
                 }
-                mIThermalCamera.SubscribeToBatteryInfo(new BatteryInfoListener() {
+                mIThermalCamera.subscribeToBatteryInfo(new BatteryInfoListener() {
                     @Override
                     public void BatteryPercentageUpdate(int percentage) {
                         batteryMeterView_BatteryIndicator.setChargeLevel(percentage);
@@ -175,7 +175,7 @@ public class CameraActivity extends AppCompatActivity {
 
         });
 
-        mIThermalCamera.SubscribeToConnectionStatus(new StatusListener() {
+        mIThermalCamera.subscribeToConnectionStatus(new StatusListener() {
             @Override
             public void onDisconnected(ErrorCode errorCode) {
                 runOnUiThread(() -> {
@@ -269,7 +269,7 @@ public class CameraActivity extends AppCompatActivity {
         if (useDefaultImage) {
             goToMarkerActivity();
         } else {
-            mIThermalCamera.SubscribeToThermalImage((thermalImage) -> {
+            mIThermalCamera.subscribeToThermalImage((thermalImage) -> {
                 File ImageDir = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/Masterthesisimages/");
                 boolean isDirectoryCreated = ImageDir.exists() || ImageDir.mkdirs();
                 try {

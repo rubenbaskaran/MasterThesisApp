@@ -44,18 +44,18 @@ public class FlirOneManager implements IThermalCamera {
     }
 
     @Override
-    public void SubscribeToThermalImage(ThermalImagelistener thermalImagelistener){
+    public void subscribeToThermalImage(ThermalImagelistener thermalImagelistener){
         this.thermalImageListeners.add(thermalImagelistener);
     }
 
     @Override
-    public void InitCameraSearchAndSub(ThermalImagelistener thermalImagelistener){
+    public void initCameraSearchAndSub(ThermalImagelistener thermalImagelistener){
         DiscoveryFactory.getInstance().scan(aDiscoveryEventListener, CommunicationInterface.USB);
         this.thermalImageListeners.add(thermalImagelistener);
     }
 
     @Override
-    public void SubscribeToConnectionStatus(StatusListener statusListener){
+    public void subscribeToConnectionStatus(StatusListener statusListener){
         this.statusListener = statusListener;
     }
 
@@ -102,7 +102,7 @@ public class FlirOneManager implements IThermalCamera {
     }
 
     @Override
-    public void SubscribeToBatteryInfo(BatteryInfoListener batteryInfoListener){
+    public void subscribeToBatteryInfo(BatteryInfoListener batteryInfoListener){
         try {
             flirCamera.getRemoteControl().getBattery().subscribePercentage(i -> batteryInfoListener.BatteryPercentageUpdate(i));
 
