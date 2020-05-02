@@ -25,7 +25,7 @@ import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
-import rubenkarim.com.masterthesisapp.Utilities.MinMaxDataTransferContainer;
+import rubenkarim.com.masterthesisapp.Utilities.MinMaxDTO;
 
 public class OverviewActivity extends AppCompatActivity {
 
@@ -37,7 +37,7 @@ public class OverviewActivity extends AppCompatActivity {
     private int imageWidth;
     private String mThermalImagePath;
     private GradientModel mGradientAndPositions;
-    private MinMaxDataTransferContainer minMaxData;
+    private MinMaxDTO minMaxData;
     private int imageViewVerticalOffset;
     private View mRootView;
     private ProgressBar progressBar_overviewProgressbar;
@@ -71,7 +71,7 @@ public class OverviewActivity extends AppCompatActivity {
         if (bundle != null) {
             mGradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
             ((TextView) findViewById(R.id.textView_gradient)).setText(String.valueOf(mGradientAndPositions.getGradient()));
-            minMaxData = (MinMaxDataTransferContainer) bundle.getSerializable("minMaxData");
+            minMaxData = (MinMaxDTO) bundle.getSerializable("minMaxData");
         }
 
         try {

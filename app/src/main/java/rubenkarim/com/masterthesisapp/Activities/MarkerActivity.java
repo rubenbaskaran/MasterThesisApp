@@ -34,7 +34,7 @@ import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
-import rubenkarim.com.masterthesisapp.Utilities.MinMaxDataTransferContainer;
+import rubenkarim.com.masterthesisapp.Utilities.MinMaxDTO;
 import rubenkarim.com.masterthesisapp.Utilities.NeuralNetworkLoader;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
@@ -50,7 +50,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     private GradientModel mGradientAndPositions = null;
     private ThermalImageFile mThermalImage;
     private ProgressBar progressBar_markerViewLoadingAnimation;
-    private MinMaxDataTransferContainer minMaxData;
+    private MinMaxDTO minMaxData;
     private int[] capturedImageDimensions;
     private int[] imageContainerDimensions;
     private int adjustedNosePositionX;
@@ -106,18 +106,18 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
 
         Bundle bundle = receivedIntent.getExtras();
         if (bundle != null) {
-            minMaxData = (MinMaxDataTransferContainer) bundle.getSerializable("minMaxData");
+            minMaxData = (MinMaxDTO) bundle.getSerializable("minMaxData");
             mGradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
         }
 
         if (mGradientAndPositions == null) {
-            ExecuteAlgorithm();
+            executeAlgorithm();
         } else {
             setPicture(mGradientAndPositions);
         }
     }
 
-    private void ExecuteAlgorithm() {
+    private void executeAlgorithm() {
         switch (GlobalVariables.getCurrentAlgorithm()) {
             case CNN:
                     new Thread(()->{
@@ -182,8 +182,8 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         });
     }
 
-    public void setPicture(GradientModel gradientAndPositions) {
-            this.mGradientAndPositions = gradientAndPositions;
+    public void setPicture(GradientModel gradientModel) {
+            this.mGradientAndPositions = gradientModel;
 
             mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
             Bitmap thermalImgBitmap = ImageProcessing.getBitmap(mThermalImage);
@@ -206,8 +206,8 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         imageView_eyeMarker.setImageURI(Uri.parse("android.resource://" + this.getPackageName() + "/drawable/eye_marker"));
         imageView_noseMarker.setImageURI(Uri.parse("android.resource://" + this.getPackageName() + "/drawable/nose_marker"));
 
-        SetOnTouchListener(imageView_noseMarker);
-        SetOnTouchListener(imageView_eyeMarker);
+        setOnTouchListener(imageView_noseMarker);
+        setOnTouchListener(imageView_eyeMarker);
         int markerWidthHeight = ((BitmapDrawable) imageView_eyeMarker.getDrawable()).getBitmap().getWidth();
 
         RelativeLayout.LayoutParams eyeParams = new RelativeLayout.LayoutParams(markerWidthHeight, markerWidthHeight);
@@ -229,7 +229,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void SetOnTouchListener(ImageView imageView) {
+    private void setOnTouchListener(ImageView imageView) {
         imageView.setOnTouchListener(new View.OnTouchListener() {
             PointF DownPT = new PointF(); // Record Mouse Position When Pressed Down
             PointF StartPT = new PointF(); // Record Start Position of 'imageView'
@@ -286,7 +286,19 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
 
     }
 
+    private void recalculateGradient(ThermalImageFile thermalImageFile) {
+        double eye = AbstractAlgorithmTask.calculateTemperature(mGradientAndPositions.getEyePosition()[0], mGradientAndPositions.getEyePosition()[1], thermalImageFile);
+        double nose = AbstractAlgorithmTask.calculateTemperature(mGradientAndPositions.getNosePosition()[0], mGradientAndPositions.getNosePosition()[1], thermalImageFile);
+        mGradientAndPositions.setEyeTemperature(eye);
+        mGradientAndPositions.setNoseTemperature(nose);
+        mGradientAndPositions.setGradient(eye - nose);
+    }
 
+    private void addMinMaxDataIfChosen(Bundle bundle) {
+        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
+            bundle.putSerializable("minMaxData", minMaxData);
+        }
+    }
 
     //region Navigation buttons
     public void backOnClick(View view) {
@@ -318,20 +330,6 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         addMinMaxDataIfChosen(bundle);
         intent.putExtras(bundle);
         startActivity(intent);
-    }
-
-    private void recalculateGradient(ThermalImageFile thermalImageFile) {
-        double eye = AbstractAlgorithmTask.calculateTemperature(mGradientAndPositions.getEyePosition()[0], mGradientAndPositions.getEyePosition()[1], thermalImageFile);
-        double nose = AbstractAlgorithmTask.calculateTemperature(mGradientAndPositions.getNosePosition()[0], mGradientAndPositions.getNosePosition()[1], thermalImageFile);
-        mGradientAndPositions.setEyeTemperature(eye);
-        mGradientAndPositions.setNoseTemperature(nose);
-        mGradientAndPositions.setGradient(eye - nose);
-    }
-
-    private void addMinMaxDataIfChosen(Bundle bundle) {
-        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
-            bundle.putSerializable("minMaxData", minMaxData);
-        }
     }
     //endregion
 }

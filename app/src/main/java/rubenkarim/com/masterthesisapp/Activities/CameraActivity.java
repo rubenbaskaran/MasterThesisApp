@@ -44,7 +44,7 @@ import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
-import rubenkarim.com.masterthesisapp.Utilities.MinMaxDataTransferContainer;
+import rubenkarim.com.masterthesisapp.Utilities.MinMaxDTO;
 
 public class CameraActivity extends AppCompatActivity {
 
@@ -313,14 +313,14 @@ public class CameraActivity extends AppCompatActivity {
 
     private void addMinMaxDataIfChosen(Intent intent) {
         if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
-            MinMaxDataTransferContainer minMaxDataTransferContainer = new MinMaxDataTransferContainer(
+            MinMaxDTO minMaxDTO = new MinMaxDTO(
                     findViewById(R.id.imageView_leftEye),
                     findViewById(R.id.imageView_RightEye),
                     findViewById(R.id.imageView_Nose),
                     findViewById(R.id.imageView_cameraPreviewContainer));
 
             Bundle bundle = new Bundle();
-            bundle.putSerializable("minMaxData", minMaxDataTransferContainer);
+            bundle.putSerializable("minMaxData", minMaxDTO);
             intent.putExtras(bundle);
         }
     }
