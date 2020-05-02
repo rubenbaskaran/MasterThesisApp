@@ -27,7 +27,6 @@ import androidx.annotation.NonNull;
 
 public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
 
-    private static final String TAG = RgbThermalAlgorithmTask.class.getSimpleName();
     private ThermalImageFile mThermalImageFile;
     private int deviceScreenWidth;
     private int deviceScreenHeight;

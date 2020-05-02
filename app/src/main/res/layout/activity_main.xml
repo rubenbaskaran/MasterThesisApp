@@ -20,7 +20,7 @@
         android:id="@+id/button_cnn"
         style="@style/MenuButtonStyle"
         android:background="@drawable/button_background"
-        android:onClick="ChooseAlgorithmOnClick"
+        android:onClick="chooseAlgorithmOnClick"
         android:tag="0"
         android:text="CNN"/>
 
@@ -28,7 +28,7 @@
         android:id="@+id/button_cnnWithTransferLearning"
         style="@style/MenuButtonStyle"
         android:background="@drawable/button_background"
-        android:onClick="ChooseAlgorithmOnClick"
+        android:onClick="chooseAlgorithmOnClick"
         android:tag="1"
         android:text="CNN with transfer learning"/>
 
@@ -36,7 +36,7 @@
         android:id="@+id/button_rgbThermalMapping"
         style="@style/MenuButtonStyle"
         android:background="@drawable/button_background"
-        android:onClick="ChooseAlgorithmOnClick"
+        android:onClick="chooseAlgorithmOnClick"
         android:tag="2"
         android:text="RGB-Thermal Mapping" />
 
@@ -44,7 +44,7 @@
         android:id="@+id/button_maxMinTemplate"
         style="@style/MenuButtonStyle"
         android:background="@drawable/button_background"
-        android:onClick="ChooseAlgorithmOnClick"
+        android:onClick="chooseAlgorithmOnClick"
         android:tag="3"
         android:text="Max-Min Template"/>
 

@@ -33,12 +33,12 @@ public class FlirOneManager implements IThermalCamera {
     private Camera flirCamera;
     private ArrayList<ThermalImagelistener> thermalImageListeners;
     private StatusListener statusListener;
-    private Context applicationContext;
+    private Context appContext;
 
-    public FlirOneManager(Context applicationContext) {
-        this.applicationContext = applicationContext;
+    public FlirOneManager(Context appContext) {
+        this.appContext = appContext;
         ThermalLog.LogLevel enableLoggingInDebug =ThermalLog.LogLevel.DEBUG;
-        ThermalSdkAndroid.init(applicationContext, enableLoggingInDebug);
+        ThermalSdkAndroid.init(appContext, enableLoggingInDebug);
         flirCamera = new Camera();
         thermalImageListeners = new ArrayList<>();
     }
@@ -50,7 +50,7 @@ public class FlirOneManager implements IThermalCamera {
 
     @Override
     public void initCameraSearchAndSub(ThermalImagelistener thermalImagelistener){
-        DiscoveryFactory.getInstance().scan(aDiscoveryEventListener, CommunicationInterface.USB);
+        DiscoveryFactory.getInstance().scan(discoveryEventListener, CommunicationInterface.USB);
         this.thermalImageListeners.add(thermalImagelistener);
     }
 
@@ -82,7 +82,7 @@ public class FlirOneManager implements IThermalCamera {
 
     @Override
     public void calibrateCamera() throws NullPointerException {
-        Logging.info(applicationContext,"FLIRONE", "is calibrating");
+        Logging.info(appContext,"FLIRONE", "is calibrating");
         flirCamera.getRemoteControl().getCalibration().nuc();
         try {
             flirCamera.getRemoteControl().getCalibration().subscribeCalibrationState(new Calibration.NucStateListener() {
@@ -92,7 +92,7 @@ public class FlirOneManager implements IThermalCamera {
                 }
             });
         } catch (Exception e) {
-            Logging.error(applicationContext,TAG + "calibrateCamera", e);
+            Logging.error(appContext,TAG + "calibrateCamera", e);
         }
 
     }
@@ -124,7 +124,7 @@ public class FlirOneManager implements IThermalCamera {
         }
     }
 
-    //region ---------- Flir's less crappy setup code ----------
+    //region ---------- Flir's setup code ----------
     private ThermalImageStreamListener thermalImageStreamListener = () -> {
         flirCamera.withImage(this::updateThermalListener);
     };
@@ -136,17 +136,17 @@ public class FlirOneManager implements IThermalCamera {
         }
     };
 
-    private DiscoveryEventListener aDiscoveryEventListener = new DiscoveryEventListener() {
+    private DiscoveryEventListener discoveryEventListener = new DiscoveryEventListener() {
         @Override
         public void onCameraFound(Identity identity) {
             connectToFlir(identity);
 
             if(UsbPermissionHandler.isFlirOne(identity)){
-                if (UsbPermissionHandler.hasFlirOnePermission(identity, applicationContext)){
+                if (UsbPermissionHandler.hasFlirOnePermission(identity, appContext)){
                     connectToFlir(identity);
                 } else {
 
-                    new UsbPermissionHandler().requestFlirOnePermisson(identity, applicationContext, new UsbPermissionHandler.UsbPermissionListener() {
+                    new UsbPermissionHandler().requestFlirOnePermisson(identity, appContext, new UsbPermissionHandler.UsbPermissionListener() {
                         @Override
                         public void permissionGranted(@NonNull Identity identity) {
                             connectToFlir(identity);
@@ -175,13 +175,13 @@ public class FlirOneManager implements IThermalCamera {
 
         @Override
         public void onDiscoveryError(CommunicationInterface communicationInterface, ErrorCode errorCode) {
-            Logging.info(applicationContext, TAG , " onDiscoveryError: "+ errorCode.toString());
+            Logging.info(appContext, TAG , " onDiscoveryError: "+ errorCode.toString());
             Log.e(TAG, "onDiscoveryError: " + errorCode + " interface: " + communicationInterface);
         }
     };
 
     private void connectToFlir(Identity identity){
-        Logging.info(applicationContext, TAG, "connecting to camera");
+        Logging.info(appContext, TAG, "connecting to camera");
 
         try {
             flirCamera.connect(identity, connectionStatusListener);

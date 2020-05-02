@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    public void ChooseAlgorithmOnClick(View view) {
+    public void chooseAlgorithmOnClick(View view) {
         int idOfChosenAlgorithm = Integer.parseInt(String.valueOf(view.getTag()));
         GlobalVariables.Algorithms chosenAlgorithm = GlobalVariables.Algorithms.values()[idOfChosenAlgorithm];
         GlobalVariables.setCurrentAlgorithm(chosenAlgorithm);

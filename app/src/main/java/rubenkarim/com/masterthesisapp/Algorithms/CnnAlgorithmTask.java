@@ -22,7 +22,6 @@ public class CnnAlgorithmTask extends AbstractAlgorithmTask {
 
     private final Interpreter mTflite;
     private ThermalImageFile mThermalImage;
-    private static final String TAG = CnnAlgorithmTask.class.getSimpleName();
 
     public CnnAlgorithmTask(MappedByteBuffer cnnModel, ThermalImageFile thermalImage) {
         mTflite = new Interpreter((ByteBuffer) cnnModel);

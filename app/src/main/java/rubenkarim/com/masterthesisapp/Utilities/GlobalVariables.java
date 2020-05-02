@@ -2,6 +2,8 @@ package rubenkarim.com.masterthesisapp.Utilities;
 
 public class GlobalVariables
 {
+    private static Algorithms CurrentAlgorithm = null;
+
     public enum Algorithms
     {
         CNN,
@@ -20,6 +22,6 @@ public class GlobalVariables
         CurrentAlgorithm = currentAlgorithm;
     }
 
-    private static Algorithms CurrentAlgorithm = null;
+
 
 }
