@@ -2,9 +2,9 @@ package rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera;
 
 public interface IThermalCamera {
 
-    void initCameraSearchAndSub(ThermalImagelistener thermalImagelistener);
+    void initCameraSearchAndSub(ThermalImageListener thermalImageListener);
 
-    void subscribeToThermalImage(ThermalImagelistener thermalImagelistener);
+    void subscribeToThermalImage(ThermalImageListener thermalImageListener);
 
     void subscribeToConnectionStatus(StatusListener statusListener);
 

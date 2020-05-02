@@ -150,7 +150,7 @@ public class CameraActivity extends AppCompatActivity {
                 }
                 mIThermalCamera.subscribeToBatteryInfo(new BatteryInfoListener() {
                     @Override
-                    public void BatteryPercentageUpdate(int percentage) {
+                    public void batteryPercentageUpdate(int percentage) {
                         batteryMeterView_BatteryIndicator.setChargeLevel(percentage);
                     }
 

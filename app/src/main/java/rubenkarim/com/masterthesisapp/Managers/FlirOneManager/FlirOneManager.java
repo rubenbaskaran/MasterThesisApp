@@ -25,13 +25,13 @@ import androidx.annotation.NonNull;
 import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.BatteryInfoListener;
 import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalCamera;
 import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.StatusListener;
-import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.ThermalImagelistener;
+import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.ThermalImageListener;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 public class FlirOneManager implements IThermalCamera {
     private static final String TAG = FlirOneManager.class.getSimpleName();
     private Camera flirCamera;
-    private ArrayList<ThermalImagelistener> thermalImageListeners;
+    private ArrayList<ThermalImageListener> thermalImageListeners;
     private StatusListener statusListener;
     private Context appContext;
 
@@ -44,12 +44,12 @@ public class FlirOneManager implements IThermalCamera {
     }
 
     @Override
-    public void subscribeToThermalImage(ThermalImagelistener thermalImagelistener){
+    public void subscribeToThermalImage(ThermalImageListener thermalImagelistener){
         this.thermalImageListeners.add(thermalImagelistener);
     }
 
     @Override
-    public void initCameraSearchAndSub(ThermalImagelistener thermalImagelistener){
+    public void initCameraSearchAndSub(ThermalImageListener thermalImagelistener){
         DiscoveryFactory.getInstance().scan(discoveryEventListener, CommunicationInterface.USB);
         this.thermalImageListeners.add(thermalImagelistener);
     }
@@ -60,7 +60,7 @@ public class FlirOneManager implements IThermalCamera {
     }
 
     private void updateThermalListener(ThermalImage thermalImage){
-        for (ThermalImagelistener t: this.thermalImageListeners) {
+        for (ThermalImageListener t: this.thermalImageListeners) {
             t.subscribe(thermalImage);
         }
     }
@@ -104,7 +104,7 @@ public class FlirOneManager implements IThermalCamera {
     @Override
     public void subscribeToBatteryInfo(BatteryInfoListener batteryInfoListener){
         try {
-            flirCamera.getRemoteControl().getBattery().subscribePercentage(i -> batteryInfoListener.BatteryPercentageUpdate(i));
+            flirCamera.getRemoteControl().getBattery().subscribePercentage(i -> batteryInfoListener.batteryPercentageUpdate(i));
 
             flirCamera.getRemoteControl().getBattery().subscribeChargingState(new Battery.BatteryStateListener() {
                 @Override

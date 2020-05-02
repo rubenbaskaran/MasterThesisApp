@@ -192,11 +192,11 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             capturedImageDimensions = new int[]{thermalImgBitmap.getWidth(), thermalImgBitmap.getHeight()};
             imageContainerDimensions = new int[]{imageWidth, imageHeight};
 
-            addMarkers(capturedImageDimensions, imageContainerDimensions, imageViewVerticalOffset);
+            addMarkers(capturedImageDimensions, imageContainerDimensions);
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
     }
 
-    private void addMarkers(int[] capturedImageDimensions, int[] imageContainerDimensions, int horizontalOffset) {
+    private void addMarkers(int[] capturedImageDimensions, int[] imageContainerDimensions) {
         ImageView imageView_eyeMarker = new ImageView(this);
         ImageView imageView_noseMarker = new ImageView(this);
 

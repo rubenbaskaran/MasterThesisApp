@@ -36,7 +36,7 @@ public class OverviewActivity extends AppCompatActivity {
     private int imageHeight;
     private int imageWidth;
     private String mThermalImagePath;
-    private GradientModel mGradientAndPositions;
+    private GradientModel mGradientModel;
     private MinMaxDTO minMaxData;
     private int imageViewVerticalOffset;
     private View mRootView;
@@ -69,14 +69,14 @@ public class OverviewActivity extends AppCompatActivity {
 
         Bundle bundle = receivedIntent.getExtras();
         if (bundle != null) {
-            mGradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
-            ((TextView) findViewById(R.id.textView_gradient)).setText(String.valueOf(mGradientAndPositions.getGradient()));
+            mGradientModel = (GradientModel) bundle.getSerializable("gradientAndPositions");
+            ((TextView) findViewById(R.id.textView_gradient)).setText(String.valueOf(mGradientModel.getGradient()));
             minMaxData = (MinMaxDTO) bundle.getSerializable("minMaxData");
         }
 
         try {
             ThermalImageFile thermalImage = (ThermalImageFile) ImageFactory.createImage(mThermalImagePath);
-            setPicture(thermalImage, mGradientAndPositions);
+            setPicture(thermalImage, mGradientModel);
         }
         catch (IOException e) {
             Logging.error(this,TAG + " onCreate: ", e);
@@ -111,7 +111,7 @@ public class OverviewActivity extends AppCompatActivity {
         intent.putExtra("imageWidth", imageWidth);
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("gradientAndPositions", mGradientAndPositions);
+        bundle.putSerializable("gradientAndPositions", mGradientModel);
         addMinMaxDataIfChosen(bundle);
         intent.putExtras(bundle);
         startActivity(intent);
@@ -141,15 +141,15 @@ public class OverviewActivity extends AppCompatActivity {
             observation.cprnumber = cprNumber;
             observation.filepath = mThermalImagePath;
             observation.filename = filename;
-            observation.gradient = mGradientAndPositions.getGradient();
-            observation.eyepositionx = mGradientAndPositions.getEyePosition()[0];
-            observation.eyepositiony = mGradientAndPositions.getEyePosition()[1];
-            observation.nosepositionx = mGradientAndPositions.getNosePosition()[0];
-            observation.nosepositiony = mGradientAndPositions.getNosePosition()[1];
-            observation.eyeTemperature = mGradientAndPositions.getEyeTemperature();
-            observation.noseTemperature = mGradientAndPositions.getNoseTemperature();
-            observation.eyemarkeradjusted = mGradientAndPositions.isEyeMarkerAdjusted();
-            observation.nosemarkeradjusted = mGradientAndPositions.isNoseMarkerAdjusted();
+            observation.gradient = mGradientModel.getGradient();
+            observation.eyepositionx = mGradientModel.getEyePosition()[0];
+            observation.eyepositiony = mGradientModel.getEyePosition()[1];
+            observation.nosepositionx = mGradientModel.getNosePosition()[0];
+            observation.nosepositiony = mGradientModel.getNosePosition()[1];
+            observation.eyeTemperature = mGradientModel.getEyeTemperature();
+            observation.noseTemperature = mGradientModel.getNoseTemperature();
+            observation.eyemarkeradjusted = mGradientModel.isEyeMarkerAdjusted();
+            observation.nosemarkeradjusted = mGradientModel.isNoseMarkerAdjusted();
             observation.chosenAlgorithm = String.valueOf(GlobalVariables.getCurrentAlgorithm());
 
             AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
