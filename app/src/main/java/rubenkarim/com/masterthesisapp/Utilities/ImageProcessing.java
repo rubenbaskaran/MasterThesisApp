@@ -86,17 +86,6 @@ public class ImageProcessing {
         b.recycle();
     }
 
-    public static Bitmap loadBitmapFromView(View view) {
-        //Define a bitmap with the same size as the view
-        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
-        //Bind a canvas to it
-        Canvas canvas = new Canvas(returnedBitmap);
-        // draw the view on the canvas
-        view.draw(canvas);
-        //return the bitmap
-        return returnedBitmap;
-    }
-
     private static Bitmap convertToBitmap(String imagePath) throws NullPointerException {
         Bitmap btp;
         btp = BitmapFactory.decodeFile(imagePath);

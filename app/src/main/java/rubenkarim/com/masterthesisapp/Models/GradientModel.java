@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 public class GradientModel implements Serializable {
 
-
     private double gradient;
     private int[] eyePosition;
     private int[] nosePosition;

@@ -164,7 +164,6 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                 }).start();
                 break;
         }
-
     }
 
     @Override
