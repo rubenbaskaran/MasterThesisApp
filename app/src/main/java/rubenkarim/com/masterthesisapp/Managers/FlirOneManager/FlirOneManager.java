@@ -186,12 +186,12 @@ public class FlirOneManager implements IThermalCamera {
         try {
             flirCamera.connect(identity, connectionStatusListener);
             flirCamera.subscribeStream(thermalImageStreamListener);
-            DiscoveryFactory.getInstance().stop();
+            if(DiscoveryFactory.getInstance().isDiscovering()){
+                DiscoveryFactory.getInstance().stop();
+            }
         } catch (IOException e) {
             statusListener.onConnectionError(e);
         }
-
-
 
         if(statusListener != null){
             statusListener.cameraFound(identity);

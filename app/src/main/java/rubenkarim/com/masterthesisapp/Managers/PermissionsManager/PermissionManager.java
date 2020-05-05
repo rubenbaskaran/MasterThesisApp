@@ -11,7 +11,7 @@ import java.util.Arrays;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
-public class PermissionManager implements ActivityCompat.OnRequestPermissionsResultCallback {
+public class PermissionManager {
 
     private static final String TAG = PermissionManager.class.getSimpleName();
     private PermissionListener permissionListener;
@@ -77,12 +77,11 @@ public class PermissionManager implements ActivityCompat.OnRequestPermissionsRes
      *
      * The parameters are the same and map's to the same...
      */
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.i(TAG, "onRequestPermissionsResult: HELLO " + requestCode);
         if(requestCode == PERMISSIONS_REQUEST_CODE){
 
-            boolean isAllPermissionGranted=true;
+            boolean isAllPermissionGranted = true;
             for (int i: grantResults
                  ) {
                 if (i == PackageManager.PERMISSION_DENIED) {

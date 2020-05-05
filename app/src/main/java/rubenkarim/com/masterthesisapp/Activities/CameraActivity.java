@@ -80,7 +80,6 @@ public class CameraActivity extends AppCompatActivity {
         }
 
         mPermissionManager = new PermissionManager();
-        mIThermalCamera = new FlirOneManager(getApplicationContext());
 
         checkPermissions(getListOfUsbDevices());
     }
@@ -91,7 +90,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void checkPermissions(HashMap<String, UsbDevice> deviceList) {
-        if (PermissionManager.checkPermissions(this, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+        if (PermissionManager.checkPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             startCameraPreview(deviceList);
         } else {
             mPermissionManager.requestPermissions(this, new PermissionListener() {
@@ -106,7 +105,6 @@ public class CameraActivity extends AppCompatActivity {
                             Snackbar.make(mRootView, "crucial permissions have been denied come back to allow permissions", Snackbar.LENGTH_INDEFINITE).show();
                         }
                     },
-                    Manifest.permission.CAMERA,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.READ_EXTERNAL_STORAGE);
         }
@@ -129,8 +127,8 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void setupFlirCamera() {
-
-        mIThermalCamera.initCameraSearchAndSub((thermalImage) -> {
+        this.mIThermalCamera = new FlirOneManager(getApplicationContext());
+        this.mIThermalCamera.initCameraSearchAndSub((thermalImage) -> {
             //The image must not be processed on the UI Thread
             JavaImageBuffer javaImageBuffer = thermalImage.getImage();
             thermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
