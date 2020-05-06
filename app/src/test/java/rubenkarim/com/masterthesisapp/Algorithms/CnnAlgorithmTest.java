@@ -51,7 +51,7 @@ class CnnAlgorithmTest {
             }
 
             @Override
-            public void onError(String errorMessage) {
+            public void onError(String errorMessage, Exception e) {
                 assertNotNull(errorMessage);
             }
         });

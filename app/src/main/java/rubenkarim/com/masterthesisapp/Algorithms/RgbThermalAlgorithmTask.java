@@ -119,7 +119,7 @@ public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
                                             finalThermalImageFile
                                     ));
                                 } else {
-                                    algorithmResultListener.onError("No faces found");
+                                    algorithmResultListener.onError("No faces found", new Exception("Face Not Found"));
                                 }
                             }
                         })
@@ -127,7 +127,7 @@ public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
                         new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                algorithmResultListener.onError("Face detection error");
+                                algorithmResultListener.onError("Face detection error", e);
                             }
                         });
     }

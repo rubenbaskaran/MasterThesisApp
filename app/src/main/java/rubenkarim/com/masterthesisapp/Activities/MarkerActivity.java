@@ -174,8 +174,8 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     }
 
     @Override
-    public void onError(String errorMessage) {
-        Logging.info(this, TAG,"Algorithm: " + errorMessage);
+    public void onError(String errorMessage, Exception e) {
+        Logging.info(this, TAG,"Algorithm onError: " + e);
         runOnUiThread(() -> {
             Snackbar.make(mRootView, errorMessage, Snackbar.LENGTH_LONG).show();
         });
