@@ -228,6 +228,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private void setupDefaultImage() {
         try {
+            mIThermalCamera = new FlirOneManager(getApplicationContext());
             String defaultImageName = "Thermal_Test_img.jpg";
             ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open(defaultImageName));
             thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
