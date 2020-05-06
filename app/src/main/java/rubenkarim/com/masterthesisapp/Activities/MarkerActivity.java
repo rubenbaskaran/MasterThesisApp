@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -63,6 +64,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     private int screenHeight;
     private View mRootView;
     private String mThermalImagePath;
+    private Button button_Submit;
     //endregion
 
     @Override
@@ -74,6 +76,8 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         progressBar_markerViewLoadingAnimation = findViewById(R.id.progressBar_markerViewLoadingAnimation);
         mRootView = findViewById(R.id.linearLayout_MarkerActivity);
 
+        button_Submit = findViewById(R.id.button_Submit);
+        button_Submit.setEnabled(false);
         Animation.showLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
 
         Intent receivedIntent = getIntent();
@@ -193,6 +197,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
 
             addMarkers(capturedImageDimensions, imageContainerDimensions);
             Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
+            button_Submit.setEnabled(true);
     }
 
     private void addMarkers(int[] capturedImageDimensions, int[] imageContainerDimensions) {

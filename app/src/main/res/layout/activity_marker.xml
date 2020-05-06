@@ -42,6 +42,7 @@
             android:onClick="backOnClick" />
 
         <Button
+            android:id="@+id/button_Submit"
             style="@style/RightNavigationButtonStyle"
             android:background="@drawable/button_background"
             android:onClick="submitOnClick"

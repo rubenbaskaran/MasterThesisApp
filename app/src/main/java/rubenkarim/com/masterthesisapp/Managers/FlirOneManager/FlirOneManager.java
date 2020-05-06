@@ -37,8 +37,9 @@ public class FlirOneManager implements IThermalCamera {
 
     public FlirOneManager(Context appContext) {
         this.appContext = appContext;
-        ThermalLog.LogLevel enableLoggingInDebug =ThermalLog.LogLevel.DEBUG;
-        ThermalSdkAndroid.init(appContext, enableLoggingInDebug);
+//        ThermalLog.LogLevel enableLoggingInDebug =ThermalLog.LogLevel.DEBUG;
+//        ThermalSdkAndroid.init(appContext, enableLoggingInDebug);
+        ThermalSdkAndroid.init(appContext);
         flirCamera = new Camera();
         thermalImageListeners = new ArrayList<>();
     }
