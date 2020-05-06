@@ -54,6 +54,7 @@ public abstract class AbstractAlgorithmTask {
     }
 
     public static Double calculateTemperature(int x, int y, ThermalImageFile thermalImg){
+        thermalImg.getMeasurements().clear();
         thermalImg.getMeasurements().addSpot(x, y);
         MeasurementSpot measurementSpot = thermalImg.getMeasurements().getSpots().get(0);
         return measurementSpot.getValue().value;
