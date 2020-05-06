@@ -121,8 +121,9 @@ public class CameraActivity extends AppCompatActivity {
             Snackbar.make(mRootView, "FLIR camera detected. Trying to connect", Snackbar.LENGTH_INDEFINITE).show();
             setupFlirCamera();
         } else {
-            Snackbar.make(mRootView, "Can't find FLIR camera. Using default image", Snackbar.LENGTH_SHORT).show();
-            setupDefaultImage();
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.putExtra("CameraNotFound", true);
+            startActivity(intent);
         }
     }
 

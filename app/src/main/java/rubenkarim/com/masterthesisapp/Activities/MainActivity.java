@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.R;
@@ -14,6 +17,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        LinearLayout linearLayout = findViewById(R.id.linearLayout_MainActivity);
+        Intent receivedIntent = getIntent();
+        if (receivedIntent.getBooleanExtra("CameraNotFound", false)){
+            Snackbar.make(linearLayout, "Connect FLIR camera and try again", Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     public void chooseAlgorithmOnClick(View view) {
