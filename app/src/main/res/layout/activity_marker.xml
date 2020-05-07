@@ -37,6 +37,7 @@
         android:weightSum="2">
 
         <Button
+            android:id="@+id/button_Back"
             style="@style/LeftNavigationButtonStyle"
             android:background="@drawable/button_background"
             android:onClick="backOnClick" />

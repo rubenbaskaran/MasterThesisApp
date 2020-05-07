@@ -87,7 +87,8 @@ public class CameraActivity extends AppCompatActivity {
             imageView_faceTemplate.setVisibility(View.INVISIBLE);
         }
 
-
+        button_BackToMainActivity.setEnabled(false);
+        button_TakePicture.setEnabled(false);
 
         checkPermissions(getListOfUsbDevices());
     }
@@ -111,6 +112,7 @@ public class CameraActivity extends AppCompatActivity {
 
                         @Override
                         public void permissionDenied(String[] permissions) {
+                            button_BackToMainActivity.setEnabled(true);
                             Snackbar.make(mRootView, "crucial permissions have been denied come back to allow permissions", Snackbar.LENGTH_INDEFINITE).show();
                         }
                     },
@@ -127,8 +129,6 @@ public class CameraActivity extends AppCompatActivity {
 
     private void startCameraPreview(HashMap<String, UsbDevice> deviceList) {
         if (!deviceList.isEmpty()) {
-            button_BackToMainActivity.setEnabled(false);
-            button_TakePicture.setEnabled(false);
             Snackbar.make(mRootView, "FLIR camera detected. Trying to connect", Snackbar.LENGTH_INDEFINITE).show();
             Animation.showLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
             setupFlirCamera();

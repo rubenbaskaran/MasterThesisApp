@@ -65,6 +65,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     private View mRootView;
     private String mThermalImagePath;
     private Button button_Submit;
+    private Button button_Back;
     //endregion
 
     @Override
@@ -75,8 +76,10 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         relativeLayout_markers = findViewById(R.id.relativeLayout_thermalImageContainer);
         progressBar_markerViewLoadingAnimation = findViewById(R.id.progressBar_markerViewLoadingAnimation);
         mRootView = findViewById(R.id.linearLayout_MarkerActivity);
-
         button_Submit = findViewById(R.id.button_Submit);
+        button_Back = findViewById(R.id.button_Back);
+
+        button_Back.setEnabled(false);
         button_Submit.setEnabled(false);
         Animation.showLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
 
@@ -201,6 +204,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         addMarkers(capturedImageDimensions, imageContainerDimensions);
         Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         button_Submit.setEnabled(true);
+        button_Back.setEnabled(true);
     }
 
     private void addMarkers(int[] capturedImageDimensions, int[] imageContainerDimensions) {
@@ -298,7 +302,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         double nose = AbstractAlgorithmTask.calculateTemperature(mGradientAndPositions.getNosePosition()[0], mGradientAndPositions.getNosePosition()[1], thermalImageFile);
         mGradientAndPositions.setEyeTemperature(eye);
         mGradientAndPositions.setNoseTemperature(nose);
-        mGradientAndPositions.setGradient(eye - nose);
+        mGradientAndPositions.setGradient(Math.abs(eye - nose));
     }
 
     private void addMinMaxDataIfChosen(Bundle bundle) {
