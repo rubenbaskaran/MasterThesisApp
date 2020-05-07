@@ -6,6 +6,7 @@ import android.graphics.Color;
 
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
+import com.flir.thermalsdk.image.palettes.PaletteManager;
 
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.Interpreter;
@@ -32,6 +33,7 @@ public class CnnAlgorithmTask extends AbstractAlgorithmTask {
     public void getGradientAndPositions(AlgorithmResultListener algorithmResultListener) {
         int[] imgShapeInput = mTflite.getInputTensor(0).shape(); // cnn: {1, width: 240, Height: 320, 3} cnnTransferlearning: {1, 320, 320, 3}
         mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
+        mThermalImage.setPalette(PaletteManager.getDefaultPalettes().get(0));
         //Bitmap grayBitmap = toGrayscale(mImageBitmap);
         Bitmap thermalImage = super.getBitmap(mThermalImage);
 

@@ -27,7 +27,7 @@ class CnnAlgorithmTest {
         System.out.println(thermalImg.getAbsolutePath());
         InputStream ip = new FileInputStream(thermalImg);
         ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(ip);
-        File cnnFile = new File("./assets/RGB_yinguobingCNNV1.tflite");
+        File cnnFile = new File("./assets/SmallEncoderDecoder.tflite");
         FileInputStream inputStream = new FileInputStream(cnnFile);
         FileChannel fileChannel = inputStream.getChannel();
         long startOffset = 0;

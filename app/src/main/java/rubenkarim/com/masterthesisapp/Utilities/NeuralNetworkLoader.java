@@ -16,7 +16,7 @@ public class NeuralNetworkLoader {
     }
 
     public static MappedByteBuffer loadCnn(Context context) throws IOException {
-        String cnnModelFile = "RGB_yinguobingCNNV1.tflite";
+        String cnnModelFile = "SmallEncoderDecoder.tflite";
         return loadNNModelFile(context, cnnModelFile);
     }
 
