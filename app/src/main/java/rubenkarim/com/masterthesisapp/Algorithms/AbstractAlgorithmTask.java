@@ -28,22 +28,22 @@ public abstract class AbstractAlgorithmTask {
         MeasurementSpot leftEye = thermalImg.getMeasurements().getSpots().get(1);
         MeasurementSpot nose = thermalImg.getMeasurements().getSpots().get(2);
 
-        final double temperatureRightEye = rigthEye.getValue().value;
-        final double temperatureLeftEye = leftEye.getValue().value;
-        final double temperatureNose = nose.getValue().value;
+        final double temperatureRightEye = rigthEye.getValue().asCelsius().value;
+        final double temperatureLeftEye = leftEye.getValue().asCelsius().value;
+        final double temperatureNose = nose.getValue().asCelsius().value;
 
         if( temperatureRightEye > temperatureLeftEye){
             return new GradientModel(Math.abs(temperatureRightEye - temperatureNose),
                     new int[]{rigthEye.getPosition().x, rigthEye.getPosition().y},
                     new int[]{nose.getPosition().x, nose.getPosition().y},
-                    rigthEye.getValue().value,
-                    nose.getValue().value);
+                    temperatureRightEye,
+                    temperatureNose);
         } else {
             return new GradientModel(Math.abs(temperatureLeftEye - temperatureNose),
                     new int[]{leftEye.getPosition().x, leftEye.getPosition().y},
                     new int[]{nose.getPosition().x, nose.getPosition().y},
-                    leftEye.getValue().value,
-                    nose.getValue().value);
+                    temperatureLeftEye,
+                    temperatureNose);
         }
 
     }
@@ -57,6 +57,6 @@ public abstract class AbstractAlgorithmTask {
         thermalImg.getMeasurements().clear();
         thermalImg.getMeasurements().addSpot(x, y);
         MeasurementSpot measurementSpot = thermalImg.getMeasurements().getSpots().get(0);
-        return measurementSpot.getValue().value;
+        return measurementSpot.getValue().asCelsius().value;
     }
 }

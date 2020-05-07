@@ -141,9 +141,9 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void setupFlirCamera() {
-        Logging.info(this, TAG, "Starting Camera");
+        //Logging.info(this, TAG, "Starting Camera");
         this.mIThermalCamera = new FlirOneManager(getApplicationContext());
-        Logging.info(this, TAG, "subscribing thermalImg");
+        //Logging.info(this, TAG, "subscribing thermalImg");
         this.mIThermalCamera.initCameraSearchAndSub((thermalImage) -> {
             //The image must not be processed on the UI Thread
             JavaImageBuffer javaImageBuffer = thermalImage.getImage();
@@ -156,7 +156,7 @@ public class CameraActivity extends AppCompatActivity {
 
             if (!isCalibrated) {
                 isCalibrated = true;
-                Logging.info(this, TAG, "trying to calibrate");
+                //Logging.info(this, TAG, "trying to calibrate");
                 try {
                     this.mIThermalCamera.calibrateCamera();
                 } catch (NullPointerException e) {
@@ -166,7 +166,7 @@ public class CameraActivity extends AppCompatActivity {
             }
         });
 
-        Logging.info(this, TAG, "subscribing batteryInfoListener");
+        //Logging.info(this, TAG, "subscribing batteryInfoListener");
         mIThermalCamera.subscribeToBatteryInfo(new BatteryInfoListener() {
             @Override
             public void batteryPercentageUpdate(int percentage) {
@@ -191,7 +191,7 @@ public class CameraActivity extends AppCompatActivity {
             }
         });
 
-        Logging.info(this, TAG, "subscribing StatusListener");
+        //Logging.info(this, TAG, "subscribing StatusListener");
         mIThermalCamera.subscribeToConnectionStatus(new StatusListener() {
             @Override
             public void onDisconnected(ErrorCode errorCode) {
@@ -205,7 +205,7 @@ public class CameraActivity extends AppCompatActivity {
 
             @Override
             public void cameraFound(Identity identity) {
-                Logging.info(getApplicationContext(), TAG, "Identity found: " + identity.toString());
+                //Logging.info(getApplicationContext(), TAG, "Identity found: " + identity.toString());
                 runOnUiThread(()->{
                     Snackbar.make(mRootView, "FLIR found, Connecting", Snackbar.LENGTH_INDEFINITE).show();
                 });
@@ -281,7 +281,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     public void takePictureOnClick(View view) {
-        Logging.info(this, TAG, "Taking Img");
+        //Logging.info(this, TAG, "Taking Img");
         // Fix for Android Studio bug (returning to previous activity on "stop app")
         if (GlobalVariables.getCurrentAlgorithm() == null) {
             Snackbar.make(mRootView, "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
@@ -304,13 +304,12 @@ public class CameraActivity extends AppCompatActivity {
                         String fileName = new SimpleDateFormat("dd-MM-yyyy'_'HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + ".jpg";
                         mThermalImagePath = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                         thermalImage.saveAs(mThermalImagePath);
-                        Logging.info(this, TAG, "thermalImg saved");
+                        //Logging.info(this, TAG, "thermalImg saved");
                         goToMarkerActivity();
                     } catch (IOException e) {
                         Logging.error(this, "saveThermalImage", e);
                     }
                 } else {
-                    Log.i(TAG, "saveThermalImage: ERROR! IMAGE DIR NOT CREATED");
                     Logging.error(this, "saveThermalImage", new Exception("ERROR! IMAGE DIR NOT CREATED"));
                     Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
                 }
@@ -373,12 +372,5 @@ public class CameraActivity extends AppCompatActivity {
             mIThermalCamera = null;
             mPermissionManager = null;
         }
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Logging.info(this, TAG, "Restarting Camera");
-        //startCameraPreview(getListOfUsbDevices());
     }
 }
