@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="7"
-    tools:context=".Activities.MainActivity">
+    tools:context=".Activities.MainActivity"
+    android:id="@+id/linearLayout_MainActivity">
 
     <Space
         android:layout_width="match_parent"

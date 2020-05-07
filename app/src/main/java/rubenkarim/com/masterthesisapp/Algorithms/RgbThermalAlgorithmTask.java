@@ -47,7 +47,7 @@ public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
         Bitmap rgbImageBitmap = null;
         double rgbImageWidth = 0;
         double rgbImageHeight = 0;
-        int defaultVerticalOffset = 25;
+        int defaultVerticalOffset = 0;
         int defaultHorizontalOffset = 10;
         int defaultScreenHeight = 1848;
         int defaultScreenWidth = 1080;

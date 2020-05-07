@@ -1,6 +1,7 @@
 package rubenkarim.com.masterthesisapp.Activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -119,10 +120,13 @@ public class CameraActivity extends AppCompatActivity {
     private void startCameraPreview(HashMap<String, UsbDevice> deviceList) {
         if (!deviceList.isEmpty()) {
             Snackbar.make(mRootView, "FLIR camera detected. Trying to connect", Snackbar.LENGTH_INDEFINITE).show();
+            Animation.showLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
             setupFlirCamera();
         } else {
-            Snackbar.make(mRootView, "Can't find FLIR camera. Using default image", Snackbar.LENGTH_SHORT).show();
-            setupDefaultImage();
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.putExtra("CameraNotFound", true);
+            startActivity(intent);
+//            setupDefaultImage();
         }
     }
 
@@ -135,6 +139,7 @@ public class CameraActivity extends AppCompatActivity {
             final Bitmap bitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
 
             runOnUiThread(() -> {
+                Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
                 imageView_cameraPreviewContainer.setImageBitmap(bitmap);
             });
 
@@ -187,7 +192,7 @@ public class CameraActivity extends AppCompatActivity {
             @Override
             public void cameraFound(Identity identity) {
                 Logging.info(getApplicationContext(),TAG, "Identity found: " + identity.toString());
-                Snackbar.make(mRootView, "Flir one found" + identity.cameraType, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mRootView, "FLIR found", Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
@@ -273,7 +278,8 @@ public class CameraActivity extends AppCompatActivity {
                 boolean isDirectoryCreated = ImageDir.exists() || ImageDir.mkdirs();
                 try {
                     if (isDirectoryCreated) {
-                        String fileName = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + "Thermal.jpg";
+                        @SuppressLint("SimpleDateFormat")
+                        String fileName = new SimpleDateFormat("dd-MM-yyyy' 'HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + ".jpg";
                         mThermalImagePath =this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
                         thermalImage.saveAs(mThermalImagePath);
                         goToMarkerActivity();

@@ -7,7 +7,7 @@ import android.widget.RelativeLayout;
 
 public class Animation {
     public static void showLoadingAnimation(ProgressBar progressBar_loadingAnimation, ImageView faceTemplate, RelativeLayout eyeNoseTemplate) {
-        if (progressBar_loadingAnimation.getVisibility() == View.INVISIBLE) {
+        if (progressBar_loadingAnimation != null && progressBar_loadingAnimation.getVisibility() == View.INVISIBLE) {
             progressBar_loadingAnimation.setVisibility(View.VISIBLE);
         }
 
@@ -25,7 +25,7 @@ public class Animation {
     }
 
     public static void hideLoadingAnimation(ProgressBar progressBar_loadingAnimation, ImageView faceTemplate, RelativeLayout eyeNoseTemplate) {
-        if (progressBar_loadingAnimation.getVisibility() == View.VISIBLE) {
+        if (progressBar_loadingAnimation != null && progressBar_loadingAnimation.getVisibility() == View.VISIBLE) {
             progressBar_loadingAnimation.setVisibility(View.INVISIBLE);
         }
 
