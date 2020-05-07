@@ -66,6 +66,7 @@ public class CameraActivity extends AppCompatActivity {
     private boolean isCalibrated = false;
     private BatteryMeterView batteryMeterView_BatteryIndicator;
     private Button button_BackToMainActivity;
+    private Button button_TakePicture;
     //endregion
 
     @Override
@@ -79,6 +80,7 @@ public class CameraActivity extends AppCompatActivity {
         imageView_cameraPreviewContainer = findViewById(R.id.imageView_cameraPreviewContainer);
         batteryMeterView_BatteryIndicator = findViewById(R.id.batteryMeterView_BatteryIndicator);
         button_BackToMainActivity = findViewById(R.id.button_Back);
+        button_TakePicture = findViewById(R.id.button_TakePicture);
 
         if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
             relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
@@ -126,6 +128,7 @@ public class CameraActivity extends AppCompatActivity {
     private void startCameraPreview(HashMap<String, UsbDevice> deviceList) {
         if (!deviceList.isEmpty()) {
             button_BackToMainActivity.setEnabled(false);
+            button_TakePicture.setEnabled(false);
             Snackbar.make(mRootView, "FLIR camera detected. Trying to connect", Snackbar.LENGTH_INDEFINITE).show();
             Animation.showLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
             setupFlirCamera();
@@ -226,6 +229,7 @@ public class CameraActivity extends AppCompatActivity {
                     } else {
                         Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
                         button_BackToMainActivity.setEnabled(true);
+                        button_TakePicture.setEnabled(true);
                         Snackbar.make(mRootView, "Camera is ready", Snackbar.LENGTH_SHORT).show();
                     }
                 });

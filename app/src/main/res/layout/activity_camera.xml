@@ -103,6 +103,7 @@
             android:onClick="backOnClick" />
 
         <Button
+            android:id="@+id/button_TakePicture"
             style="@style/RightNavigationButtonStyle"
             android:background="@drawable/button_background"
             android:onClick="takePictureOnClick"
