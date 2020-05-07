@@ -218,8 +218,8 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         imageView_eyeMarker.setTag("eye");
         imageView_noseMarker.setTag("nose");
 
-        imageView_eyeMarker.setImageURI(Uri.parse("android.resource://" + this.getPackageName() + "/drawable/eye_marker"));
-        imageView_noseMarker.setImageURI(Uri.parse("android.resource://" + this.getPackageName() + "/drawable/nose_marker"));
+        imageView_eyeMarker.setImageURI(Uri.parse("android.resource://" + this.getPackageName() + "/drawable/eye_marker_large"));
+        imageView_noseMarker.setImageURI(Uri.parse("android.resource://" + this.getPackageName() + "/drawable/nose_marker_large"));
 
         setOnTouchListener(imageView_noseMarker);
         setOnTouchListener(imageView_eyeMarker);
