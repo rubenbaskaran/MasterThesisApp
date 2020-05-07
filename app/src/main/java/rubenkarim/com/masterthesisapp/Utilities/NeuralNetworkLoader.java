@@ -11,7 +11,7 @@ import java.nio.channels.FileChannel;
 public class NeuralNetworkLoader {
 
     public static MappedByteBuffer loadCnnTransferLearning(Context context) throws IOException {
-        String cnnTransferLearningModelFile = "RGB_InceptionV3_Huber_loss.tflite";
+        String cnnTransferLearningModelFile = "RGB_InceptionV3.tflite";
         return loadNNModelFile(context, cnnTransferLearningModelFile);
     }
 

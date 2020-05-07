@@ -24,7 +24,6 @@ public class CnnAlgorithmTask extends AbstractAlgorithmTask {
 
     private final Interpreter mTflite;
     private ThermalImageFile mThermalImage;
-    private Palette mDeafaultPalette;
 
     public CnnAlgorithmTask(MappedByteBuffer cnnModel, ThermalImageFile thermalImage) {
         mTflite = new Interpreter((ByteBuffer) cnnModel);
@@ -35,7 +34,6 @@ public class CnnAlgorithmTask extends AbstractAlgorithmTask {
     public void getGradientAndPositions(AlgorithmResultListener algorithmResultListener) {
         int[] imgShapeInput = mTflite.getInputTensor(0).shape(); // cnn: {1, width: 240, Height: 320, 3} cnnTransferlearning: {1, 320, 320, 3}
         mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
-        mDeafaultPalette = mThermalImage.getPalette();
         mThermalImage.setPalette(PaletteManager.getDefaultPalettes().get(0));
         //Bitmap grayBitmap = toGrayscale(mImageBitmap);
         Bitmap thermalImage = super.getBitmap(mThermalImage);
@@ -66,7 +64,7 @@ public class CnnAlgorithmTask extends AbstractAlgorithmTask {
                 scaledResults[i] = results[i] * heightProportion;
             }
         }
-        mThermalImage.setPalette(mDeafaultPalette);
+        mThermalImage.setPalette(PaletteManager.getDefaultPalettes().get(12));
         algorithmResultListener.onResult(super.calculateGradient(scaledResults, mThermalImage));
     }
 

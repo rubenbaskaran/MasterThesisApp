@@ -88,8 +88,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
                 mThermalImage = (ThermalImageFile) ImageFactory.createImage(mThermalImagePath);
                 mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
             } catch (IOException e) {
-                Logging.error(this,TAG + " onCreate: ", e);
-                Snackbar.make(mRootView, R.string.errorThermal_Img, Snackbar.LENGTH_INDEFINITE).show();
+                Logging.error(this, TAG + " onCreate: ", e);
             }
         }
         if (receivedIntent.hasExtra("imageViewVerticalOffset")) {
@@ -113,50 +112,54 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             minMaxData = (MinMaxDTO) bundle.getSerializable("minMaxData");
             mGradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
         }
-
-        if (mGradientAndPositions == null) {
-            executeAlgorithm();
+        if (mThermalImage != null) {
+            if (mGradientAndPositions == null) {
+                executeAlgorithm();
+            } else {
+                setPicture(mGradientAndPositions);
+            }
         } else {
-            setPicture(mGradientAndPositions);
+            Snackbar.make(mRootView, R.string.errorThermal_Img, Snackbar.LENGTH_INDEFINITE).show();
         }
+
     }
 
     private void executeAlgorithm() {
         switch (GlobalVariables.getCurrentAlgorithm()) {
             case CNN:
-                    new Thread(()->{
-                        try {
-                            AbstractAlgorithmTask cnn = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnn(this), mThermalImage);
-                            cnn.getGradientAndPositions(this);
-                        } catch (IOException e) {
-                            Logging.error(this,"ExecuteAlgorithm(), CNN", e);
-                            Snackbar.make(mRootView, R.string.errorAlgorithm, Snackbar.LENGTH_LONG).show();
-                        }
-                    }).start();
+                new Thread(() -> {
+                    try {
+                        AbstractAlgorithmTask cnn = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnn(this), mThermalImage);
+                        cnn.getGradientAndPositions(this);
+                    } catch (IOException e) {
+                        Logging.error(this, "ExecuteAlgorithm(), CNN", e);
+                        Snackbar.make(mRootView, R.string.errorAlgorithm, Snackbar.LENGTH_LONG).show();
+                    }
+                }).start();
                 break;
 
             case CNNWithTransferLearning:
-                new Thread(()->{
+                new Thread(() -> {
                     try {
                         AbstractAlgorithmTask cnnTransferLearning = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnnTransferLearning(this), mThermalImage);
                         cnnTransferLearning.getGradientAndPositions(this);
                     } catch (IOException e) {
-                        Logging.error(this,"ExecuteAlgorithm(), CNNWithTransferLearning", e);
+                        Logging.error(this, "ExecuteAlgorithm(), CNNWithTransferLearning", e);
                         Snackbar.make(mRootView, R.string.errorAlgorithm, Snackbar.LENGTH_LONG).show();
                     }
                 }).start();
                 break;
 
             case RgbThermalMapping:
-                new Thread(()->{
-                    Logging.info(this,TAG, "starting RGB");
+                new Thread(() -> {
+                    Logging.info(this, TAG, "starting RGB");
                     AbstractAlgorithmTask rgbThermalAlgorithm = new RgbThermalAlgorithmTask(mThermalImage, screenWidth, screenHeight);
                     rgbThermalAlgorithm.getGradientAndPositions(this);
                 }).start();
                 break;
 
             case MinMaxTemplate:
-                new Thread(()->{
+                new Thread(() -> {
                     AbstractAlgorithmTask minMaxAlgorithm = new MinMaxAlgorithmTask(
                             mThermalImage,
                             new RoiModel(minMaxData.getLeftEyeLocation(), minMaxData.getLeftEyeWidth(), minMaxData.getLeftEyeHeight()),
@@ -179,25 +182,25 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
 
     @Override
     public void onError(String errorMessage, Exception e) {
-        Logging.info(this, TAG,"Algorithm onError: " + e);
+        Logging.info(this, TAG, "Algorithm onError: " + e);
         runOnUiThread(() -> {
             Snackbar.make(mRootView, errorMessage, Snackbar.LENGTH_LONG).show();
         });
     }
 
     public void setPicture(GradientModel gradientModel) {
-            this.mGradientAndPositions = gradientModel;
+        this.mGradientAndPositions = gradientModel;
 
-            mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
-            Bitmap thermalImgBitmap = ImageProcessing.getBitmap(mThermalImage);
-            imageView_thermalImageContainer.setImageBitmap(thermalImgBitmap);
+        mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+        Bitmap thermalImgBitmap = ImageProcessing.getBitmap(mThermalImage);
+        imageView_thermalImageContainer.setImageBitmap(thermalImgBitmap);
 
-            capturedImageDimensions = new int[]{thermalImgBitmap.getWidth(), thermalImgBitmap.getHeight()};
-            imageContainerDimensions = new int[]{imageWidth, imageHeight};
+        capturedImageDimensions = new int[]{thermalImgBitmap.getWidth(), thermalImgBitmap.getHeight()};
+        imageContainerDimensions = new int[]{imageWidth, imageHeight};
 
-            addMarkers(capturedImageDimensions, imageContainerDimensions);
-            Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
-            button_Submit.setEnabled(true);
+        addMarkers(capturedImageDimensions, imageContainerDimensions);
+        Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
+        button_Submit.setEnabled(true);
     }
 
     private void addMarkers(int[] capturedImageDimensions, int[] imageContainerDimensions) {
