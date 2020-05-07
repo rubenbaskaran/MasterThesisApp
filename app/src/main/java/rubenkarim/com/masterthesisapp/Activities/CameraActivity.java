@@ -86,10 +86,7 @@ public class CameraActivity extends AppCompatActivity {
             relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
             imageView_faceTemplate.setVisibility(View.INVISIBLE);
         }
-
-        button_BackToMainActivity.setEnabled(false);
-        button_TakePicture.setEnabled(false);
-
+        enableButtons(false);
         checkPermissions(getListOfUsbDevices());
     }
 
@@ -136,8 +133,14 @@ public class CameraActivity extends AppCompatActivity {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.putExtra("CameraNotFound", true);
             startActivity(intent);
-//            setupDefaultImage();
+            //setupDefaultImage();
+
         }
+    }
+
+    private void enableButtons(boolean b) {
+        button_BackToMainActivity.setEnabled(b);
+        button_TakePicture.setEnabled(b);
     }
 
     private void setupFlirCamera() {
@@ -197,7 +200,7 @@ public class CameraActivity extends AppCompatActivity {
             public void onDisconnected(ErrorCode errorCode) {
                 runOnUiThread(() -> {
                     if (!errorCode.getMessage().isEmpty()) {
-                        Snackbar.make(mRootView, "Disconnection Error: " + errorCode.getMessage(), Snackbar.LENGTH_INDEFINITE).show();
+                        Snackbar.make(mRootView, "Check battery or reconnect device", Snackbar.LENGTH_INDEFINITE).show();
                         Log.i(TAG, "onDisconnection: ERROR: " + errorCode.toString());
                     }
                 });
@@ -228,8 +231,7 @@ public class CameraActivity extends AppCompatActivity {
                         Snackbar.make(mRootView, "Hold on, camera is calibrating", Snackbar.LENGTH_INDEFINITE).show();
                     } else {
                         Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
-                        button_BackToMainActivity.setEnabled(true);
-                        button_TakePicture.setEnabled(true);
+                        enableButtons(true);
                         Snackbar.make(mRootView, "Camera is ready", Snackbar.LENGTH_SHORT).show();
                     }
                 });
@@ -278,6 +280,7 @@ public class CameraActivity extends AppCompatActivity {
             Snackbar.make(mRootView, "an error accrued when open default image", Snackbar.LENGTH_SHORT).show();
             Logging.error(this, "startCameraPreview", e);
         }
+        enableButtons(true);
     }
 
     public void takePictureOnClick(View view) {
