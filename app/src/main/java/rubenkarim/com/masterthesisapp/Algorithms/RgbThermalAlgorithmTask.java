@@ -16,6 +16,7 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import rubenkarim.com.masterthesisapp.Utilities.NoFaceDetectedException;
 
 
 // Sample – face-detection – is the simplest implementation of the face detection functionality on Android.
@@ -119,7 +120,7 @@ public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
                                             finalThermalImageFile
                                     ));
                                 } else {
-                                    algorithmResultListener.onError("No faces found", new Exception("Face Not Found"));
+                                    algorithmResultListener.onError(new NoFaceDetectedException("No faces found"));
                                 }
                             }
                         })
@@ -127,7 +128,7 @@ public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
                         new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                algorithmResultListener.onError("Face detection error", e);
+                                algorithmResultListener.onError(new NoFaceDetectedException("No faces found"));
                             }
                         });
     }

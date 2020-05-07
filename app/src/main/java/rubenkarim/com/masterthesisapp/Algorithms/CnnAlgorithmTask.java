@@ -24,10 +24,12 @@ public class CnnAlgorithmTask extends AbstractAlgorithmTask {
 
     private final Interpreter mTflite;
     private ThermalImageFile mThermalImage;
+    private boolean needsOffset;
 
-    public CnnAlgorithmTask(MappedByteBuffer cnnModel, ThermalImageFile thermalImage) {
+    public CnnAlgorithmTask(MappedByteBuffer cnnModel, ThermalImageFile thermalImage, boolean needsOffset) {
         mTflite = new Interpreter((ByteBuffer) cnnModel);
         this.mThermalImage = thermalImage;
+        this.needsOffset = needsOffset;
     }
 
     @Override
@@ -62,7 +64,9 @@ public class CnnAlgorithmTask extends AbstractAlgorithmTask {
                 scaledResults[i] = results[i] * widthProportion;
             } else {
                 scaledResults[i] = results[i] * heightProportion;
-                scaledResults[i] -=78.0f;
+                if(needsOffset){
+                    scaledResults[i] -=80.0f;
+                }
             }
         }
         mThermalImage.setPalette(PaletteManager.getDefaultPalettes().get(12));

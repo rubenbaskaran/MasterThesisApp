@@ -37,6 +37,7 @@ import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 import rubenkarim.com.masterthesisapp.Utilities.MinMaxDTO;
 import rubenkarim.com.masterthesisapp.Utilities.NeuralNetworkLoader;
+import rubenkarim.com.masterthesisapp.Utilities.NoFaceDetectedException;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
 public class MarkerActivity extends AppCompatActivity implements AlgorithmResultListener {
@@ -132,7 +133,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNN:
                 new Thread(() -> {
                     try {
-                        AbstractAlgorithmTask cnn = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnn(this), mThermalImage);
+                        AbstractAlgorithmTask cnn = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnn(this), mThermalImage, true);
                         cnn.getGradientAndPositions(this);
                     } catch (IOException e) {
                         Logging.error(this, "ExecuteAlgorithm(), CNN", e);
@@ -144,7 +145,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNNWithTransferLearning:
                 new Thread(() -> {
                     try {
-                        AbstractAlgorithmTask cnnTransferLearning = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnnTransferLearning(this), mThermalImage);
+                        AbstractAlgorithmTask cnnTransferLearning = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnnTransferLearning(this), mThermalImage, false);
                         cnnTransferLearning.getGradientAndPositions(this);
                     } catch (IOException e) {
                         Logging.error(this, "ExecuteAlgorithm(), CNNWithTransferLearning", e);
@@ -184,11 +185,15 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     }
 
     @Override
-    public void onError(String errorMessage, Exception e) {
-        Logging.info(this, TAG, "Algorithm onError: " + e);
-        runOnUiThread(() -> {
-            Snackbar.make(mRootView, errorMessage, Snackbar.LENGTH_LONG).show();
-        });
+    public void onError(Exception exception) {
+        if (exception instanceof NoFaceDetectedException){
+            Logging.info(this, TAG, "Algorithm onError: " + exception);
+            runOnUiThread(() -> {
+                Snackbar.make(mRootView, exception.getMessage(), Snackbar.LENGTH_LONG).show();
+                setPicture(new GradientModel(0.0, new int[]{100, 100}, new int[]{100,200}, 0, 0));
+            });
+        }
+
     }
 
     public void setPicture(GradientModel gradientModel) {
@@ -200,7 +205,6 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
 
         capturedImageDimensions = new int[]{thermalImgBitmap.getWidth(), thermalImgBitmap.getHeight()};
         imageContainerDimensions = new int[]{imageWidth, imageHeight};
-
         addMarkers(capturedImageDimensions, imageContainerDimensions);
         Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
         button_Submit.setEnabled(true);
