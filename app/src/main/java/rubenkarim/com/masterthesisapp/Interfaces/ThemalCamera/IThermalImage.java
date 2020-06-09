@@ -13,4 +13,6 @@ public interface IThermalImage {
     Bitmap getThermalImgWithPalette(ThermalImgModel.Palette palette);
     double getTemperatureAtPoint(int x, int y);
     Bitmap getVisualImage();
+    int getThermalImgWidth();
+    int getThermalImgHeight();
 }

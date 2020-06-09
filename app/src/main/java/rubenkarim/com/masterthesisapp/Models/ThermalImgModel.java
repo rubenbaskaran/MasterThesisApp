@@ -14,6 +14,7 @@ import com.flir.thermalsdk.image.palettes.PaletteManager;
 import java.io.IOException;
 
 import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalImage;
+import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 
 public class ThermalImgModel implements IThermalImage {
 
@@ -43,7 +44,7 @@ public class ThermalImgModel implements IThermalImage {
 
     }
 
-    private ThermalImgModel(ThermalImageFile thermalImageFile) {
+    public ThermalImgModel(ThermalImageFile thermalImageFile) {
         this.thermalImage = (ThermalImage) thermalImageFile;
     }
 
@@ -82,6 +83,14 @@ public class ThermalImgModel implements IThermalImage {
     public Bitmap getVisualImage() {
         thermalImage.getFusion().setFusionMode(FusionMode.VISUAL_ONLY);
         return getBitmap(thermalImage);
+    }
+
+    public int getThermalImgWidth(){
+        return thermalImage.getWidth();
+    }
+
+    public int getThermalImgHeight(){
+        return thermalImage.getHeight();
     }
 
 }

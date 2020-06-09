@@ -3,12 +3,11 @@ package rubenkarim.com.masterthesisapp.Algorithms;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
-import com.flir.thermalsdk.image.ThermalImageFile;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalImage;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
@@ -22,14 +21,13 @@ public class MinMaxAlgorithmTask extends AbstractAlgorithmTask {
     private int height;
     private int[] center;
     private int radius;
-    private ThermalImageFile capturedImageBitmap;
-    private String mThermalImagePath;
+    private IThermalImage thermalImage;
     //endregion
 
-    public MinMaxAlgorithmTask(ThermalImageFile thermalImage, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) {
-        capturedImageBitmap = thermalImage;
+    public MinMaxAlgorithmTask(IThermalImage thermalImage, RoiModel leftEye, RoiModel rightEye, RoiModel nose, RoiModel cameraPreviewElement) {
+        this.thermalImage = thermalImage;
 
-        int[] imageOriginalDimensions = new int[]{capturedImageBitmap.getWidth(), capturedImageBitmap.getHeight()};
+        int[] imageOriginalDimensions = new int[]{this.thermalImage.getThermalImgWidth(), this.thermalImage.getThermalImgHeight()};
         int[] cameraPreviewDimensions = new int[]{cameraPreviewElement.getWidth(), cameraPreviewElement.getHeight()};
 
         double scalingFactorX = (double) imageOriginalDimensions[0] / (double) cameraPreviewDimensions[0];
@@ -59,7 +57,7 @@ public class MinMaxAlgorithmTask extends AbstractAlgorithmTask {
                 leftEyeMax[1],
                 noseMin[0],
                 noseMin[1],
-                capturedImageBitmap));
+                thermalImage));
     }
 
     private int[] getMaxMinSpotInRoi(RoiModel roiCircle, String category) {
@@ -71,7 +69,7 @@ public class MinMaxAlgorithmTask extends AbstractAlgorithmTask {
         double minValue = 255 * 3 * (groupSize * groupSize);
         int targetPixel;
         Integer[] centerPointInPixelGroup = null;
-        Bitmap bitmap = super.getBitmap(capturedImageBitmap);
+        Bitmap bitmap = thermalImage.getThermalImage();
 
         for (int x = leftUpperCornerLocation[0]; x < leftUpperCornerLocation[0] + width; x += groupSize) {
             for (int y = leftUpperCornerLocation[1]; y < leftUpperCornerLocation[1] + height; y += groupSize) {

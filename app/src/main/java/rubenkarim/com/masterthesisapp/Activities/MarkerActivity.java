@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.AbstractAlgorithmTask;
 import rubenkarim.com.masterthesisapp.Algorithms.AlgorithmResultListener;
 import rubenkarim.com.masterthesisapp.Algorithms.CnnAlgorithmTask;
+import rubenkarim.com.masterthesisapp.Algorithms.Exceptions.NoFaceDetectedException;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithmTask;
 import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithmTask;
 import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalImage;
@@ -39,7 +40,6 @@ import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 import rubenkarim.com.masterthesisapp.Utilities.MinMaxDTO;
 import rubenkarim.com.masterthesisapp.Utilities.NeuralNetworkLoader;
-import rubenkarim.com.masterthesisapp.Utilities.NoFaceDetectedException;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
 public class MarkerActivity extends AppCompatActivity implements AlgorithmResultListener {
@@ -200,8 +200,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     public void setPicture(GradientModel gradientModel) {
         this.mGradientAndPositions = gradientModel;
 
-        mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
-        Bitmap thermalImgBitmap = ImageProcessing.getBitmap(mThermalImage);
+        Bitmap thermalImgBitmap = mThermalImage.getThermalImage();
         imageView_thermalImageContainer.setImageBitmap(thermalImgBitmap);
 
         capturedImageDimensions = new int[]{thermalImgBitmap.getWidth(), thermalImgBitmap.getHeight()};
@@ -302,9 +301,9 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
 
     }
 
-    private void recalculateGradient(ThermalImageFile thermalImageFile) {
-        double eye = AbstractAlgorithmTask.calculateTemperature(mGradientAndPositions.getEyePosition()[0], mGradientAndPositions.getEyePosition()[1], thermalImageFile);
-        double nose = AbstractAlgorithmTask.calculateTemperature(mGradientAndPositions.getNosePosition()[0], mGradientAndPositions.getNosePosition()[1], thermalImageFile);
+    private void recalculateGradient(IThermalImage thermalImageFile) {
+        double eye = thermalImageFile.getTemperatureAtPoint(mGradientAndPositions.getEyePosition()[0], mGradientAndPositions.getEyePosition()[1]);
+        double nose = thermalImageFile.getTemperatureAtPoint(mGradientAndPositions.getNosePosition()[0], mGradientAndPositions.getNosePosition()[1]);
         mGradientAndPositions.setEyeTemperature(eye);
         mGradientAndPositions.setNoseTemperature(nose);
         mGradientAndPositions.setGradient(Math.abs(eye - nose));
