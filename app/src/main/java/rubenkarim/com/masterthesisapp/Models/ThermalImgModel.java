@@ -20,6 +20,7 @@ public class ThermalImgModel implements IThermalImage {
 
     private ThermalImage thermalImage;
 
+
     public enum Palette {
         IRON(0),
         ARCTIC(1),

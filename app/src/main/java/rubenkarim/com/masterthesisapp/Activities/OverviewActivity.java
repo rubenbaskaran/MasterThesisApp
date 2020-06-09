@@ -19,7 +19,9 @@ import java.io.IOException;
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Database.AppDatabase;
 import rubenkarim.com.masterthesisapp.Database.Entities.Observation;
+import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalImage;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
+import rubenkarim.com.masterthesisapp.Models.ThermalImgModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
@@ -36,6 +38,7 @@ public class OverviewActivity extends AppCompatActivity {
     private int imageHeight;
     private int imageWidth;
     private String mThermalImagePath;
+    private IThermalImage thermalImage;
     private GradientModel mGradientModel;
     private MinMaxDTO minMaxData;
     private int imageViewVerticalOffset;
@@ -55,6 +58,12 @@ public class OverviewActivity extends AppCompatActivity {
         Intent receivedIntent = getIntent();
         if (receivedIntent.hasExtra("thermalImagePath")) {
             mThermalImagePath = receivedIntent.getStringExtra("thermalImagePath");
+            try {
+                ImageProcessing.FixImageOrientation(mThermalImagePath);
+                thermalImage = new ThermalImgModel((ThermalImageFile) ImageFactory.createImage(mThermalImagePath));
+            } catch (IOException e) {
+                Logging.error(this, TAG + " onCreate: ", e);
+            }
         }
         if (receivedIntent.hasExtra("imageHeight")) {
             imageHeight = receivedIntent.getIntExtra("imageHeight", 0);
@@ -98,8 +107,7 @@ public class OverviewActivity extends AppCompatActivity {
     }
 
     private void setPicture(ThermalImageFile thermalImageFile, GradientModel gradientModel) {
-        thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
-        Bitmap bmp = ImageProcessing.getBitmap(thermalImageFile);
+        Bitmap bmp = thermalImage.getThermalImage();
         drawCirclesOnBitmap(bmp, gradientModel.getEyePosition(), gradientModel.getNosePosition());
         imageView_thermalImageContainer.setImageBitmap(bmp);
     }
