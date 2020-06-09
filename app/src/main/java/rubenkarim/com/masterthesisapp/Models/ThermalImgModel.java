@@ -9,7 +9,6 @@ import com.flir.thermalsdk.image.TemperatureUnit;
 import com.flir.thermalsdk.image.ThermalImage;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
-import com.flir.thermalsdk.image.palettes.Palette;
 import com.flir.thermalsdk.image.palettes.PaletteManager;
 
 import java.io.IOException;
@@ -20,10 +19,10 @@ public class ThermalImgModel implements IThermalImage {
 
     private ThermalImage thermalImage;
 
-    public enum Palette{
-        IRON (0),
+    public enum Palette {
+        IRON(0),
         ARCTIC(1),
-        BLACKHOT (2),
+        BLACKHOT(2),
         BW(3),
         COLDEST(4),
         COLORWHEEL_REDHOT(5),
@@ -37,21 +36,22 @@ public class ThermalImgModel implements IThermalImage {
         HOTTEST(13);
 
         private final int index;
-        Palette(int index){
+
+        Palette(int index) {
             this.index = index;
         }
 
     }
 
-    private ThermalImgModel(ThermalImageFile thermalImageFile){
+    private ThermalImgModel(ThermalImageFile thermalImageFile) {
         this.thermalImage = (ThermalImage) thermalImageFile;
     }
 
-    public ThermalImgModel(ThermalImage thermalImage){
+    public ThermalImgModel(ThermalImage thermalImage) {
         this.thermalImage = thermalImage;
     }
 
-    public Bitmap getThermalImage(){
+    public Bitmap getThermalImage() {
         JavaImageBuffer javaImageBuffer = thermalImage.getImage();
         thermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
         return BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
@@ -61,20 +61,27 @@ public class ThermalImgModel implements IThermalImage {
         thermalImage.saveAs(path);
     }
 
-    public Bitmap getThermalImgWithPalette(Palette palette){
+    public Bitmap getThermalImgWithPalette(Palette palette) {
         thermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
         thermalImage.setPalette(PaletteManager.getDefaultPalettes().get(palette.index));
-        return getThermalBitmap(thermalImage);
+        Bitmap paletteThermalImage = getBitmap(thermalImage);
+        thermalImage.setPalette(PaletteManager.getDefaultPalettes().get(Palette.IRON.index)); //default
+        return paletteThermalImage;
     }
 
-    public double getTempertureAtPoint(int x, int y){
+    public double getTemperatureAtPoint(int x, int y) {
         thermalImage.setTemperatureUnit(TemperatureUnit.CELSIUS);
         return thermalImage.getValueAt(new Point(x, y));
     }
 
-    private Bitmap getThermalBitmap(ThermalImage thermalImage){
+    private Bitmap getBitmap(ThermalImage thermalImage) {
         JavaImageBuffer javaBuffer = thermalImage.getImage();
         return BitmapAndroid.createBitmap(javaBuffer).getBitMap();
+    }
+
+    public Bitmap getVisualImage() {
+        thermalImage.getFusion().setFusionMode(FusionMode.VISUAL_ONLY);
+        return getBitmap(thermalImage);
     }
 
 }

@@ -1,9 +1,5 @@
 package rubenkarim.com.masterthesisapp.Algorithms;
 
-import android.graphics.Bitmap;
-
-import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
-import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.measurements.MeasurementSpot;
 
@@ -21,9 +17,9 @@ public abstract class AbstractAlgorithmTask {
 
     protected GradientModel calculateGradient(int rigthEyeX, int rigthEyeY, int leftEyeX, int leftEyeY, int noseX, int noseY, IThermalImage thermalImg){
 
-        final double temperatureRightEye = thermalImg.getTempertureAtPoint(rigthEyeX,rigthEyeY);
-        final double temperatureLeftEye = thermalImg.getTempertureAtPoint(leftEyeX,leftEyeY);
-        final double temperatureNose = thermalImg.getTempertureAtPoint(noseX,noseY);
+        final double temperatureRightEye = thermalImg.getTemperatureAtPoint(rigthEyeX,rigthEyeY);
+        final double temperatureLeftEye = thermalImg.getTemperatureAtPoint(leftEyeX,leftEyeY);
+        final double temperatureNose = thermalImg.getTemperatureAtPoint(noseX,noseY);
 
         if( temperatureRightEye > temperatureLeftEye){
             return new GradientModel(Math.abs(temperatureRightEye - temperatureNose),
@@ -39,11 +35,6 @@ public abstract class AbstractAlgorithmTask {
                     temperatureNose);
         }
 
-    }
-
-    protected Bitmap getBitmap(ThermalImageFile thermalImageFile) {
-        JavaImageBuffer javaBuffer = thermalImageFile.getImage();
-        return BitmapAndroid.createBitmap(javaBuffer).getBitMap();
     }
 
     public static Double calculateTemperature(int x, int y, ThermalImageFile thermalImg){

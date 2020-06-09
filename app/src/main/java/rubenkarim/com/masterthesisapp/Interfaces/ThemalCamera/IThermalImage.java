@@ -11,6 +11,6 @@ public interface IThermalImage {
     Bitmap getThermalImage();
     void save(String mThermalImagePath) throws IOException;
     Bitmap getThermalImgWithPalette(ThermalImgModel.Palette palette);
-    double getTempertureAtPoint(int x, int y);
-
+    double getTemperatureAtPoint(int x, int y);
+    Bitmap getVisualImage();
 }

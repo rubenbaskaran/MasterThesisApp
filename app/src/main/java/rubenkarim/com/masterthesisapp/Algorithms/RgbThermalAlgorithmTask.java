@@ -17,6 +17,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import rubenkarim.com.masterthesisapp.Algorithms.Exceptions.NoFaceDetectedException;
+import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalImage;
 
 
 // Sample – face-detection – is the simplest implementation of the face detection functionality on Android.
@@ -28,21 +29,20 @@ import rubenkarim.com.masterthesisapp.Algorithms.Exceptions.NoFaceDetectedExcept
 
 public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
 
-    private ThermalImageFile mThermalImageFile;
+    private IThermalImage thermalImage;
     private int deviceScreenWidth;
     private int deviceScreenHeight;
 
 
-    public RgbThermalAlgorithmTask(ThermalImageFile thermalImage, int deviceScreenWidth, int deviceScreenHeight) {
-        mThermalImageFile = thermalImage;
+    public RgbThermalAlgorithmTask(IThermalImage thermalImage, int deviceScreenWidth, int deviceScreenHeight) {
+        this.thermalImage = thermalImage;
         this.deviceScreenWidth = deviceScreenWidth;
         this.deviceScreenHeight = deviceScreenHeight;
     }
 
     @Override
     public void getGradientAndPositions(AlgorithmResultListener algorithmResultListener) {
-        mThermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
-        Bitmap thermalImageBitmap = super.getBitmap(mThermalImageFile);
+        Bitmap thermalImageBitmap = thermalImage.getThermalImage();
         double thermalImageWidth = thermalImageBitmap.getWidth();
         double thermalImageHeight = thermalImageBitmap.getHeight();
         Bitmap rgbImageBitmap = null;
@@ -61,9 +61,7 @@ public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
                 (defaultHorizontalOffset * (deviceScreenWidth / defaultScreenWidth))
                 : (defaultHorizontalOffset / (defaultScreenWidth / deviceScreenWidth));
 
-        ThermalImageFile thermalImageFile = mThermalImageFile;
-        thermalImageFile.getFusion().setFusionMode(FusionMode.VISUAL_ONLY);
-        rgbImageBitmap = super.getBitmap(thermalImageFile);
+        rgbImageBitmap = thermalImage.getVisualImage();
         rgbImageWidth = rgbImageBitmap.getWidth();
         rgbImageHeight = rgbImageBitmap.getHeight();
 
@@ -118,7 +116,7 @@ public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
                                             leftEyeCoordinates[1],
                                             noseCoordinates[0],
                                             noseCoordinates[1],
-                                            thermalImageFile
+                                            thermalImage
                                     ));
                                 } else {
                                     algorithmResultListener.onError(new NoFaceDetectedException("No faces found"));
