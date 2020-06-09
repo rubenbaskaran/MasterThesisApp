@@ -7,7 +7,6 @@ public interface IThermalCamera {
     void calibrateCamera() throws NullPointerException;
     void subscribeToBatteryInfo(BatteryInfoListener batteryInfoListener);
     void close();
-
     void unSubscribeThermalImages();
 }
 

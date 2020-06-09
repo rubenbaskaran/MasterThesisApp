@@ -20,35 +20,36 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 
+import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalImage;
+import rubenkarim.com.masterthesisapp.Models.ThermalImgModel;
+
 public class CnnAlgorithmTask extends AbstractAlgorithmTask {
 
     private final Interpreter mTflite;
-    private ThermalImageFile mThermalImage;
-    private boolean needsOffset;
+    private IThermalImage mThermalImage;
 
-    public CnnAlgorithmTask(MappedByteBuffer cnnModel, ThermalImageFile thermalImage, boolean needsOffset) {
+    public CnnAlgorithmTask(MappedByteBuffer cnnModel, IThermalImage thermalImage) {
         mTflite = new Interpreter((ByteBuffer) cnnModel);
         this.mThermalImage = thermalImage;
-        this.needsOffset = needsOffset;
     }
 
     @Override
     public void getGradientAndPositions(AlgorithmResultListener algorithmResultListener) {
-        int[] imgShapeInput = mTflite.getInputTensor(0).shape(); // cnn: {1, width: 240, Height: 320, 3} cnnTransferlearning: {1, 320, 320, 3}
-        mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);//to get the thermal image only
-        mThermalImage.setPalette(PaletteManager.getDefaultPalettes().get(0));
-        //Bitmap grayBitmap = toGrayscale(mImageBitmap);
-        Bitmap thermalImage = super.getBitmap(mThermalImage);
+        int[] imgShapeInput = mTflite.getInputTensor(0).shape();    //{1, width: 320, Height: 320, channels: 3}
+        Bitmap thermalImage = mThermalImage.getThermalImgWithPalette(ThermalImgModel.Palette.IRON);
 
         //Change Img
-        int cnnImgInputSize = 640; //image has not been downsized yet
-        BitmapWithBordersInfo bitmapWithBordersInfo = addBlackBorder(thermalImage, cnnImgInputSize);
-        TensorImage tensorImage = getTensorImage(imgShapeInput, bitmapWithBordersInfo.getThermalImg());
+        int squareImgInputSize = 640; //image has not been downsized yet therefor it is 640x640
+        BitmapWithBordersInfo bitmapWithBordersInfo = addBlackBorder(thermalImage, squareImgInputSize);
+        TensorImage tensorImage = resizeAndGetTensorImage(imgShapeInput, bitmapWithBordersInfo.getThermalImg());
 
         //Output
         int[] probabilityShapeOutput = mTflite.getOutputTensor(0).shape();//{1,6}
-        DataType probabilityDataTypeOutput = mTflite.getOutputTensor(0).dataType(); //FLOAT32
-        TensorBuffer tensorBufferOutput = TensorBuffer.createFixedSize(probabilityShapeOutput, probabilityDataTypeOutput);
+        DataType probabilityDataTypeOutput = mTflite.getOutputTensor(0).dataType();//FLOAT32
+        TensorBuffer tensorBufferOutput = TensorBuffer.createFixedSize(
+                probabilityShapeOutput,
+                probabilityDataTypeOutput
+        );
 
         //Get predictions
         mTflite.run(tensorImage.getBuffer(), tensorBufferOutput.getBuffer().rewind());
@@ -64,16 +65,12 @@ public class CnnAlgorithmTask extends AbstractAlgorithmTask {
                 scaledResults[i] = results[i] * widthProportion;
             } else {
                 scaledResults[i] = results[i] * heightProportion;
-                if(needsOffset){
-                    scaledResults[i] -=80.0f;
-                }
             }
         }
-        mThermalImage.setPalette(PaletteManager.getDefaultPalettes().get(12));
         algorithmResultListener.onResult(super.calculateGradient(scaledResults, mThermalImage));
     }
 
-    private TensorImage getTensorImage(int[] imgShapeInput, Bitmap thermalImage) {
+    private TensorImage resizeAndGetTensorImage(int[] imgShapeInput, Bitmap thermalImage) {
         DataType dataTypeInput = mTflite.getInputTensor(0).dataType(); //FLOAT32
         TensorImage inputImageBuffer = new TensorImage(dataTypeInput);
         ImageProcessor imageProcessor = new ImageProcessor.Builder()

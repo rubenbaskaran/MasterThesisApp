@@ -1,9 +1,9 @@
-package rubenkarim.com.masterthesisapp.Utilities;
+package rubenkarim.com.masterthesisapp.Algorithms.Exceptions;
 
-import androidx.annotation.Nullable;
 
 public class NoFaceDetectedException extends Exception {
     public NoFaceDetectedException(String message) {
         super(message);
     }
 }
+

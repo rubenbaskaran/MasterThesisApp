@@ -7,41 +7,34 @@ import com.flir.thermalsdk.image.JavaImageBuffer;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.measurements.MeasurementSpot;
 
+import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalImage;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 
 public abstract class AbstractAlgorithmTask {
 
     public abstract void getGradientAndPositions(AlgorithmResultListener algorithmResultListener);
 
-    protected GradientModel calculateGradient(float[] coordinates, ThermalImageFile thermalImg){
+    protected GradientModel calculateGradient(float[] coordinates, IThermalImage thermalImg){
         return calculateGradient(Math.round(coordinates[0]), Math.round(coordinates[1]), Math.round(coordinates[2]),
                 Math.round(coordinates[3]), Math.round(coordinates[4]), Math.round(coordinates[5]), thermalImg);
     }
 
-    protected GradientModel calculateGradient(int rigthEyeX, int rigthEyeY, int leftEyeX, int leftEyeY, int noseX, int noseY, ThermalImageFile thermalImg){
+    protected GradientModel calculateGradient(int rigthEyeX, int rigthEyeY, int leftEyeX, int leftEyeY, int noseX, int noseY, IThermalImage thermalImg){
 
-        thermalImg.getMeasurements().addSpot(rigthEyeX, rigthEyeY);
-        thermalImg.getMeasurements().addSpot(leftEyeX, leftEyeY);
-        thermalImg.getMeasurements().addSpot(noseX,noseY);
-
-        MeasurementSpot rigthEye = thermalImg.getMeasurements().getSpots().get(0);
-        MeasurementSpot leftEye = thermalImg.getMeasurements().getSpots().get(1);
-        MeasurementSpot nose = thermalImg.getMeasurements().getSpots().get(2);
-
-        final double temperatureRightEye = rigthEye.getValue().asCelsius().value;
-        final double temperatureLeftEye = leftEye.getValue().asCelsius().value;
-        final double temperatureNose = nose.getValue().asCelsius().value;
+        final double temperatureRightEye = thermalImg.getTempertureAtPoint(rigthEyeX,rigthEyeY);
+        final double temperatureLeftEye = thermalImg.getTempertureAtPoint(leftEyeX,leftEyeY);
+        final double temperatureNose = thermalImg.getTempertureAtPoint(noseX,noseY);
 
         if( temperatureRightEye > temperatureLeftEye){
             return new GradientModel(Math.abs(temperatureRightEye - temperatureNose),
-                    new int[]{rigthEye.getPosition().x, rigthEye.getPosition().y},
-                    new int[]{nose.getPosition().x, nose.getPosition().y},
+                    new int[]{rigthEyeX, rigthEyeY},
+                    new int[]{noseX, noseX},
                     temperatureRightEye,
                     temperatureNose);
         } else {
             return new GradientModel(Math.abs(temperatureLeftEye - temperatureNose),
-                    new int[]{leftEye.getPosition().x, leftEye.getPosition().y},
-                    new int[]{nose.getPosition().x, nose.getPosition().y},
+                    new int[]{leftEyeX, leftEyeY},
+                    new int[]{noseX, noseX},
                     temperatureLeftEye,
                     temperatureNose);
         }

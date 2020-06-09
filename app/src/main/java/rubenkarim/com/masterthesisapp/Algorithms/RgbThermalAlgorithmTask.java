@@ -16,7 +16,7 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceLandmark;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import rubenkarim.com.masterthesisapp.Utilities.NoFaceDetectedException;
+import rubenkarim.com.masterthesisapp.Algorithms.Exceptions.NoFaceDetectedException;
 
 
 // Sample – face-detection – is the simplest implementation of the face detection functionality on Android.
@@ -82,24 +82,25 @@ public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
                         .build();
 
         FirebaseVisionFaceDetector detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
-        ThermalImageFile finalThermalImageFile = thermalImageFile;
 
         detector.detectInImage(firebaseVisionImage)
                 .addOnSuccessListener(
                         new OnSuccessListener<List<FirebaseVisionFace>>() {
                             @Override
                             public void onSuccess(List<FirebaseVisionFace> faces) {
-                                // Task completed successfully
-                                // [START_EXCLUDE]
-                                // [START get_face_info]
                                 if (!faces.isEmpty()) {
                                     int[] rightEyeCoordinates = null;
                                     int[] leftEyeCoordinates = null;
                                     int[] noseCoordinates = null;
 
                                     FirebaseVisionFaceLandmark rightEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
-                                    if (rightEye != null) {
-                                        rightEyeCoordinates = new int[]{(int)Math.round((rightEye.getPosition().getX() * widthScalingFactor - scaledHorizontalOffset)), (int)Math.round((rightEye.getPosition().getY() * heightScalingFactor - scaledVerticalOffset))};
+                                    if (rightEye != null)
+                                    {
+                                        rightEyeCoordinates = new int[]
+                                                {
+                                                (int)Math.round(rightEye.getPosition().getX() * widthScalingFactor - scaledHorizontalOffset),
+                                                (int)Math.round(rightEye.getPosition().getY() * heightScalingFactor - scaledVerticalOffset)
+                                                };
                                     }
                                     FirebaseVisionFaceLandmark leftEye = faces.get(0).getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
                                     if (leftEye != null) {
@@ -117,7 +118,7 @@ public class RgbThermalAlgorithmTask extends AbstractAlgorithmTask {
                                             leftEyeCoordinates[1],
                                             noseCoordinates[0],
                                             noseCoordinates[1],
-                                            finalThermalImageFile
+                                            thermalImageFile
                                     ));
                                 } else {
                                     algorithmResultListener.onError(new NoFaceDetectedException("No faces found"));

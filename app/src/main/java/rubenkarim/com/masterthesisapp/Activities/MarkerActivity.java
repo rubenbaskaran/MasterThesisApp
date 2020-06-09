@@ -28,8 +28,10 @@ import rubenkarim.com.masterthesisapp.Algorithms.AlgorithmResultListener;
 import rubenkarim.com.masterthesisapp.Algorithms.CnnAlgorithmTask;
 import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithmTask;
 import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithmTask;
+import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalImage;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
+import rubenkarim.com.masterthesisapp.Models.ThermalImgModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
@@ -50,7 +52,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     private ImageView imageView_thermalImageContainer;
     private RelativeLayout relativeLayout_markers;
     private GradientModel mGradientAndPositions = null;
-    private ThermalImageFile mThermalImage;
+    private IThermalImage mThermalImage;
     private ProgressBar progressBar_markerViewLoadingAnimation;
     private MinMaxDTO minMaxData;
     private int[] capturedImageDimensions;
@@ -89,8 +91,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             mThermalImagePath = receivedIntent.getStringExtra("thermalImagePath");
             try {
                 ImageProcessing.FixImageOrientation(mThermalImagePath);
-                mThermalImage = (ThermalImageFile) ImageFactory.createImage(mThermalImagePath);
-                mThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+                mThermalImage = new ThermalImgModel ((ThermalImageFile) ImageFactory.createImage(mThermalImagePath));
             } catch (IOException e) {
                 Logging.error(this, TAG + " onCreate: ", e);
             }
@@ -133,7 +134,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNN:
                 new Thread(() -> {
                     try {
-                        AbstractAlgorithmTask cnn = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnn(this), mThermalImage, true);
+                        AbstractAlgorithmTask cnn = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnn(this), mThermalImage);
                         cnn.getGradientAndPositions(this);
                     } catch (IOException e) {
                         Logging.error(this, "ExecuteAlgorithm(), CNN", e);
@@ -145,7 +146,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
             case CNNWithTransferLearning:
                 new Thread(() -> {
                     try {
-                        AbstractAlgorithmTask cnnTransferLearning = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnnTransferLearning(this), mThermalImage, false);
+                        AbstractAlgorithmTask cnnTransferLearning = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnnTransferLearning(this), mThermalImage);
                         cnnTransferLearning.getGradientAndPositions(this);
                     } catch (IOException e) {
                         Logging.error(this, "ExecuteAlgorithm(), CNNWithTransferLearning", e);

@@ -20,18 +20,20 @@ import com.flir.thermalsdk.log.ThermalLog;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.BatteryInfoListener;
 import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalCamera;
 import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.StatusListener;
 import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.ThermalImageListener;
+import rubenkarim.com.masterthesisapp.Models.ThermalImgModel;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 
 public class FlirOneManager implements IThermalCamera {
     private static final String TAG = FlirOneManager.class.getSimpleName();
     private Camera flirCamera;
-    private ArrayList<ThermalImageListener> thermalImageListeners;
+    private List<ThermalImageListener> thermalImageListeners;
     private StatusListener statusListener;
     private Context appContext;
     private BatteryInfoListener mBatteryInfoListener;
@@ -67,8 +69,10 @@ public class FlirOneManager implements IThermalCamera {
     }
 
     private void updateThermalListener(ThermalImage thermalImage) {
-        for (ThermalImageListener t : this.thermalImageListeners) {
-            t.subscribe(thermalImage);
+        if (this.thermalImageListeners != null && !this.thermalImageListeners.isEmpty()) {
+            for (ThermalImageListener t : this.thermalImageListeners) {
+                t.subscribe(new ThermalImgModel(thermalImage));
+            }
         }
     }
 
@@ -99,7 +103,9 @@ public class FlirOneManager implements IThermalCamera {
             flirCamera.getRemoteControl().getCalibration().subscribeCalibrationState(new Calibration.NucStateListener() {
                 @Override
                 public void onNucState(boolean b) {
-                    statusListener.isCalibrating(b);
+                    if (statusListener != null) {
+                        statusListener.isCalibrating(b);
+                    }
                 }
             });
         } catch (Exception e) {
@@ -121,7 +127,9 @@ public class FlirOneManager implements IThermalCamera {
     private final ConnectionStatusListener connectionStatusListener = new ConnectionStatusListener() {
         @Override
         public void onDisconnected(ErrorCode errorCode) {
-            statusListener.onDisconnected(errorCode);
+            if (statusListener != null) {
+                statusListener.onDisconnected(errorCode);
+            }
         }
     };
 
@@ -174,30 +182,36 @@ public class FlirOneManager implements IThermalCamera {
             try {
                 flirCamera.connect(identity, connectionStatusListener);
                 flirCamera.subscribeStream(thermalImageStreamListener);
-                try {
-                    mBatteryInfoListener.batteryPercentageUpdate(flirCamera.getRemoteControl().getBattery().getPercentage());
-                    flirCamera.getRemoteControl().getBattery().subscribePercentage(i -> mBatteryInfoListener.batteryPercentageUpdate(i));
 
-                    flirCamera.getRemoteControl().getBattery().subscribeChargingState(new Battery.BatteryStateListener() {
-                        @Override
-                        public void onStateChange(Battery.ChargingState chargingState) {
-                            switch (chargingState) {
-                                case MANAGED_CHARGING:
-                                case MANAGED_CHARGING_ONLY:
-                                    mBatteryInfoListener.isCharging(true);
-                                    break;
-                                case NO_CHARGING:
-                                    mBatteryInfoListener.isCharging(false);
-                                    break;
+                if (mBatteryInfoListener != null) {
+                    try {
+                        mBatteryInfoListener.batteryPercentageUpdate(flirCamera.getRemoteControl().getBattery().getPercentage());
+                        flirCamera.getRemoteControl().getBattery().subscribePercentage(i -> mBatteryInfoListener.batteryPercentageUpdate(i));
+
+                        flirCamera.getRemoteControl().getBattery().subscribeChargingState(new Battery.BatteryStateListener() {
+                            @Override
+                            public void onStateChange(Battery.ChargingState chargingState) {
+                                switch (chargingState) {
+                                    case MANAGED_CHARGING:
+                                    case MANAGED_CHARGING_ONLY:
+                                        mBatteryInfoListener.isCharging(true);
+                                        break;
+                                    case NO_CHARGING:
+                                        mBatteryInfoListener.isCharging(false);
+                                        break;
+                                }
                             }
-                        }
-                    });
+                        });
 
-                } catch (Exception e) {
-                    mBatteryInfoListener.subscriptionError(e);
+                    } catch (Exception e) {
+                        mBatteryInfoListener.subscriptionError(e);
+                    }
                 }
+
             } catch (IOException e) {
-                statusListener.onConnectionError(e);
+                if (statusListener != null) {
+                    statusListener.onConnectionError(e);
+                }
             } finally {
                 if (DiscoveryFactory.getInstance().isDiscovering()) {
                     DiscoveryFactory.getInstance().stop();

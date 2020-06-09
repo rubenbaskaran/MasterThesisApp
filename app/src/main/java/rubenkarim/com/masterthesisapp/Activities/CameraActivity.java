@@ -18,11 +18,8 @@ import android.widget.RelativeLayout;
 import android.widget.TabHost;
 
 import com.flir.thermalsdk.ErrorCode;
-import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
 import com.flir.thermalsdk.image.ImageFactory;
-import com.flir.thermalsdk.image.JavaImageBuffer;
-import com.flir.thermalsdk.image.ThermalImage;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.flir.thermalsdk.live.Identity;
@@ -43,6 +40,7 @@ import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.StatusListener;
 import rubenkarim.com.masterthesisapp.Managers.FlirOneManager.FlirOneManager;
 import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionListener;
 import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionManager;
+import rubenkarim.com.masterthesisapp.Models.ThermalImgModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
@@ -149,12 +147,10 @@ public class CameraActivity extends AppCompatActivity {
         //Logging.info(this, TAG, "subscribing thermalImg");
         this.mIThermalCamera.initCameraSearchAndSub((thermalImage) -> {
             //The image must not be processed on the UI Thread
-            JavaImageBuffer javaImageBuffer = thermalImage.getImage();
-            thermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
-            final Bitmap bitmap = BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
+            final Bitmap thermalimage = thermalImage.getThermalImage();
 
             runOnUiThread(() -> {
-                imageView_cameraPreviewContainer.setImageBitmap(bitmap);
+                imageView_cameraPreviewContainer.setImageBitmap(thermalimage);
             });
 
             if (!isCalibrated) {
@@ -306,8 +302,7 @@ public class CameraActivity extends AppCompatActivity {
                         @SuppressLint("SimpleDateFormat")
                         String fileName = new SimpleDateFormat("dd-MM-yyyy'_'HH:mm:ss").format(new Timestamp(System.currentTimeMillis())) + ".jpg";
                         mThermalImagePath = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + fileName;
-                        thermalImage.saveAs(mThermalImagePath);
-                        //Logging.info(this, TAG, "thermalImg saved");
+                        thermalImage.save(mThermalImagePath);
                         goToMarkerActivity();
                     } catch (IOException e) {
                         Logging.error(this, "saveThermalImage", e);

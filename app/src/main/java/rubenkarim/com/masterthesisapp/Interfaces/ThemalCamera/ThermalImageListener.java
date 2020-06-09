@@ -1,7 +1,5 @@
 package rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera;
 
-import com.flir.thermalsdk.image.ThermalImage;
-
 public interface ThermalImageListener {
 
     /**
@@ -9,5 +7,5 @@ public interface ThermalImageListener {
      * use android method 'runOnUiThread(()->{ ...push image to ui inhere.. })'
      * @param thermalImage the image from the thermalCamera
      */
-    void subscribe(ThermalImage thermalImage);
+    void subscribe(IThermalImage thermalImage);
 }
