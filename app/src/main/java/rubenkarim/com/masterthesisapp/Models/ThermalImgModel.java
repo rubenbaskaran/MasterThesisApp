@@ -47,6 +47,7 @@ public class ThermalImgModel implements IThermalImage {
 
     public ThermalImgModel(ThermalImageFile thermalImageFile) {
         this.thermalImage = (ThermalImage) thermalImageFile;
+        thermalImage.setPalette(PaletteManager.getDefaultPalettes().get(Palette.IRON.index)); //default
     }
 
     public ThermalImgModel(ThermalImage thermalImage) {
