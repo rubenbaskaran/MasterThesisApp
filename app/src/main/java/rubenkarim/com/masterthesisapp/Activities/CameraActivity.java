@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.flir.thermalsdk.ErrorCode;
 import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
@@ -42,6 +43,7 @@ import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionMana
 import rubenkarim.com.masterthesisapp.Models.ThermalImgModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.Animation;
+import rubenkarim.com.masterthesisapp.Utilities.FrameCounter;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 import rubenkarim.com.masterthesisapp.Utilities.MinMaxDTO;
@@ -63,6 +65,7 @@ public class CameraActivity extends AppCompatActivity {
     private BatteryMeterView batteryMeterView_BatteryIndicator;
     private Button button_BackToMainActivity;
     private Button button_TakePicture;
+    private TextView FPScounter;
     //endregion
 
     @Override
@@ -77,7 +80,7 @@ public class CameraActivity extends AppCompatActivity {
         batteryMeterView_BatteryIndicator = findViewById(R.id.batteryMeterView_BatteryIndicator);
         button_BackToMainActivity = findViewById(R.id.button_Back);
         button_TakePicture = findViewById(R.id.button_TakePicture);
-
+        FPScounter = findViewById(R.id.textView_frameCounter);
         if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
             relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
             imageView_faceTemplate.setVisibility(View.INVISIBLE);
@@ -140,20 +143,20 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void setupFlirCamera() {
-        //Logging.info(this, TAG, "Starting Camera");
         this.mIThermalCamera = new FlirOneManager(getApplicationContext());
-        //Logging.info(this, TAG, "subscribing thermalImg");
+        FrameCounter frameCounter = new FrameCounter();
         this.mIThermalCamera.initCameraSearchAndSub((thermalImage) -> {
             //The image must not be processed on the UI Thread
+            frameCounter.tick();
+            String fps = Integer.toString(frameCounter.getFPS());
             final Bitmap thermalimage = thermalImage.getThermalImage();
-
             runOnUiThread(() -> {
+                FPScounter.setText(fps);
                 imageView_cameraPreviewContainer.setImageBitmap(thermalimage);
             });
 
             if (!isCalibrated) {
                 isCalibrated = true;
-                //Logging.info(this, TAG, "trying to calibrate");
                 try {
                     this.mIThermalCamera.calibrateCamera();
                 } catch (NullPointerException e) {
@@ -163,7 +166,6 @@ public class CameraActivity extends AppCompatActivity {
             }
         });
 
-        //Logging.info(this, TAG, "subscribing batteryInfoListener");
         mIThermalCamera.subscribeToBatteryInfo(new BatteryInfoListener() {
             @Override
             public void batteryPercentageUpdate(int percentage) {
@@ -188,7 +190,6 @@ public class CameraActivity extends AppCompatActivity {
             }
         });
 
-        //Logging.info(this, TAG, "subscribing StatusListener");
         mIThermalCamera.subscribeToConnectionStatus(new StatusListener() {
             @Override
             public void onDisconnected(ErrorCode errorCode) {
