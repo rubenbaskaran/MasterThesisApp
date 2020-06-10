@@ -15,13 +15,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TabHost;
 
 import com.flir.thermalsdk.ErrorCode;
 import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.ThermalImageFile;
-import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.flir.thermalsdk.live.Identity;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -36,6 +34,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import eo.view.batterymeter.BatteryMeterView;
 import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.BatteryInfoListener;
 import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalCamera;
+import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalImage;
 import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.StatusListener;
 import rubenkarim.com.masterthesisapp.Managers.FlirOneManager.FlirOneManager;
 import rubenkarim.com.masterthesisapp.Managers.PermissionsManager.PermissionListener;
@@ -44,7 +43,6 @@ import rubenkarim.com.masterthesisapp.Models.ThermalImgModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
-import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
 import rubenkarim.com.masterthesisapp.Utilities.MinMaxDTO;
 
@@ -128,10 +126,10 @@ public class CameraActivity extends AppCompatActivity {
             Animation.showLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
             setupFlirCamera();
         } else {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.putExtra("CameraNotFound", true);
-            startActivity(intent);
-            //setupDefaultImage();
+//            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//            intent.putExtra("CameraNotFound", true);
+//            startActivity(intent);
+            setupDefaultImage();
 
         }
     }
@@ -255,8 +253,7 @@ public class CameraActivity extends AppCompatActivity {
         try {
             mIThermalCamera = new FlirOneManager(getApplicationContext());
             String defaultImageName = "Thermal_Test_img.jpg";
-            ThermalImageFile thermalImageFile = (ThermalImageFile) ImageFactory.createImage(getAssets().open(defaultImageName));
-            thermalImageFile.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+            IThermalImage thermalImage = new ThermalImgModel ((ThermalImageFile) ImageFactory.createImage(getAssets().open(defaultImageName)));
             File folder = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + File.separator + "Masterthesisimages");
             boolean success = true;
             if (!folder.exists()) {
@@ -265,8 +262,8 @@ public class CameraActivity extends AppCompatActivity {
             if (success) {
                 Logging.info(this, TAG, "folder created");
                 mThermalImagePath = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getPath() + "/Masterthesisimages/" + defaultImageName;
-                thermalImageFile.saveAs(mThermalImagePath);
-                imageView_cameraPreviewContainer.setImageBitmap(ImageProcessing.getBitmap(thermalImageFile));
+                thermalImage.save(mThermalImagePath);
+                imageView_cameraPreviewContainer.setImageBitmap(thermalImage.getThermalImage());
                 useDefaultImage = true;
             } else {
                 throw new IOException("Save Folder cannot be created");

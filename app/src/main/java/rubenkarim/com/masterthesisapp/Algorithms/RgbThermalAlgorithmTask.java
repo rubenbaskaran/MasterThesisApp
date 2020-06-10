@@ -2,8 +2,6 @@ package rubenkarim.com.masterthesisapp.Algorithms;
 
 import android.graphics.Bitmap;
 
-import com.flir.thermalsdk.image.ThermalImageFile;
-import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.ml.vision.FirebaseVision;

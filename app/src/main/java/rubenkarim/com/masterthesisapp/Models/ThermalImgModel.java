@@ -14,11 +14,10 @@ import com.flir.thermalsdk.image.palettes.PaletteManager;
 import java.io.IOException;
 
 import rubenkarim.com.masterthesisapp.Interfaces.ThemalCamera.IThermalImage;
-import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 
 public class ThermalImgModel implements IThermalImage {
 
-    private ThermalImage thermalImage;
+    private ThermalImage flirThermalImage;
 
 
     public enum Palette {
@@ -45,36 +44,40 @@ public class ThermalImgModel implements IThermalImage {
 
     }
 
+    private void setFlirThermalImage(ThermalImage thermalImage){
+        this.flirThermalImage = thermalImage;
+        flirThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+        flirThermalImage.setPalette(PaletteManager.getDefaultPalettes().get(Palette.WHITEHOT.index)); //default
+    }
+
     public ThermalImgModel(ThermalImageFile thermalImageFile) {
-        this.thermalImage = (ThermalImage) thermalImageFile;
-        thermalImage.setPalette(PaletteManager.getDefaultPalettes().get(Palette.IRON.index)); //default
+        setFlirThermalImage(thermalImageFile);
     }
 
     public ThermalImgModel(ThermalImage thermalImage) {
-        this.thermalImage = thermalImage;
+        setFlirThermalImage(thermalImage);
     }
 
     public Bitmap getThermalImage() {
-        JavaImageBuffer javaImageBuffer = thermalImage.getImage();
-        thermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+        JavaImageBuffer javaImageBuffer = flirThermalImage.getImage();
         return BitmapAndroid.createBitmap(javaImageBuffer).getBitMap();
     }
 
     public void save(String path) throws IOException {
-        thermalImage.saveAs(path);
+        flirThermalImage.saveAs(path);
     }
 
     public Bitmap getThermalImgWithPalette(Palette palette) {
-        thermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
-        thermalImage.setPalette(PaletteManager.getDefaultPalettes().get(palette.index));
-        Bitmap paletteThermalImage = getBitmap(thermalImage);
-        thermalImage.setPalette(PaletteManager.getDefaultPalettes().get(Palette.IRON.index)); //default
+        flirThermalImage.setPalette(PaletteManager.getDefaultPalettes().get(palette.index));
+        flirThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+        Bitmap paletteThermalImage = getBitmap(flirThermalImage);
+        flirThermalImage.setPalette(PaletteManager.getDefaultPalettes().get(Palette.WHITEHOT.index)); //default
         return paletteThermalImage;
     }
 
     public double getTemperatureAtPoint(int x, int y) {
-        thermalImage.setTemperatureUnit(TemperatureUnit.CELSIUS);
-        return thermalImage.getValueAt(new Point(x, y));
+        flirThermalImage.setTemperatureUnit(TemperatureUnit.CELSIUS);
+        return flirThermalImage.getValueAt(new Point(x, y));
     }
 
     private Bitmap getBitmap(ThermalImage thermalImage) {
@@ -83,16 +86,18 @@ public class ThermalImgModel implements IThermalImage {
     }
 
     public Bitmap getVisualImage() {
-        thermalImage.getFusion().setFusionMode(FusionMode.VISUAL_ONLY);
-        return getBitmap(thermalImage);
+        flirThermalImage.getFusion().setFusionMode(FusionMode.VISUAL_ONLY);
+        Bitmap visualImage = getBitmap(flirThermalImage);
+        flirThermalImage.getFusion().setFusionMode(FusionMode.THERMAL_ONLY);
+        return visualImage;
     }
 
     public int getThermalImgWidth(){
-        return thermalImage.getWidth();
+        return flirThermalImage.getWidth();
     }
 
     public int getThermalImgHeight(){
-        return thermalImage.getHeight();
+        return flirThermalImage.getHeight();
     }
 
 }
