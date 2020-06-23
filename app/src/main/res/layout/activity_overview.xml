@@ -55,25 +55,25 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="0dp"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:background="#2C5350"
             android:gravity="center"
             android:maxLength="7"
             android:text="Gradient"
             android:textColor="#FFFFFF" />
 
-<!--        <TextView-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_marginStart="2dp"-->
-<!--            android:layout_marginTop="5dp"-->
-<!--            android:layout_marginEnd="5dp"-->
-<!--            android:layout_marginBottom="0dp"-->
-<!--            android:layout_weight="1"-->
-<!--            android:background="#2C5350"-->
-<!--            android:gravity="center"-->
-<!--            android:text="Health rating"-->
-<!--            android:textColor="#FFFFFF" />-->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="0dp"
+            android:layout_weight="1"
+            android:background="#2C5350"
+            android:gravity="center"
+            android:text="Health rating"
+            android:textColor="#FFFFFF" />
     </LinearLayout>
 
     <LinearLayout

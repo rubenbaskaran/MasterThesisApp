@@ -11,12 +11,12 @@ import java.nio.channels.FileChannel;
 public class NeuralNetworkLoader {
 
     public static MappedByteBuffer loadCnnTransferLearning(Context context) throws IOException {
-        String cnnTransferLearningModelFile = "RGB_InceptionV3.tflite";
+        String cnnTransferLearningModelFile = "InceptionV3.tflite";
         return loadNNModelFile(context, cnnTransferLearningModelFile);
     }
 
     public static MappedByteBuffer loadCnn(Context context) throws IOException {
-        String cnnModelFile = "SmallEncoderDecoder.tflite";
+        String cnnModelFile = "CNNv25_Marcin_Dropout04.tflite";
         return loadNNModelFile(context, cnnModelFile);
     }
 
