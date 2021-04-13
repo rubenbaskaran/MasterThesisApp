@@ -20,6 +20,8 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 
+// TODO: Remove this algorithm
+
 public class CnnAlgorithmTask extends AbstractAlgorithmTask {
 
     private final Interpreter mTflite;

@@ -12,6 +12,8 @@ import java.util.Comparator;
 import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
+// TODO: Remove this algorithm
+
 public class MinMaxAlgorithmTask extends AbstractAlgorithmTask {
 
     //region Properties
