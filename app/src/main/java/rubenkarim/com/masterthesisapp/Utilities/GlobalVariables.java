@@ -6,10 +6,7 @@ public class GlobalVariables
 
     public enum Algorithms
     {
-        CNN,
-        CNNWithTransferLearning,
         RgbThermalMapping,
-        MinMaxTemplate
     }
 
     public static Algorithms getCurrentAlgorithm()

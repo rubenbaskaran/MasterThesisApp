@@ -15,14 +15,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TabHost;
 
 import com.flir.thermalsdk.ErrorCode;
 import com.flir.thermalsdk.androidsdk.image.BitmapAndroid;
 import com.flir.thermalsdk.androidsdk.live.connectivity.UsbPermissionHandler;
 import com.flir.thermalsdk.image.ImageFactory;
 import com.flir.thermalsdk.image.JavaImageBuffer;
-import com.flir.thermalsdk.image.ThermalImage;
 import com.flir.thermalsdk.image.ThermalImageFile;
 import com.flir.thermalsdk.image.fusion.FusionMode;
 import com.flir.thermalsdk.live.Identity;
@@ -48,7 +46,6 @@ import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
-import rubenkarim.com.masterthesisapp.Utilities.MinMaxDTO;
 
 public class CameraActivity extends AppCompatActivity {
 
@@ -61,7 +58,6 @@ public class CameraActivity extends AppCompatActivity {
     private String mThermalImagePath;
     private ImageView imageView_cameraPreviewContainer;
     private ImageView imageView_faceTemplate;
-    private RelativeLayout relativeLayout_eyeNoseTemplate;
     private ProgressBar progressBar_loadingAnimation;
     private boolean isCalibrated = false;
     private BatteryMeterView batteryMeterView_BatteryIndicator;
@@ -74,7 +70,6 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         mRootView = findViewById(R.id.linearLayout_CameraActivity);
-        relativeLayout_eyeNoseTemplate = findViewById(R.id.relativeLayout_eyeNoseTemplate);
         imageView_faceTemplate = findViewById(R.id.imageView_faceTemplate);
         progressBar_loadingAnimation = findViewById(R.id.progressBar_cameraViewLoadingAnimation);
         imageView_cameraPreviewContainer = findViewById(R.id.imageView_cameraPreviewContainer);
@@ -82,10 +77,6 @@ public class CameraActivity extends AppCompatActivity {
         button_BackToMainActivity = findViewById(R.id.button_Back);
         button_TakePicture = findViewById(R.id.button_TakePicture);
 
-        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
-            relativeLayout_eyeNoseTemplate.setVisibility(View.VISIBLE);
-            imageView_faceTemplate.setVisibility(View.INVISIBLE);
-        }
         enableButtons(false);
         checkPermissions(getListOfUsbDevices());
     }
@@ -127,7 +118,7 @@ public class CameraActivity extends AppCompatActivity {
     private void startCameraPreview(HashMap<String, UsbDevice> deviceList) {
         if (!deviceList.isEmpty()) {
             Snackbar.make(mRootView, "FLIR camera detected. Trying to connect", Snackbar.LENGTH_INDEFINITE).show();
-            Animation.showLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
+            Animation.showLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate);
             setupFlirCamera();
         } else {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -230,7 +221,7 @@ public class CameraActivity extends AppCompatActivity {
                     if (isCalibrating) {
                         Snackbar.make(mRootView, "Hold on, camera is calibrating", Snackbar.LENGTH_INDEFINITE).show();
                     } else {
-                        Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
+                        Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate);
                         enableButtons(true);
                         Snackbar.make(mRootView, "Camera is ready", Snackbar.LENGTH_SHORT).show();
                     }
@@ -290,7 +281,7 @@ public class CameraActivity extends AppCompatActivity {
             Snackbar.make(mRootView, "Error - Algorithm not selected", Snackbar.LENGTH_SHORT).show();
             return;
         }
-        Animation.showLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
+        Animation.showLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate);
         saveThermalImage();
     }
 
@@ -314,7 +305,7 @@ public class CameraActivity extends AppCompatActivity {
                     }
                 } else {
                     Logging.error(this, "saveThermalImage", new Exception("ERROR! IMAGE DIR NOT CREATED"));
-                    Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate, relativeLayout_eyeNoseTemplate);
+                    Animation.hideLoadingAnimation(progressBar_loadingAnimation, imageView_faceTemplate);
                 }
                 mIThermalCamera.unSubscribeThermalImages();
             });
@@ -336,23 +327,8 @@ public class CameraActivity extends AppCompatActivity {
         intent.putExtra("imageWidth", imageWidth);
         intent.putExtra("screenHeight", mRootView.getHeight());
         intent.putExtra("screenWidth", mRootView.getWidth());
-        addMinMaxDataIfChosen(intent);
 
         startActivity(intent);
-    }
-
-    private void addMinMaxDataIfChosen(Intent intent) {
-        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
-            MinMaxDTO minMaxDTO = new MinMaxDTO(
-                    findViewById(R.id.imageView_leftEye),
-                    findViewById(R.id.imageView_RightEye),
-                    findViewById(R.id.imageView_Nose),
-                    findViewById(R.id.imageView_cameraPreviewContainer));
-
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("minMaxData", minMaxDTO);
-            intent.putExtras(bundle);
-        }
     }
 
     public void backOnClick(View view) {

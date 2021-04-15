@@ -6,38 +6,26 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 public class Animation {
-    public static void showLoadingAnimation(ProgressBar progressBar_loadingAnimation, ImageView faceTemplate, RelativeLayout eyeNoseTemplate) {
+    public static void showLoadingAnimation(ProgressBar progressBar_loadingAnimation, ImageView faceTemplate) {
         if (progressBar_loadingAnimation != null && progressBar_loadingAnimation.getVisibility() == View.INVISIBLE) {
             progressBar_loadingAnimation.setVisibility(View.VISIBLE);
         }
 
-        if (faceTemplate != null && GlobalVariables.getCurrentAlgorithm() != GlobalVariables.Algorithms.MinMaxTemplate) {
+        if (faceTemplate != null) {
             if (faceTemplate.getVisibility() == View.VISIBLE) {
                 faceTemplate.setVisibility(View.INVISIBLE);
             }
         }
-
-        if (eyeNoseTemplate != null && GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
-            if (eyeNoseTemplate.getVisibility() == View.VISIBLE) {
-                eyeNoseTemplate.setVisibility(View.INVISIBLE);
-            }
-        }
     }
 
-    public static void hideLoadingAnimation(ProgressBar progressBar_loadingAnimation, ImageView faceTemplate, RelativeLayout eyeNoseTemplate) {
+    public static void hideLoadingAnimation(ProgressBar progressBar_loadingAnimation, ImageView faceTemplate) {
         if (progressBar_loadingAnimation != null && progressBar_loadingAnimation.getVisibility() == View.VISIBLE) {
             progressBar_loadingAnimation.setVisibility(View.INVISIBLE);
         }
 
-        if (faceTemplate != null && GlobalVariables.getCurrentAlgorithm() != GlobalVariables.Algorithms.MinMaxTemplate) {
+        if (faceTemplate != null) {
             if (faceTemplate.getVisibility() == View.INVISIBLE) {
                 faceTemplate.setVisibility(View.VISIBLE);
-            }
-        }
-
-        if (eyeNoseTemplate != null && GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
-            if (eyeNoseTemplate.getVisibility() == View.INVISIBLE) {
-                eyeNoseTemplate.setVisibility(View.VISIBLE);
             }
         }
     }

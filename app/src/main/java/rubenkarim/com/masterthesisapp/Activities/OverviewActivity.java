@@ -25,7 +25,6 @@ import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
-import rubenkarim.com.masterthesisapp.Utilities.MinMaxDTO;
 
 public class OverviewActivity extends AppCompatActivity {
 
@@ -37,7 +36,6 @@ public class OverviewActivity extends AppCompatActivity {
     private int imageWidth;
     private String mThermalImagePath;
     private GradientModel mGradientModel;
-    private MinMaxDTO minMaxData;
     private int imageViewVerticalOffset;
     private View mRootView;
     private ProgressBar progressBar_overviewProgressbar;
@@ -71,7 +69,6 @@ public class OverviewActivity extends AppCompatActivity {
         if (bundle != null) {
             mGradientModel = (GradientModel) bundle.getSerializable("gradientAndPositions");
             ((TextView) findViewById(R.id.textView_gradient)).setText(String.valueOf(mGradientModel.getGradient()));
-            minMaxData = (MinMaxDTO) bundle.getSerializable("minMaxData");
         }
 
         try {
@@ -112,15 +109,8 @@ public class OverviewActivity extends AppCompatActivity {
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         Bundle bundle = new Bundle();
         bundle.putSerializable("gradientAndPositions", mGradientModel);
-        addMinMaxDataIfChosen(bundle);
         intent.putExtras(bundle);
         startActivity(intent);
-    }
-
-    private void addMinMaxDataIfChosen(Bundle bundle) {
-        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
-            bundle.putSerializable("minMaxData", minMaxData);
-        }
     }
 
     public void saveOnClick(View view) {
@@ -135,7 +125,7 @@ public class OverviewActivity extends AppCompatActivity {
         String filename = filepathSplitted[filepathSplitted.length-1];
 
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            runOnUiThread(() -> Animation.showLoadingAnimation(progressBar_overviewProgressbar, null, null));
+            runOnUiThread(() -> Animation.showLoadingAnimation(progressBar_overviewProgressbar, null));
 
             Observation observation = new Observation();
             observation.cprnumber = cprNumber;
@@ -155,7 +145,7 @@ public class OverviewActivity extends AppCompatActivity {
             AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
             db.observationDao().insertObservation(observation);
 
-            runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_overviewProgressbar, null, null));
+            runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_overviewProgressbar, null));
 
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);

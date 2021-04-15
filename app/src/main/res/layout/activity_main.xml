@@ -24,7 +24,7 @@
         style="@style/MenuButtonStyle"
         android:background="@drawable/button_background"
         android:onClick="chooseAlgorithmOnClick"
-        android:tag="2"
+        android:tag="0"
         android:text="RGB-Thermal Mapping"
         android:layout_height="0dp"
         android:layout_weight="1"/>

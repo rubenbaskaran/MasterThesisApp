@@ -1,1 +1,0 @@
-Put '.tflite' model file in here

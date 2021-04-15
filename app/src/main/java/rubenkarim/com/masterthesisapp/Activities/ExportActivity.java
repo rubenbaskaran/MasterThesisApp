@@ -44,13 +44,13 @@ public class ExportActivity extends AppCompatActivity {
 
     public void createCsvOnClick(View view) {
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            runOnUiThread(() -> Animation.showLoadingAnimation(progressBar_exportProgressbar, null, null));
+            runOnUiThread(() -> Animation.showLoadingAnimation(progressBar_exportProgressbar, null));
 
             AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
             List<Observation> observations = db.observationDao().getAllObservations();
 
             if (observations.isEmpty()) {
-                runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null, null));
+                runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null));
                 Snackbar.make(linearLayout_RootView, "Database is empty", Snackbar.LENGTH_SHORT).show();
                 return;
             }
@@ -102,18 +102,18 @@ public class ExportActivity extends AppCompatActivity {
                     fileWriter.close();
                 }
                 catch (IOException e) {
-                    runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null, null));
+                    runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null));
                     Snackbar.make(linearLayout_RootView, "Couldn't write to csv file", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
             }
             else {
-                runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null, null));
+                runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null));
                 Snackbar.make(linearLayout_RootView, "Couldn't create export directory", Snackbar.LENGTH_SHORT).show();
                 return;
             }
 
-            runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null, null));
+            runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null));
             Snackbar.make(linearLayout_RootView, "CSV file created successfully", Snackbar.LENGTH_SHORT).show();
         });
     }
@@ -158,24 +158,24 @@ public class ExportActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         AppDatabase.databaseWriteExecutor.execute(() -> {
-                            runOnUiThread(() -> Animation.showLoadingAnimation(progressBar_exportProgressbar, null, null));
+                            runOnUiThread(() -> Animation.showLoadingAnimation(progressBar_exportProgressbar, null));
 
                             AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
                             int numberOfObservations = db.observationDao().getAllObservations().size();
 
                             if (numberOfObservations == 0) {
-                                runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null, null));
+                                runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null));
                                 Snackbar.make(linearLayout_RootView, "Database is already empty", Snackbar.LENGTH_SHORT).show();
                             }
                             else {
                                 db.observationDao().deleteAllObservations();
 
                                 if (db.observationDao().getAllObservations().isEmpty()) {
-                                    runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null, null));
+                                    runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null));
                                     Snackbar.make(linearLayout_RootView, "Removed: " + numberOfObservations + " observation(s)", Snackbar.LENGTH_LONG).show();
                                 }
                                 else {
-                                    runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null, null));
+                                    runOnUiThread(() -> Animation.hideLoadingAnimation(progressBar_exportProgressbar, null));
                                     Snackbar.make(linearLayout_RootView, "Couldn't clear database", Snackbar.LENGTH_LONG).show();
                                 }
                             }

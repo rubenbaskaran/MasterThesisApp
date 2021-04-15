@@ -25,18 +25,13 @@ import java.io.IOException;
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.Algorithms.AbstractAlgorithmTask;
 import rubenkarim.com.masterthesisapp.Algorithms.AlgorithmResultListener;
-import rubenkarim.com.masterthesisapp.Algorithms.CnnAlgorithmTask;
-import rubenkarim.com.masterthesisapp.Algorithms.MinMaxAlgorithmTask;
 import rubenkarim.com.masterthesisapp.Algorithms.RgbThermalAlgorithmTask;
 import rubenkarim.com.masterthesisapp.Models.GradientModel;
-import rubenkarim.com.masterthesisapp.Models.RoiModel;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.Animation;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
 import rubenkarim.com.masterthesisapp.Utilities.ImageProcessing;
 import rubenkarim.com.masterthesisapp.Utilities.Logging;
-import rubenkarim.com.masterthesisapp.Utilities.MinMaxDTO;
-import rubenkarim.com.masterthesisapp.Utilities.NeuralNetworkLoader;
 import rubenkarim.com.masterthesisapp.Utilities.NoFaceDetectedException;
 import rubenkarim.com.masterthesisapp.Utilities.Scaling;
 
@@ -52,7 +47,6 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
     private GradientModel mGradientAndPositions = null;
     private ThermalImageFile mThermalImage;
     private ProgressBar progressBar_markerViewLoadingAnimation;
-    private MinMaxDTO minMaxData;
     private int[] capturedImageDimensions;
     private int[] imageContainerDimensions;
     private int adjustedNosePositionX;
@@ -82,7 +76,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
 
         button_Back.setEnabled(false);
         button_Submit.setEnabled(false);
-        Animation.showLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
+        Animation.showLoadingAnimation(progressBar_markerViewLoadingAnimation, null);
 
         Intent receivedIntent = getIntent();
         if (receivedIntent.hasExtra("thermalImagePath")) {
@@ -113,7 +107,6 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
 
         Bundle bundle = receivedIntent.getExtras();
         if (bundle != null) {
-            minMaxData = (MinMaxDTO) bundle.getSerializable("minMaxData");
             mGradientAndPositions = (GradientModel) bundle.getSerializable("gradientAndPositions");
         }
         if (mThermalImage != null) {
@@ -125,53 +118,15 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         } else {
             Snackbar.make(mRootView, R.string.errorThermal_Img, Snackbar.LENGTH_INDEFINITE).show();
         }
-
     }
 
     private void executeAlgorithm() {
         switch (GlobalVariables.getCurrentAlgorithm()) {
-            case CNN:
-                new Thread(() -> {
-                    try {
-                        AbstractAlgorithmTask cnn = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnn(this), mThermalImage, true);
-                        cnn.getGradientAndPositions(this);
-                    } catch (IOException e) {
-                        Logging.error(this, "ExecuteAlgorithm(), CNN", e);
-                        Snackbar.make(mRootView, R.string.errorAlgorithm, Snackbar.LENGTH_LONG).show();
-                    }
-                }).start();
-                break;
-
-            case CNNWithTransferLearning:
-                new Thread(() -> {
-                    try {
-                        AbstractAlgorithmTask cnnTransferLearning = new CnnAlgorithmTask(NeuralNetworkLoader.loadCnnTransferLearning(this), mThermalImage, false);
-                        cnnTransferLearning.getGradientAndPositions(this);
-                    } catch (IOException e) {
-                        Logging.error(this, "ExecuteAlgorithm(), CNNWithTransferLearning", e);
-                        Snackbar.make(mRootView, R.string.errorAlgorithm, Snackbar.LENGTH_LONG).show();
-                    }
-                }).start();
-                break;
-
             case RgbThermalMapping:
                 new Thread(() -> {
                     Logging.info(this, TAG, "starting RGB");
                     AbstractAlgorithmTask rgbThermalAlgorithm = new RgbThermalAlgorithmTask(mThermalImage, screenWidth, screenHeight);
                     rgbThermalAlgorithm.getGradientAndPositions(this);
-                }).start();
-                break;
-
-            case MinMaxTemplate:
-                new Thread(() -> {
-                    AbstractAlgorithmTask minMaxAlgorithm = new MinMaxAlgorithmTask(
-                            mThermalImage,
-                            new RoiModel(minMaxData.getLeftEyeLocation(), minMaxData.getLeftEyeWidth(), minMaxData.getLeftEyeHeight()),
-                            new RoiModel(minMaxData.getRightEyeLocation(), minMaxData.getRightEyeWidth(), minMaxData.getRightEyeHeight()),
-                            new RoiModel(minMaxData.getNoseLocation(), minMaxData.getNoseWidth(), minMaxData.getNoseHeight()),
-                            new RoiModel(minMaxData.getCameraPreviewContainerLocation(), minMaxData.getCameraPreviewContainerWidth(), minMaxData.getCameraPreviewContainerHeight())
-                    );
-                    minMaxAlgorithm.getGradientAndPositions(this);
                 }).start();
                 break;
         }
@@ -206,7 +161,7 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         capturedImageDimensions = new int[]{thermalImgBitmap.getWidth(), thermalImgBitmap.getHeight()};
         imageContainerDimensions = new int[]{imageWidth, imageHeight};
         addMarkers(capturedImageDimensions, imageContainerDimensions);
-        Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null, null);
+        Animation.hideLoadingAnimation(progressBar_markerViewLoadingAnimation, null);
         button_Submit.setEnabled(true);
         button_Back.setEnabled(true);
     }
@@ -309,12 +264,6 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         mGradientAndPositions.setGradient(Math.abs(eye - nose));
     }
 
-    private void addMinMaxDataIfChosen(Bundle bundle) {
-        if (GlobalVariables.getCurrentAlgorithm() == GlobalVariables.Algorithms.MinMaxTemplate) {
-            bundle.putSerializable("minMaxData", minMaxData);
-        }
-    }
-
     //region Navigation buttons
     public void backOnClick(View view) {
         Intent intent = new Intent(getApplicationContext(), CameraActivity.class);
@@ -342,7 +291,6 @@ public class MarkerActivity extends AppCompatActivity implements AlgorithmResult
         intent.putExtra("imageViewVerticalOffset", imageViewVerticalOffset);
         Bundle bundle = new Bundle();
         bundle.putSerializable("gradientAndPositions", mGradientAndPositions);
-        addMinMaxDataIfChosen(bundle);
         intent.putExtras(bundle);
         startActivity(intent);
     }
