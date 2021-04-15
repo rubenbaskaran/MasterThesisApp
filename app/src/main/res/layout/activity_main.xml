@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:weightSum="7"
+    android:weightSum="6"
     tools:context=".Activities.MainActivity"
     android:id="@+id/linearLayout_MainActivity">
 
@@ -15,23 +15,9 @@
 
     <TextView
         style="@style/textViewRoleStyle"
-        android:text="User"/>
-
-    <Button
-        android:id="@+id/button_cnn"
-        style="@style/MenuButtonStyle"
-        android:background="@drawable/button_background"
-        android:onClick="chooseAlgorithmOnClick"
-        android:tag="0"
-        android:text="CNN"/>
-
-    <Button
-        android:id="@+id/button_cnnWithTransferLearning"
-        style="@style/MenuButtonStyle"
-        android:background="@drawable/button_background"
-        android:onClick="chooseAlgorithmOnClick"
-        android:tag="1"
-        android:text="CNN with transfer learning"/>
+        android:text="User"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
     <Button
         android:id="@+id/button_rgbThermalMapping"
@@ -39,39 +25,28 @@
         android:background="@drawable/button_background"
         android:onClick="chooseAlgorithmOnClick"
         android:tag="2"
-        android:text="RGB-Thermal Mapping" />
-
-    <Button
-        android:id="@+id/button_maxMinTemplate"
-        style="@style/MenuButtonStyle"
-        android:background="@drawable/button_background"
-        android:onClick="chooseAlgorithmOnClick"
-        android:tag="3"
-        android:text="Max-Min Template"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#000000"
-        android:layout_marginTop="2.5dp"
-        android:layout_marginBottom="2.5dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"/>
+        android:text="RGB-Thermal Mapping"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
     <TextView
         style="@style/textViewRoleStyle"
-        android:text="Admin"/>
+        android:text="Admin"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
     <Button
         android:id="@+id/button_exportData"
         style="@style/MenuButtonStyle"
         android:background="@drawable/export_button_background"
         android:onClick="exportDataOnClick"
-        android:text="Export Data"/>
+        android:text="Export Data"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.5" />
+        android:layout_weight="1.5" />
 
 </LinearLayout>
