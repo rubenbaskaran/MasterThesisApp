@@ -11,6 +11,7 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
+import rubenkarim.com.masterthesisapp.Utilities.SharepointUpload;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -20,12 +21,27 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout linearLayout = findViewById(R.id.linearLayout_MainActivity);
         Intent receivedIntent = getIntent();
-        if (receivedIntent.getBooleanExtra("CameraNotFound", false)){
+        if (receivedIntent.getBooleanExtra("CameraNotFound", false)) {
             Snackbar.make(linearLayout, "Connect FLIR camera and try again", Snackbar.LENGTH_SHORT).show();
         }
     }
 
     public void chooseAlgorithmOnClick(View view) {
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    SharepointUpload.UploadToSharepoint();
+                }
+                catch (Exception e) {
+                    Log.e("UploadToSharepoint error", e.toString());
+                }
+            }
+        });
+
+        thread.start();
+
         int idOfChosenAlgorithm = Integer.parseInt(String.valueOf(view.getTag()));
         GlobalVariables.Algorithms chosenAlgorithm = GlobalVariables.Algorithms.values()[idOfChosenAlgorithm];
         GlobalVariables.setCurrentAlgorithm(chosenAlgorithm);
