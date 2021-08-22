@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    SharepointUpload.UploadToSharepoint();
+                    SharepointUpload.UploadToSharepoint(view.getContext());
                 }
                 catch (Exception e) {
                     Log.e("UploadToSharepoint error", e.toString());
