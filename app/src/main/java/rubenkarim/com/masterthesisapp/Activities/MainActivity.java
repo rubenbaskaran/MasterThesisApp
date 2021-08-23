@@ -11,7 +11,6 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import rubenkarim.com.masterthesisapp.R;
 import rubenkarim.com.masterthesisapp.Utilities.GlobalVariables;
-import rubenkarim.com.masterthesisapp.Utilities.SharepointUpload;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -27,21 +26,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void chooseAlgorithmOnClick(View view) {
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    SharepointUpload.UploadToSharepoint(view.getContext());
-                }
-                catch (Exception e) {
-                    Log.e("UploadToSharepoint error", e.toString());
-                }
-            }
-        });
-
-        thread.start();
-
         int idOfChosenAlgorithm = Integer.parseInt(String.valueOf(view.getTag()));
         GlobalVariables.Algorithms chosenAlgorithm = GlobalVariables.Algorithms.values()[idOfChosenAlgorithm];
         GlobalVariables.setCurrentAlgorithm(chosenAlgorithm);
